@@ -1175,7 +1175,7 @@ export default function InboxSignalApp({
                 {remaining}/{limit} left today
               </span>
               {/* UserButton renders nothing on server, mounts on client — safe with suppressHydrationWarning on body */}
-              <UserButton afterSignOutUrl="/" />
+              <UserButton />
             </div>
             <div className="header-tagline" style={{ fontSize: 10, fontFamily: "'DM Mono', monospace", color: "#1E293B", letterSpacing: "0.07em" }}>
               cold email intelligence
