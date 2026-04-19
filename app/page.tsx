@@ -85,8 +85,8 @@ export default async function Page() {
             SignUp — the afterSignIn/afterSignUp redirects go back to /  */}
         <SignIn
           routing="hash"
-          afterSignInUrl="/"
-          afterSignUpUrl="/"
+          forceRedirectUrl="/"
+          fallbackRedirectUrl="/"
           appearance={{
             variables: {
               colorBackground: "#0D1117",
