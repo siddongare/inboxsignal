@@ -206,14 +206,12 @@ function HeroScore({ signals }: { signals: Signals }) {
     }}>
       <div style={{ position: "absolute", top: -30, right: -30, width: 120, height: 120, borderRadius: "50%", background: `radial-gradient(circle, ${c}08 0%, transparent 70%)`, pointerEvents: "none" }} />
 
-      {/* Score + verdict: always flex row */}
       <div style={{ display: "flex", alignItems: "center", gap: 18, marginBottom: 18 }}>
         <div style={{ flexShrink: 0, textAlign: "center", minWidth: 72 }}>
           <div style={{
             fontSize: "clamp(44px, 11vw, 60px)", fontWeight: 900, color: c,
             lineHeight: 1, letterSpacing: "-0.06em",
             fontFamily: "'Geist Mono', 'DM Mono', monospace",
-            textShadow: `0 0 30px ${c}40`,
           }}>{avg}</div>
           <div style={{ fontSize: 9, color: "#1E293B", fontFamily: "'Geist Mono', 'DM Mono', monospace", marginTop: 2, letterSpacing: "0.08em" }}>/ 100</div>
         </div>
@@ -233,7 +231,6 @@ function HeroScore({ signals }: { signals: Signals }) {
         </div>
       </div>
 
-      {/* Spark bars — 2-col grid on mobile */}
       <div className="spark-grid">
         {sparkBars.map(({ label, value }) => {
           const sc = scoreColor(value);
@@ -300,7 +297,6 @@ function DiagnosisCard({ item, index }: { item: DiagnosisItem; index: number }) 
     >
       <div style={{ position: "absolute", top: 0, right: 0, width: 80, height: 80, background: `radial-gradient(circle at 80% 0%, ${cfg.cardAccent}06 0%, transparent 70%)`, pointerEvents: "none" }} />
 
-      {/* Header: index badge + title + severity badge */}
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 10, marginBottom: 14 }}>
         <div style={{ display: "flex", alignItems: "flex-start", gap: 10, flex: 1, minWidth: 0 }}>
           <div style={{
@@ -482,7 +478,7 @@ function MetricBar({ label, score, id }: { label: string; score: number; id: str
       <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 8 }}>
         <span style={{ fontSize: 12, color: "#64748B", fontFamily: "'Geist Mono', 'DM Mono', monospace", letterSpacing: "0.04em" }}>{label}</span>
         <div style={{ display: "flex", alignItems: "baseline", gap: 4, flexShrink: 0 }}>
-          <span style={{ fontSize: 18, fontWeight: 800, color: c, letterSpacing: "-0.02em", lineHeight: 1, fontFamily: "'Geist Mono', 'DM Mono', monospace", textShadow: `0 0 16px ${c}50` }}>{score}</span>
+          <span style={{ fontSize: 18, fontWeight: 800, color: c, letterSpacing: "-0.02em", lineHeight: 1, fontFamily: "'Geist Mono', 'DM Mono', monospace" }}>{score}</span>
           <span style={{ fontSize: 10, color: "#1E293B", fontFamily: "'Geist Mono', 'DM Mono', monospace" }}>/100</span>
           <span style={{ fontSize: 9, color: c, letterSpacing: "0.07em", marginLeft: 2, fontFamily: "'Geist Mono', 'DM Mono', monospace" }}>{scoreLabel(score)}</span>
         </div>
@@ -498,7 +494,7 @@ function MetricBar({ label, score, id }: { label: string; score: number; id: str
   );
 }
 
-// ─── Breakdown row — stacks on mobile ────────────────────────────────────────
+// ─── Breakdown row ────────────────────────────────────────────────────────────
 
 function BreakdownRow({ label, body }: { label: string; body: string }) {
   return (
@@ -612,7 +608,6 @@ function StickyNav({ containerRef }: { containerRef: React.RefObject<HTMLDivElem
   const [showTop, setShowTop] = useState(false);
 
   useEffect(() => {
-    // On mobile, the scroll container is the window, not a panel div
     const isMobile = window.innerWidth < 1024;
     const container = isMobile ? null : containerRef.current;
 
@@ -814,11 +809,41 @@ export default function InboxSignalApp({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, prospect }),
       });
-      const data: AuditApiResponse = await res.json();
+
+      // Safe parsing: never call res.json() directly.
+      // If the server returns an HTML error page (e.g. a cold-start 500,
+      // a Vercel edge error, or an auth redirect) res.json() throws
+      // "Unexpected token '<'" which crashes the component.
+      // Using text() + JSON.parse() lets us catch that gracefully.
+      let data: AuditApiResponse;
+      const rawText = await res.text();
+      try {
+        data = JSON.parse(rawText) as AuditApiResponse;
+      } catch {
+        // The server returned non-JSON (HTML error page or similar)
+        throw new Error("Server error, try again");
+      }
+
+      // Update usage counters from every response (success or error)
       if (typeof data.remaining === "number") setRemaining(data.remaining);
-      if (typeof data.limit === "number") setLimit(data.limit);
-      if (!res.ok || data.error) throw new Error(data.error || "Audit request failed");
-      if (!data.success || !data.data) throw new Error("Audit response was missing structured data");
+      if (typeof data.limit    === "number") setLimit(data.limit);
+
+      if (!res.ok || data.error) {
+        // Map API error strings to user-friendly messages
+        const apiError = data.error ?? "";
+        if (res.status === 401 || apiError.toLowerCase().includes("login") || apiError.toLowerCase().includes("unauthorized")) {
+          throw new Error("Login required");
+        }
+        if (res.status === 429 || apiError.toLowerCase().includes("limit")) {
+          throw new Error("Daily limit reached");
+        }
+        throw new Error("Server error, try again");
+      }
+
+      if (!data.success || !data.data) {
+        throw new Error("Server error, try again");
+      }
+
       setRawResult(JSON.stringify(data.data, null, 2));
       setSubmittedEmail(email);
       setAnalysis(data.data);
@@ -829,7 +854,8 @@ export default function InboxSignalApp({
         }
       }, 100);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Something went wrong");
+      const msg = err instanceof Error ? err.message : "Server error, try again";
+      setError(msg);
     } finally {
       setLoading(false);
     }
@@ -968,13 +994,11 @@ export default function InboxSignalApp({
 
         /* ── LAYOUT ──────────────────────────────────────────────────────── */
 
-        /* Mobile-first: single column */
         .app-grid {
           display: flex;
           flex-direction: column;
           min-height: calc(100vh - var(--header-h));
         }
-        /* Desktop: two-column sticky */
         @media (min-width: 960px) {
           .app-grid {
             display: grid;
@@ -983,7 +1007,6 @@ export default function InboxSignalApp({
           }
         }
 
-        /* Input panel */
         .input-panel {
           padding: var(--panel-py) var(--panel-px);
           display: flex;
@@ -1007,7 +1030,6 @@ export default function InboxSignalApp({
           }
         }
 
-        /* Results panel */
         .results-panel {
           padding: var(--panel-py) var(--panel-px);
           width: 100%;
@@ -1027,7 +1049,6 @@ export default function InboxSignalApp({
           }
         }
 
-        /* Results inner container */
         .results-inner {
           display: flex;
           flex-direction: column;
@@ -1043,7 +1064,6 @@ export default function InboxSignalApp({
         }
 
         /* ── SPARK BARS ──────────────────────────────────────────────────── */
-        /* 2-col on mobile, 1-col on sm */
         .spark-grid {
           display: grid;
           grid-template-columns: 1fr 1fr;
@@ -1054,7 +1074,6 @@ export default function InboxSignalApp({
         }
 
         /* ── BREAKDOWN ROW ───────────────────────────────────────────────── */
-        /* Stack on mobile, side-by-side on sm+ */
         .breakdown-row {
           display: flex;
           flex-direction: column;
@@ -1102,18 +1121,15 @@ export default function InboxSignalApp({
           }
         }
 
-        /* ── HEADER TAGLINE: hidden on small phones ──────────────────────── */
         .header-tagline { display: none; }
         @media (min-width: 480px) {
           .header-tagline { display: block; }
         }
 
-        /* ── "PRIMARY" BADGE: hidden on tiny phones ─────────────────────── */
         @media (max-width: 359px) {
           .subject-primary-badge { display: none !important; }
         }
 
-        /* ── RESULTS ANCHOR: scroll-margin so sticky header doesn't cover it */
         .results-anchor {
           scroll-margin-top: calc(var(--header-h) + 8px);
           display: none;
@@ -1153,28 +1169,13 @@ export default function InboxSignalApp({
             </span>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 10,
-                padding: "8px 12px",
-                borderRadius: 999,
-                background: "rgba(255,255,255,0.03)",
-                border: "1px solid rgba(255,255,255,0.06)",
-              }}
-            >
-              <span
-                style={{
-                  fontSize: 10,
-                  fontFamily: "'DM Mono', monospace",
-                  color: limitReached ? "#FCA5A5" : "#C7D2FE",
-                  letterSpacing: "0.05em",
-                }}
-              >
-                You have {remaining}/{limit} analyses left today
+            {/* Usage counter + Clerk UserButton */}
+            <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", borderRadius: 999, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
+              <span style={{ fontSize: 10, fontFamily: "'DM Mono', monospace", color: limitReached ? "#FCA5A5" : "#C7D2FE", letterSpacing: "0.05em" }}>
+                {remaining}/{limit} left today
               </span>
-              <UserButton />
+              {/* UserButton renders nothing on server, mounts on client — safe with suppressHydrationWarning on body */}
+              <UserButton afterSignOutUrl="/" />
             </div>
             <div className="header-tagline" style={{ fontSize: 10, fontFamily: "'DM Mono', monospace", color: "#1E293B", letterSpacing: "0.07em" }}>
               cold email intelligence
@@ -1250,26 +1251,13 @@ export default function InboxSignalApp({
               />
             </div>
 
-            <div
-              style={{
-                padding: "12px 14px",
-                borderRadius: 10,
-                background: limitReached
-                  ? "rgba(239,68,68,0.08)"
-                  : "rgba(99,102,241,0.08)",
-                border: limitReached
-                  ? "1px solid rgba(239,68,68,0.16)"
-                  : "1px solid rgba(99,102,241,0.16)",
-              }}
-            >
-              <div
-                style={{
-                  fontSize: 10,
-                  fontFamily: "'DM Mono', monospace",
-                  color: limitReached ? "#FCA5A5" : "#C7D2FE",
-                  letterSpacing: "0.06em",
-                }}
-              >
+            {/* Usage status block */}
+            <div style={{
+              padding: "12px 14px", borderRadius: 10,
+              background: limitReached ? "rgba(239,68,68,0.08)" : "rgba(99,102,241,0.08)",
+              border: limitReached ? "1px solid rgba(239,68,68,0.16)" : "1px solid rgba(99,102,241,0.16)",
+            }}>
+              <div style={{ fontSize: 10, fontFamily: "'DM Mono', monospace", color: limitReached ? "#FCA5A5" : "#C7D2FE", letterSpacing: "0.06em" }}>
                 You have {remaining}/{limit} analyses left today
               </div>
               {limitReached ? (

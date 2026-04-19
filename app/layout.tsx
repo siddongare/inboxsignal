@@ -14,11 +14,14 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // ClerkProvider must wrap the entire tree including <html> to prevent
+  // hydration mismatches. Placing it inside <body> causes SSR/client
+  // divergence because Clerk injects context before the first render.
   return (
-    <html lang="en">
-      <body>
-        <ClerkProvider>{children}</ClerkProvider>
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="en" suppressHydrationWarning>
+        <body suppressHydrationWarning>{children}</body>
+      </html>
+    </ClerkProvider>
   );
 }
