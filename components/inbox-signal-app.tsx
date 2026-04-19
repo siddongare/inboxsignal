@@ -407,7 +407,7 @@ function RewriteSection({ originalEmail, rewrite }: { originalEmail: string; rew
                       display: "flex", alignItems: "center", justifyContent: "center",
                     }}>{letter}</span>
                     {isFirst && (
-                      <span className="subject-primary-badge" style={{ fontSize: 9, fontFamily: "'Geist Mono', 'DM Mono', monospace", padding: "2px 8px", borderRadius: 999, background: "rgba(99,102,241,0.15)", color: "#818CF8", border: "1px solid rgba(99,102,241,0.28)", letterSpacing: "0.05em", whiteSpace: "nowrap" }}>
+                      <span className="subject-primary-badge" style={{  9, fontFamily: "'Geist Mono', 'DM Mono', monospace", padding: "2px 8px", borderRadius: 999, background: "rgba(99,102,241,0.15)", color: "#818CF8", border: "1px solid rgba(99,102,241,0.28)", letterSpacing: "0.05em", whiteSpace: "nowrap" }}>
                         ★ Primary
                       </span>
                     )}

@@ -247,7 +247,6 @@ function LandingPage({ onLaunchApp }: { onLaunchApp: (email?: string) => void })
                 display: "block",
                 caretColor: "#818CF8",
                 // iOS zoom prevention
-                fontSize: "16px",
               } as React.CSSProperties}
             />
 
