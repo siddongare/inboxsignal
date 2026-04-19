@@ -699,16 +699,9 @@ function StickyNav({ containerRef }: { containerRef: React.RefObject<HTMLDivElem
 // ─── Shortcut hint ────────────────────────────────────────────────────────────
 
 function ShortcutHint() {
-  const [hint, setHint] = useState<string | null>(null);
-  useEffect(() => {
-    if ("ontouchstart" in window) return; // No hint on touch
-    const mac = navigator.platform.toUpperCase().includes("MAC") || navigator.userAgent.includes("Mac");
-    setHint(`${mac ? "⌘" : "CTRL"} + ENTER TO TRANSMIT`);
-  }, []);
-  if (!hint) return null;
   return (
     <div style={{ textAlign: "center", fontSize: 9, fontFamily: "'Geist Mono', 'DM Mono', monospace", color: "#1E293B", letterSpacing: "0.07em" }}>
-      {hint}
+      CTRL / CMD + ENTER TO TRANSMIT
     </div>
   );
 }
@@ -725,8 +718,7 @@ function PanelStatus({ analysis, lastRunAt, onReRun, canSubmit, loading }: {
   if (!analysis || !lastRunAt) return null;
   const avg = Math.round((analysis.signals.clarity + analysis.signals.relevance + analysis.signals.credibility + analysis.signals.ctaStrength) / 4);
   const c = scoreColor(avg);
-  const elapsed = Math.round((Date.now() - lastRunAt.getTime()) / 60000);
-  const timeStr = elapsed === 0 ? "just now" : `${elapsed}m ago`;
+  const timeStr = lastRunAt.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
   return (
     <div style={{ padding: "13px 15px", borderRadius: 11, background: "rgba(52,211,153,0.04)", border: "1px solid rgba(52,211,153,0.14)" }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
@@ -943,7 +935,7 @@ export default function Home() {
             --gap: 14px;
           }
         }
-        @media (min-width: 1024px) {
+        @media (min-width: 960px) {
           :root {
             --header-h: 54px;
             --panel-px: 40px;
@@ -962,10 +954,11 @@ export default function Home() {
           min-height: calc(100vh - var(--header-h));
         }
         /* Desktop: two-column sticky */
-        @media (min-width: 1024px) {
+        @media (min-width: 960px) {
           .app-grid {
             display: grid;
-            grid-template-columns: 360px 1fr;
+            grid-template-columns: minmax(320px, 360px) minmax(0, 1fr);
+            align-items: start;
           }
         }
 
@@ -978,8 +971,9 @@ export default function Home() {
           background: rgba(6,9,14,0.5);
           border-bottom: 1px solid rgba(255,255,255,0.06);
           width: 100%;
+          order: 1;
         }
-        @media (min-width: 1024px) {
+        @media (min-width: 960px) {
           .input-panel {
             border-bottom: none;
             border-right: 1px solid rgba(255,255,255,0.06);
@@ -988,6 +982,7 @@ export default function Home() {
             height: calc(100vh - var(--header-h));
             overflow-y: auto;
             width: auto;
+            order: 0;
           }
         }
 
@@ -996,13 +991,16 @@ export default function Home() {
           padding: var(--panel-py) var(--panel-px);
           width: 100%;
           overflow-x: hidden;
+          min-width: 0;
+          order: 2;
         }
-        @media (min-width: 1024px) {
+        @media (min-width: 960px) {
           .results-panel {
             overflow-y: auto;
             height: calc(100vh - var(--header-h));
             position: relative;
             width: auto;
+            order: 0;
           }
         }
 
@@ -1013,8 +1011,11 @@ export default function Home() {
           width: 100%;
           max-width: 100%;
         }
-        @media (min-width: 1024px) {
-          .results-inner { max-width: 800px; }
+        @media (min-width: 960px) {
+          .results-inner {
+            max-width: 800px;
+            min-width: 0;
+          }
         }
 
         /* ── SPARK BARS ──────────────────────────────────────────────────── */
@@ -1060,14 +1061,21 @@ export default function Home() {
           z-index: 50;
           backdrop-filter: blur(12px);
         }
-        @media (min-width: 1024px) {
+        @media (min-width: 960px) {
           .mobile-results-banner { display: none; }
         }
 
         /* ── MOBILE BOTTOM SPACER ────────────────────────────────────────── */
         .mobile-bottom-spacer { height: 80px; }
-        @media (min-width: 1024px) {
+        @media (min-width: 960px) {
           .mobile-bottom-spacer { display: none; }
+        }
+
+        @media (max-width: 959px) {
+          .results-anchor {
+            width: 100%;
+            height: 1px;
+          }
         }
 
         /* ── HEADER TAGLINE: hidden on small phones ──────────────────────── */
