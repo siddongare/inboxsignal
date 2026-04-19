@@ -58,6 +58,10 @@ interface AuditApiResponse {
 interface InboxSignalAppProps {
   initialLimit: number;
   initialRemaining: number;
+  /** Optional pre-filled email text from the landing page input */
+  prefillEmail?: string;
+  /** Called when user wants to go back to landing page */
+  onBack?: () => void;
 }
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
@@ -212,6 +216,7 @@ function HeroScore({ signals }: { signals: Signals }) {
             fontSize: "clamp(44px, 11vw, 60px)", fontWeight: 900, color: c,
             lineHeight: 1, letterSpacing: "-0.06em",
             fontFamily: "'Geist Mono', 'DM Mono', monospace",
+            textShadow: `0 0 30px ${c}40`,
           }}>{avg}</div>
           <div style={{ fontSize: 9, color: "#1E293B", fontFamily: "'Geist Mono', 'DM Mono', monospace", marginTop: 2, letterSpacing: "0.08em" }}>/ 100</div>
         </div>
@@ -478,7 +483,7 @@ function MetricBar({ label, score, id }: { label: string; score: number; id: str
       <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 8 }}>
         <span style={{ fontSize: 12, color: "#64748B", fontFamily: "'Geist Mono', 'DM Mono', monospace", letterSpacing: "0.04em" }}>{label}</span>
         <div style={{ display: "flex", alignItems: "baseline", gap: 4, flexShrink: 0 }}>
-          <span style={{ fontSize: 18, fontWeight: 800, color: c, letterSpacing: "-0.02em", lineHeight: 1, fontFamily: "'Geist Mono', 'DM Mono', monospace" }}>{score}</span>
+          <span style={{ fontSize: 18, fontWeight: 800, color: c, letterSpacing: "-0.02em", lineHeight: 1, fontFamily: "'Geist Mono', 'DM Mono', monospace", textShadow: `0 0 16px ${c}50` }}>{score}</span>
           <span style={{ fontSize: 10, color: "#1E293B", fontFamily: "'Geist Mono', 'DM Mono', monospace" }}>/100</span>
           <span style={{ fontSize: 9, color: c, letterSpacing: "0.07em", marginLeft: 2, fontFamily: "'Geist Mono', 'DM Mono', monospace" }}>{scoreLabel(score)}</span>
         </div>
@@ -608,7 +613,7 @@ function StickyNav({ containerRef }: { containerRef: React.RefObject<HTMLDivElem
   const [showTop, setShowTop] = useState(false);
 
   useEffect(() => {
-    const isMobile = window.innerWidth < 1024;
+    const isMobile = window.innerWidth < 960;
     const container = isMobile ? null : containerRef.current;
 
     const getScrollTop = () => container ? container.scrollTop : window.scrollY;
@@ -633,7 +638,7 @@ function StickyNav({ containerRef }: { containerRef: React.RefObject<HTMLDivElem
   }, [containerRef]);
 
   const scrollTo = (id: string) => {
-    const isMobile = window.innerWidth < 1024;
+    const isMobile = window.innerWidth < 960;
     const el = document.getElementById(id);
     if (!el) return;
     if (isMobile) {
@@ -682,7 +687,7 @@ function StickyNav({ containerRef }: { containerRef: React.RefObject<HTMLDivElem
         {showTop && (
           <button
             onClick={() => {
-              if (window.innerWidth < 1024) window.scrollTo({ top: 0, behavior: "smooth" });
+              if (window.innerWidth < 960) window.scrollTo({ top: 0, behavior: "smooth" });
               else containerRef.current?.scrollTo({ top: 0, behavior: "smooth" });
             }}
             style={{
@@ -777,8 +782,11 @@ function MobileResultsBanner({ onView }: { onView: () => void }) {
 export default function InboxSignalApp({
   initialLimit,
   initialRemaining,
+  prefillEmail = "",
+  onBack,
 }: InboxSignalAppProps) {
-  const [email,          setEmail]          = useState("");
+  // Pre-fill email from landing page if provided
+  const [email,          setEmail]          = useState(prefillEmail);
   const [prospect,       setProspect]       = useState("");
   const [rawResult,      setRawResult]      = useState("");
   const [analysis,       setAnalysis]       = useState<AnalysisResult | null>(null);
@@ -810,26 +818,18 @@ export default function InboxSignalApp({
         body: JSON.stringify({ email, prospect }),
       });
 
-      // Safe parsing: never call res.json() directly.
-      // If the server returns an HTML error page (e.g. a cold-start 500,
-      // a Vercel edge error, or an auth redirect) res.json() throws
-      // "Unexpected token '<'" which crashes the component.
-      // Using text() + JSON.parse() lets us catch that gracefully.
       let data: AuditApiResponse;
       const rawText = await res.text();
       try {
         data = JSON.parse(rawText) as AuditApiResponse;
       } catch {
-        // The server returned non-JSON (HTML error page or similar)
         throw new Error("Server error, try again");
       }
 
-      // Update usage counters from every response (success or error)
       if (typeof data.remaining === "number") setRemaining(data.remaining);
       if (typeof data.limit    === "number") setLimit(data.limit);
 
       if (!res.ok || data.error) {
-        // Map API error strings to user-friendly messages
         const apiError = data.error ?? "";
         if (res.status === 401 || apiError.toLowerCase().includes("login") || apiError.toLowerCase().includes("unauthorized")) {
           throw new Error("Login required");
@@ -849,7 +849,7 @@ export default function InboxSignalApp({
       setAnalysis(data.data);
       setLastRunAt(new Date());
       setTimeout(() => {
-        if (window.innerWidth >= 1024 && mainPanelRef.current) {
+        if (window.innerWidth >= 960 && mainPanelRef.current) {
           mainPanelRef.current.scrollTo({ top: 0, behavior: "smooth" });
         }
       }, 100);
@@ -887,82 +887,62 @@ export default function InboxSignalApp({
         @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@600;700;800&display=swap');
 
         *, *::before, *::after { box-sizing: border-box; }
-
         html, body { overflow-x: hidden; max-width: 100vw; }
-
         body {
           background: #06090E !important;
           font-family: 'Syne', system-ui, sans-serif;
           -webkit-font-smoothing: antialiased;
           margin: 0;
         }
-
         ::selection { background: rgba(99,102,241,0.30); color: #E0E7FF; }
-
-        textarea {
-          resize: vertical;
-          /* Prevents iOS auto-zoom on focus — font-size must be >= 16px */
-          font-size: 16px !important;
-        }
+        textarea { resize: vertical; font-size: 16px !important; }
         textarea:focus {
           outline: none;
           border-color: rgba(99,102,241,0.50) !important;
           box-shadow: 0 0 0 3px rgba(99,102,241,0.08), 0 0 20px rgba(99,102,241,0.06) !important;
         }
 
-        @keyframes skeletonPulse {
-          0%, 100% { opacity: 1; }
-          50%       { opacity: 0.35; }
-        }
+        @keyframes skeletonPulse { 0%,100%{opacity:1} 50%{opacity:0.35} }
         .skeleton-card { animation: skeletonPulse 1.6s ease-in-out infinite; }
 
-        @keyframes pulseDot {
-          0%, 100% { opacity: 1; transform: scale(1); }
-          50%       { opacity: 0.5; transform: scale(0.7); }
-        }
+        @keyframes pulseDot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.7)} }
         .pulse-dot { animation: pulseDot 1.1s ease-in-out infinite; }
 
-        @keyframes fadeUp {
-          from { opacity: 0; transform: translateY(16px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
+        @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
         .report-section { animation: fadeUp 0.4s cubic-bezier(0.16,1,0.3,1) both; }
         .diag-card      { animation: fadeUp 0.4s cubic-bezier(0.16,1,0.3,1) both; }
 
-        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes spin { to{transform:rotate(360deg)} }
         .spinner {
-          width: 14px; height: 14px; border-radius: 50%;
-          border: 2px solid rgba(255,255,255,0.10);
-          border-top-color: rgba(255,255,255,0.85);
-          animation: spin 0.75s linear infinite;
-          display: inline-block; flex-shrink: 0;
+          width:14px;height:14px;border-radius:50%;
+          border:2px solid rgba(255,255,255,0.10);
+          border-top-color:rgba(255,255,255,0.85);
+          animation:spin 0.75s linear infinite;
+          display:inline-block;flex-shrink:0;
         }
 
         .run-btn { transition: filter 0.15s, transform 0.12s, box-shadow 0.15s; }
-        .run-btn:hover:not(:disabled) { filter: brightness(1.14); transform: translateY(-1px); box-shadow: 0 8px 24px rgba(99,102,241,0.30); }
-        .run-btn:active:not(:disabled) { transform: scale(0.98) translateY(0); }
-        .run-btn:disabled { cursor: not-allowed; opacity: 0.35; }
+        .run-btn:hover:not(:disabled) { filter:brightness(1.14); transform:translateY(-1px); box-shadow:0 8px 24px rgba(99,102,241,0.30); }
+        .run-btn:active:not(:disabled) { transform:scale(0.98) translateY(0); }
+        .run-btn:disabled { cursor:not-allowed; opacity:0.35; }
 
-        .diag-card:hover { filter: brightness(1.05); }
+        .diag-card:hover { filter:brightness(1.05); }
 
-        details > summary { list-style: none; cursor: pointer; user-select: none; }
-        details > summary::-webkit-details-marker { display: none; }
+        details>summary { list-style:none; cursor:pointer; user-select:none; }
+        details>summary::-webkit-details-marker { display:none; }
 
-        /* Scrollbar */
-        ::-webkit-scrollbar { width: 4px; height: 4px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.07); border-radius: 999px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.12); }
+        ::-webkit-scrollbar { width:4px; height:4px; }
+        ::-webkit-scrollbar-track { background:transparent; }
+        ::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.07); border-radius:999px; }
+        ::-webkit-scrollbar-thumb:hover { background:rgba(255,255,255,0.12); }
 
-        /* Noise texture */
         .noise-bg::after {
-          content: '';
-          position: fixed; inset: 0;
-          background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.025'/%3E%3C/svg%3E");
-          pointer-events: none; z-index: 999; opacity: 0.4;
+          content:''; position:fixed; inset:0;
+          background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.025'/%3E%3C/svg%3E");
+          pointer-events:none; z-index:999; opacity:0.4;
         }
 
-        /* ── CSS TOKENS ──────────────────────────────────────────────────── */
+        /* ── TOKENS ── */
         :root {
           --header-h: 48px;
           --panel-px: 16px;
@@ -970,181 +950,110 @@ export default function InboxSignalApp({
           --card-p: 14px;
           --gap: 12px;
         }
-        @media (min-width: 480px) {
-          :root { --panel-px: 20px; }
+        @media (min-width:480px) { :root { --panel-px:20px; } }
+        @media (min-width:640px) {
+          :root { --header-h:52px; --panel-px:28px; --panel-py:26px; --card-p:18px; --gap:14px; }
         }
-        @media (min-width: 640px) {
-          :root {
-            --header-h: 52px;
-            --panel-px: 28px;
-            --panel-py: 26px;
-            --card-p: 18px;
-            --gap: 14px;
-          }
-        }
-        @media (min-width: 960px) {
-          :root {
-            --header-h: 54px;
-            --panel-px: 40px;
-            --panel-py: 32px;
-            --card-p: 20px;
-            --gap: 16px;
-          }
+        @media (min-width:960px) {
+          :root { --header-h:54px; --panel-px:40px; --panel-py:32px; --card-p:20px; --gap:16px; }
         }
 
-        /* ── LAYOUT ──────────────────────────────────────────────────────── */
-
+        /* ── LAYOUT ── */
         .app-grid {
-          display: flex;
-          flex-direction: column;
-          min-height: calc(100vh - var(--header-h));
+          display:flex; flex-direction:column;
+          min-height:calc(100vh - var(--header-h));
         }
-        @media (min-width: 960px) {
+        @media (min-width:960px) {
           .app-grid {
-            display: grid;
-            grid-template-columns: minmax(320px, 360px) minmax(0, 1fr);
-            align-items: start;
+            display:grid;
+            grid-template-columns: minmax(320px,360px) minmax(0,1fr);
+            align-items:start;
           }
         }
 
         .input-panel {
-          padding: var(--panel-py) var(--panel-px);
-          display: flex;
-          flex-direction: column;
-          gap: var(--gap);
-          background: rgba(6,9,14,0.5);
-          border-bottom: 1px solid rgba(255,255,255,0.06);
-          width: 100%;
-          order: 1;
+          padding:var(--panel-py) var(--panel-px);
+          display:flex; flex-direction:column; gap:var(--gap);
+          background:rgba(6,9,14,0.5);
+          border-bottom:1px solid rgba(255,255,255,0.06);
+          width:100%; order:1;
         }
-        @media (min-width: 960px) {
+        @media (min-width:960px) {
           .input-panel {
-            border-bottom: none;
-            border-right: 1px solid rgba(255,255,255,0.06);
-            position: sticky;
-            top: var(--header-h);
-            height: calc(100vh - var(--header-h));
-            overflow-y: auto;
-            width: auto;
-            order: 0;
+            border-bottom:none;
+            border-right:1px solid rgba(255,255,255,0.06);
+            position:sticky; top:var(--header-h);
+            height:calc(100vh - var(--header-h)); overflow-y:auto;
+            width:auto; order:0;
           }
         }
 
         .results-panel {
-          padding: var(--panel-py) var(--panel-px);
-          width: 100%;
-          overflow-x: hidden;
-          min-width: 0;
-          order: 2;
+          padding:var(--panel-py) var(--panel-px);
+          width:100%; overflow-x:hidden; min-width:0; order:2;
         }
-        @media (min-width: 960px) {
+        @media (min-width:960px) {
           .results-panel {
-            display: flex;
-            justify-content: center;
-            overflow-y: auto;
-            height: calc(100vh - var(--header-h));
-            position: relative;
-            width: auto;
-            order: 0;
+            display:flex; justify-content:center;
+            overflow-y:auto;
+            height:calc(100vh - var(--header-h));
+            position:relative; width:auto; order:0;
           }
         }
 
-        .results-inner {
-          display: flex;
-          flex-direction: column;
-          width: 100%;
-          max-width: 100%;
-        }
-        @media (min-width: 960px) {
-          .results-inner {
-            max-width: 1040px;
-            min-width: 0;
-            width: min(100%, 1040px);
-          }
+        .results-inner { display:flex; flex-direction:column; width:100%; max-width:100%; }
+        @media (min-width:960px) {
+          .results-inner { max-width:1040px; min-width:0; width:min(100%,1040px); }
         }
 
-        /* ── SPARK BARS ──────────────────────────────────────────────────── */
-        .spark-grid {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 10px;
-        }
-        @media (min-width: 640px) {
-          .spark-grid { grid-template-columns: 1fr; gap: 8px; }
-        }
+        .spark-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+        @media (min-width:640px) { .spark-grid { grid-template-columns:1fr; gap:8px; } }
 
-        /* ── BREAKDOWN ROW ───────────────────────────────────────────────── */
         .breakdown-row {
-          display: flex;
-          flex-direction: column;
-          gap: 6px;
-          padding: 13px 0;
-          border-bottom: 1px solid rgba(255,255,255,0.05);
+          display:flex; flex-direction:column; gap:6px;
+          padding:13px 0; border-bottom:1px solid rgba(255,255,255,0.05);
         }
-        @media (min-width: 640px) {
-          .breakdown-row {
-            display: grid;
-            grid-template-columns: 120px 1fr;
-            gap: 16px;
-            align-items: start;
-          }
+        @media (min-width:640px) {
+          .breakdown-row { display:grid; grid-template-columns:120px 1fr; gap:16px; align-items:start; }
         }
 
-        /* ── MOBILE RESULTS BANNER ───────────────────────────────────────── */
         .mobile-results-banner {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          gap: 12px;
-          padding: 12px 16px;
-          background: rgba(6,9,14,0.97);
-          border-top: 1px solid rgba(52,211,153,0.18);
-          position: sticky;
-          bottom: 0;
-          z-index: 50;
-          backdrop-filter: blur(12px);
+          display:flex; align-items:center; justify-content:space-between;
+          gap:12px; padding:12px 16px;
+          background:rgba(6,9,14,0.97);
+          border-top:1px solid rgba(52,211,153,0.18);
+          position:sticky; bottom:0; z-index:50;
+          backdrop-filter:blur(12px);
         }
-        @media (min-width: 960px) {
-          .mobile-results-banner { display: none; }
+        @media (min-width:960px) { .mobile-results-banner { display:none; } }
+
+        .mobile-bottom-spacer { height:80px; }
+        @media (min-width:960px) { .mobile-bottom-spacer { display:none; } }
+
+        .results-anchor { scroll-margin-top:calc(var(--header-h) + 8px); display:none; }
+        @media (max-width:959px) {
+          .results-anchor { display:block; width:100%; height:1px; order:2; }
+          .results-panel { order:3; }
         }
 
-        /* ── MOBILE BOTTOM SPACER ────────────────────────────────────────── */
-        .mobile-bottom-spacer { height: 80px; }
-        @media (min-width: 960px) {
-          .mobile-bottom-spacer { display: none; }
-        }
+        .header-tagline { display:none; }
+        @media (min-width:480px) { .header-tagline { display:block; } }
 
-        @media (max-width: 959px) {
-          .results-anchor {
-            width: 100%;
-            height: 1px;
-          }
-        }
+        @media (max-width:359px) { .subject-primary-badge { display:none !important; } }
 
-        .header-tagline { display: none; }
-        @media (min-width: 480px) {
-          .header-tagline { display: block; }
+        /* Back button */
+        .back-btn {
+          display:inline-flex; align-items:center; gap:6px;
+          padding:6px 12px; border-radius:8px;
+          background:transparent; border:1px solid rgba(255,255,255,0.09);
+          color:#64748B; font-size:12px;
+          font-family:'Geist Mono','DM Mono',monospace;
+          cursor:pointer; transition:all 0.15s;
+          letter-spacing:0.04em;
+          min-height:32px;
+          white-space:nowrap;
         }
-
-        @media (max-width: 359px) {
-          .subject-primary-badge { display: none !important; }
-        }
-
-        .results-anchor {
-          scroll-margin-top: calc(var(--header-h) + 8px);
-          display: none;
-        }
-        @media (max-width: 959px) {
-          .results-anchor {
-            display: block;
-            width: 100%;
-            height: 1px;
-            order: 2;
-          }
-          .results-panel {
-            order: 3;
-          }
-        }
+        .back-btn:hover { background:rgba(255,255,255,0.04); color:#94A3B8; border-color:rgba(255,255,255,0.15); }
       `}</style>
 
       <div className="noise-bg" style={{ minHeight: "100vh", background: "#06090E", color: "#F1F5F9", fontFamily: "'Syne', system-ui, sans-serif", overflowX: "hidden" }}>
@@ -1162,28 +1071,35 @@ export default function InboxSignalApp({
           position: "sticky", top: 0, zIndex: 100,
           background: "rgba(6,9,14,0.94)", backdropFilter: "blur(16px)",
         }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          {/* Logo + optional back */}
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <SignalOrb size={26} />
             <span style={{ fontWeight: 800, fontSize: "clamp(13px, 3.5vw, 15px)", color: "#E2E8F0", letterSpacing: "-0.02em", fontFamily: "'Syne', system-ui, sans-serif" }}>
               Inbox<span style={{ color: "#818CF8" }}>Signal</span>
             </span>
+            {onBack && (
+              <button className="back-btn" onClick={onBack}>
+                ← Home
+              </button>
+            )}
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            {/* Usage counter + Clerk UserButton */}
-            <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", borderRadius: 999, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
-              <span style={{ fontSize: 10, fontFamily: "'DM Mono', monospace", color: limitReached ? "#FCA5A5" : "#C7D2FE", letterSpacing: "0.05em" }}>
-                {remaining}/{limit} left today
+
+          {/* Right: usage counter + UserButton */}
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            {/* Usage pill */}
+            <div style={{
+              display: "flex", alignItems: "center", gap: 8,
+              padding: "5px 12px", borderRadius: 999,
+              background: limitReached ? "rgba(239,68,68,0.08)" : "rgba(255,255,255,0.03)",
+              border: limitReached ? "1px solid rgba(239,68,68,0.16)" : "1px solid rgba(255,255,255,0.06)",
+            }}>
+              <span style={{ fontSize: 10, fontFamily: "'DM Mono', monospace", color: limitReached ? "#FCA5A5" : "#C7D2FE", letterSpacing: "0.05em", whiteSpace: "nowrap" }}>
+                {remaining}/{limit}
+                <span className="header-tagline" style={{ display: "inline" }}> left today</span>
               </span>
-              {/* UserButton renders nothing on server, mounts on client — safe with suppressHydrationWarning on body */}
-              <UserButton />
             </div>
-            <div className="header-tagline" style={{ fontSize: 10, fontFamily: "'DM Mono', monospace", color: "#1E293B", letterSpacing: "0.07em" }}>
-              cold email intelligence
-            </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-              <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#10B981", boxShadow: "0 0 6px rgba(16,185,129,0.7)" }} />
-              <span style={{ fontSize: 10, fontFamily: "'DM Mono', monospace", color: "#1E293B", letterSpacing: "0.06em" }}>LIVE</span>
-            </div>
+            {/* Clerk UserButton — renders nothing on server, hydrates on client */}
+            <UserButton />
           </div>
         </header>
 
@@ -1217,8 +1133,7 @@ export default function InboxSignalApp({
                   background: "rgba(255,255,255,0.02)",
                   border: "1px solid rgba(255,255,255,0.07)",
                   borderRadius: 10, color: "#CBD5E1",
-                  padding: "12px 14px",
-                  lineHeight: 1.75,
+                  padding: "12px 14px", lineHeight: 1.75,
                   fontFamily: "'DM Mono', monospace",
                   transition: "border-color 0.15s, box-shadow 0.15s",
                   display: "block",
@@ -1242,8 +1157,7 @@ export default function InboxSignalApp({
                   background: "rgba(255,255,255,0.02)",
                   border: "1px solid rgba(255,255,255,0.07)",
                   borderRadius: 10, color: "#CBD5E1",
-                  padding: "12px 14px",
-                  lineHeight: 1.75,
+                  padding: "12px 14px", lineHeight: 1.75,
                   fontFamily: "'DM Mono', monospace",
                   transition: "border-color 0.15s, box-shadow 0.15s",
                   display: "block",
@@ -1251,7 +1165,7 @@ export default function InboxSignalApp({
               />
             </div>
 
-            {/* Usage status block */}
+            {/* Usage block */}
             <div style={{
               padding: "12px 14px", borderRadius: 10,
               background: limitReached ? "rgba(239,68,68,0.08)" : "rgba(99,102,241,0.08)",
@@ -1277,8 +1191,7 @@ export default function InboxSignalApp({
               onClick={runAudit}
               disabled={!canSubmit}
               style={{
-                width: "100%", padding: "15px",
-                minHeight: 52,
+                width: "100%", padding: "15px", minHeight: 52,
                 background: limitReached
                   ? "rgba(71,85,105,0.35)"
                   : "linear-gradient(135deg, #6366F1 0%, #4F46E5 60%, #4338CA 100%)",
