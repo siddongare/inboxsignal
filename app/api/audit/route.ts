@@ -1,5 +1,8 @@
+import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import Groq from "groq-sdk";
+
+import { DAILY_ANALYSIS_LIMIT, reserveDailyUsage } from "@/lib/usage";
 
 type ImpactLevel = "low" | "medium" | "high" | "critical";
 
@@ -41,6 +44,14 @@ interface AuditResponseData {
   emailBreakdown: EmailBreakdown;
   rewrite: RewriteSection;
   followUps: FollowUps;
+}
+
+interface AuditApiResponse {
+  success?: boolean;
+  data?: AuditResponseData;
+  error?: string;
+  remaining: number;
+  limit: number;
 }
 
 const client = new Groq({
@@ -211,13 +222,43 @@ function normalizeAuditResponse(payload: unknown): AuditResponseData {
 
 export async function POST(req: Request) {
   try {
+    const { userId } = await auth();
+
+    if (!userId) {
+      return NextResponse.json<AuditApiResponse>(
+        {
+          error: "Unauthorized",
+          remaining: 0,
+          limit: DAILY_ANALYSIS_LIMIT,
+        },
+        { status: 401 },
+      );
+    }
+
+    const usage = await reserveDailyUsage(userId);
+
+    if (!usage.allowed) {
+      return NextResponse.json<AuditApiResponse>(
+        {
+          error: "Daily limit reached",
+          remaining: 0,
+          limit: usage.limit,
+        },
+        { status: 429 },
+      );
+    }
+
     const body = await req.json();
     const { email, prospect } = body;
 
     if (!email || !prospect) {
-      return NextResponse.json(
-        { error: "Missing email or prospect" },
-        { status: 400 }
+      return NextResponse.json<AuditApiResponse>(
+        {
+          error: "Missing email or prospect",
+          remaining: usage.remaining,
+          limit: usage.limit,
+        },
+        { status: 400 },
       );
     }
 
@@ -331,9 +372,13 @@ REWRITE RULES:
     const content = completion.choices[0]?.message?.content;
 
     if (!content) {
-      return NextResponse.json(
-        { error: "The audit model returned an empty response." },
-        { status: 502 }
+      return NextResponse.json<AuditApiResponse>(
+        {
+          error: "The audit model returned an empty response.",
+          remaining: usage.remaining,
+          limit: usage.limit,
+        },
+        { status: 502 },
       );
     }
 
@@ -341,20 +386,34 @@ REWRITE RULES:
       JSON.parse(extractJsonObject(content))
     );
 
-    return NextResponse.json({ success: true, data });
+    return NextResponse.json<AuditApiResponse>({
+      success: true,
+      data,
+      remaining: usage.remaining,
+      limit: usage.limit,
+    });
   } catch (err: unknown) {
     if (err instanceof SyntaxError) {
-      return NextResponse.json(
+      return NextResponse.json<AuditApiResponse>(
         {
           error:
             "The audit model returned invalid JSON and could not be normalized.",
+          remaining: 0,
+          limit: DAILY_ANALYSIS_LIMIT,
         },
-        { status: 502 }
+        { status: 502 },
       );
     }
 
     const message =
       err instanceof Error ? err.message : "Something went wrong";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return NextResponse.json<AuditApiResponse>(
+      {
+        error: message,
+        remaining: 0,
+        limit: DAILY_ANALYSIS_LIMIT,
+      },
+      { status: 500 },
+    );
   }
 }
