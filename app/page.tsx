@@ -996,6 +996,8 @@ export default function Home() {
         }
         @media (min-width: 960px) {
           .results-panel {
+            display: flex;
+            justify-content: center;
             overflow-y: auto;
             height: calc(100vh - var(--header-h));
             position: relative;
@@ -1013,8 +1015,9 @@ export default function Home() {
         }
         @media (min-width: 960px) {
           .results-inner {
-            max-width: 800px;
+            max-width: 1040px;
             min-width: 0;
+            width: min(100%, 1040px);
           }
         }
 
@@ -1092,6 +1095,18 @@ export default function Home() {
         /* ── RESULTS ANCHOR: scroll-margin so sticky header doesn't cover it */
         .results-anchor {
           scroll-margin-top: calc(var(--header-h) + 8px);
+          display: none;
+        }
+        @media (max-width: 959px) {
+          .results-anchor {
+            display: block;
+            width: 100%;
+            height: 1px;
+            order: 2;
+          }
+          .results-panel {
+            order: 3;
+          }
         }
       `}</style>
 
