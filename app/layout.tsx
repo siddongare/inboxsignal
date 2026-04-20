@@ -1,7 +1,9 @@
 import { ClerkProvider } from "@clerk/nextjs";
+import { dark } from "@clerk/themes";
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
+// ─── SEO & Metadata ──────────────────────────────────────────────────────────
 export const metadata: Metadata = {
   title: {
     default: "InboxSignal — Turn cold emails into replies",
@@ -14,29 +16,45 @@ export const metadata: Metadata = {
     description:
       "Diagnose your cold email in seconds. Signal score, failure analysis, rewrite, and follow-up sequence.",
     type: "website",
+    url: "https://inboxsignal.vercel.app",
+    siteName: "InboxSignal",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "InboxSignal",
+    description: "Turn cold emails into replies with AI diagnostics.",
   },
 };
 
-// Separate viewport export — required by Next.js 14+ for proper mobile rendering.
-// This ensures `width=device-width, initial-scale=1` is always present.
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,   // prevents unwanted iOS zoom on input focus
+  maximumScale: 1, // Prevents annoying zoom on iPhone when tapping inputs
 };
 
+// ─── Root Layout ──────────────────────────────────────────────────────────────
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // ClerkProvider must wrap the entire tree including <html> to prevent
-  // hydration mismatches. Placing it inside <body> causes SSR/client
-  // divergence because Clerk injects context before the first render.
   return (
-    <ClerkProvider>
-      <html lang="en" suppressHydrationWarning>
-        <body suppressHydrationWarning>{children}</body>
+    <ClerkProvider
+      appearance={{
+        baseTheme: dark,
+        variables: {
+          colorPrimary: "#ffffff", // Makes buttons sharp white in the auth modal
+          colorBackground: "#0a0a0a", // Matches your deep black aesthetic
+        },
+      }}
+    >
+      <html lang="en" suppressHydrationWarning className="bg-black text-white">
+        <body
+          suppressHydrationWarning
+          className="bg-black antialiased selection:bg-white/20"
+        >
+          {children}
+        </body>
       </html>
     </ClerkProvider>
   );
