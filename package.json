@@ -11,6 +11,9 @@
   "dependencies": {
     "@clerk/nextjs": "^7.2.3",
     "@clerk/themes": "^2.4.57",
+    "@upstash/box": "^0.1.36",
+    "@upstash/ratelimit": "^2.0.8",
+    "@upstash/redis": "^1.37.0",
     "@vercel/kv": "^3.0.0",
     "clsx": "^2.1.1",
     "framer-motion": "^12.38.0",

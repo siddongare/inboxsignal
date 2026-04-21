@@ -1,15 +1,34 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import Groq from "groq-sdk";
+import { Ratelimit } from "@upstash/ratelimit";
+import { Redis } from "@upstash/redis";
 
-// ─── Usage limit (in-memory, per-process) ─────────────────────────────────────
-// NOTE: In a serverless environment each cold start gets a fresh Map. For
-// production persistence, replace this with a Redis or KV store. For a
-// portfolio / MVP this is sufficient and matches the stated requirement of
-// a "simple in-memory store".
+// ─── Rate-limit (Upstash Redis, sliding window) ───────────────────────────────
+// Requires env vars: UPSTASH_REDIS_REST_URL + UPSTASH_REDIS_REST_TOKEN
+// Falls back gracefully to an in-memory Map if the env vars are absent so the
+// app still works in local dev without Redis configured.
 
 export const DAILY_ANALYSIS_LIMIT = 5;
 
+type LimitResult = { allowed: boolean; remaining: number; limit: number };
+
+// ── Upstash path ──────────────────────────────────────────────────────────────
+let ratelimit: Ratelimit | null = null;
+if (
+  process.env.UPSTASH_REDIS_REST_URL &&
+  process.env.UPSTASH_REDIS_REST_TOKEN
+) {
+  ratelimit = new Ratelimit({
+    redis: Redis.fromEnv(),
+    // 5 requests per 24-hour sliding window, keyed per user ID
+    limiter: Ratelimit.slidingWindow(DAILY_ANALYSIS_LIMIT, "24 h"),
+    analytics: true,
+    prefix: "inboxsignal:ratelimit",
+  });
+}
+
+// ── In-memory fallback (dev / cold-start safe) ────────────────────────────────
 interface UsageEntry {
   count: number;
   date: string; // YYYY-MM-DD
@@ -21,26 +40,23 @@ function todayKey(): string {
   return new Date().toISOString().slice(0, 10);
 }
 
-function reserveDailyUsage(userId: string): {
-  allowed: boolean;
-  remaining: number;
-  limit: number;
-} {
+function reserveInMemory(userId: string): LimitResult {
   const today = todayKey();
   const entry = usageStore.get(userId);
 
-  // New day or first ever — reset counter
   if (!entry || entry.date !== today) {
     usageStore.set(userId, { count: 1, date: today });
-    return { allowed: true, remaining: DAILY_ANALYSIS_LIMIT - 1, limit: DAILY_ANALYSIS_LIMIT };
+    return {
+      allowed: true,
+      remaining: DAILY_ANALYSIS_LIMIT - 1,
+      limit: DAILY_ANALYSIS_LIMIT,
+    };
   }
 
-  // Already at limit
   if (entry.count >= DAILY_ANALYSIS_LIMIT) {
     return { allowed: false, remaining: 0, limit: DAILY_ANALYSIS_LIMIT };
   }
 
-  // Increment
   entry.count += 1;
   usageStore.set(userId, entry);
   return {
@@ -48,6 +64,14 @@ function reserveDailyUsage(userId: string): {
     remaining: DAILY_ANALYSIS_LIMIT - entry.count,
     limit: DAILY_ANALYSIS_LIMIT,
   };
+}
+
+async function checkLimit(userId: string): Promise<LimitResult> {
+  if (ratelimit) {
+    const { success, remaining, limit } = await ratelimit.limit(userId);
+    return { allowed: success, remaining, limit };
+  }
+  return reserveInMemory(userId);
 }
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -104,7 +128,7 @@ interface AuditApiResponse {
 
 // ─── Groq client ──────────────────────────────────────────────────────────────
 
-const client = new Groq({
+const groqClient = new Groq({
   apiKey: process.env.GROQ_API_KEY,
 });
 
@@ -124,7 +148,7 @@ function coerceSignalScore(value: unknown): number {
 
   if (!Number.isFinite(num)) return 0;
 
-  // Guard against the model accidentally returning 0–10 instead of 0–100
+  // Guard against the model returning 0–10 instead of 0–100
   const normalized =
     num <= 10 && num > 0 ? Math.round(num * 10) : Math.round(num);
 
@@ -183,14 +207,14 @@ function normalizeDiagnosis(value: unknown): DiagnosisItem[] {
       impact: "high",
       whyItMatters:
         "Generic outreach signals mass-send. Prospects assume the message is not worth reading.",
-      fix: "Reference a specific company detail, role pain point, or recent trigger from the provided context.",
+      fix: "Reference a specific company detail, role pain point, or recent trigger.",
     },
     {
       issue: "Value proposition is too vague",
       impact: "high",
       whyItMatters:
-        "If the benefit is unclear the prospect cannot assess whether to invest time evaluating it.",
-      fix: "State the concrete problem you solve and the measurable outcome in one tight sentence.",
+        "If the benefit is unclear the prospect cannot assess whether to invest time.",
+      fix: "State the concrete problem you solve and the measurable outcome in one sentence.",
     },
     {
       issue: "Weak CTA does not create a next step",
@@ -260,41 +284,46 @@ function normalizeAuditResponse(payload: unknown): AuditResponseData {
 
 // ─── Route handler ────────────────────────────────────────────────────────────
 
-export async function POST(req: Request): Promise<NextResponse<AuditApiResponse>> {
-  // Outer try/catch guarantees we NEVER return HTML — always JSON.
+export async function POST(
+  req: Request
+): Promise<NextResponse<AuditApiResponse>> {
   try {
-    // ── 1. Auth check ────────────────────────────────────────────────────────
+    // 1. Auth ─────────────────────────────────────────────────────────────────
     const { userId } = await auth();
 
     if (!userId) {
       return NextResponse.json<AuditApiResponse>(
         { error: "Login required", remaining: 0, limit: DAILY_ANALYSIS_LIMIT },
-        { status: 401 },
+        { status: 401 }
       );
     }
 
-    // ── 2. Usage check ───────────────────────────────────────────────────────
-    const usage = reserveDailyUsage(userId);
+    // 2. Rate limit ────────────────────────────────────────────────────────────
+    const usage = await checkLimit(userId);
 
     if (!usage.allowed) {
       return NextResponse.json<AuditApiResponse>(
-        { error: "Daily limit reached", remaining: 0, limit: usage.limit },
-        { status: 429 },
+        {
+          error: "Daily limit reached",
+          remaining: 0,
+          limit: usage.limit,
+        },
+        { status: 429 }
       );
     }
 
-    // ── 3. Parse request body ─────────────────────────────────────────────────
+    // 3. Parse body ────────────────────────────────────────────────────────────
     let body: { email?: unknown; prospect?: unknown };
     try {
-      body = await req.json();
+      body = (await req.json()) as { email?: unknown; prospect?: unknown };
     } catch {
       return NextResponse.json<AuditApiResponse>(
         {
-          error: "Server error, try again",
+          error: "Invalid request body",
           remaining: usage.remaining,
           limit: usage.limit,
         },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -307,17 +336,17 @@ export async function POST(req: Request): Promise<NextResponse<AuditApiResponse>
           remaining: usage.remaining,
           limit: usage.limit,
         },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
-    // ── 4. LLM call ───────────────────────────────────────────────────────────
-    const completion = await client.chat.completions.create({
+    // 4. LLM call ──────────────────────────────────────────────────────────────
+    const completion = await groqClient.chat.completions.create({
       model: "llama-3.3-70b-versatile",
       messages: [
         {
           role: "system",
-          content: `You are Rejection Decoder — a cold email failure diagnosis system for B2B SaaS outreach.
+          content: `You are InboxSignal — a cold email failure diagnosis system for B2B SaaS outreach.
 Your job is to diagnose WHY an email fails before suggesting any improvements.
 
 Return ONLY valid JSON. No markdown. No commentary. No extra text.
@@ -347,7 +376,7 @@ Return this exact shape:
   "rewrite": {
     "email": "improved email text",
     "subjectLines": ["option 1", "option 2", "option 3", "option 4"],
-    "whyThisWorks": "structured explanation of the specific changes made and why each one improves reply likelihood"
+    "whyThisWorks": "structured explanation of the specific changes made"
   },
   "followUps": {
     "day3": "day 3 follow-up email text",
@@ -355,57 +384,37 @@ Return this exact shape:
   }
 }
 
-SIGNAL SCORING — use a 0–100 integer scale ONLY. Never return decimals. Never return /10 values.
+SIGNAL SCORING — 0–100 integers ONLY. No decimals.
 
-clarity (0–100): How readable and focused is the email?
-  - 0–30: Confusing structure, buried message, or too long to scan.
-  - 31–50: Readable but unfocused — multiple competing ideas.
-  - 51–70: Clear main point but some friction in delivery.
-  - 71–85: Clean, focused, easy to scan in under 10 seconds.
-  - 86–100: Exceptionally tight. One clear message, zero friction.
+clarity (0–100): Readability and focus.
+  0–30: Confusing structure or too long. 31–50: Readable but unfocused.
+  51–70: Clear but some friction. 71–85: Clean and scannable. 86–100: Exceptionally tight.
 
-relevance (0–100): How well does the email address this specific prospect?
-  - 0–30: Entirely generic. Could be sent to anyone.
-  - 31–50: Mentions role or industry but no specific context.
-  - 51–70: Uses some provided context but surface-level.
-  - 71–85: Clearly researched. Mentions a specific trigger or detail.
-  - 86–100: Deeply personalized to a specific problem or moment.
+relevance (0–100): How well-targeted to this specific prospect.
+  0–30: Generic. 31–50: Mentions role/industry only. 51–70: Surface-level context.
+  71–85: Specific trigger or detail. 86–100: Deeply personalized.
 
-credibility (0–100): Does the sender come across as trustworthy and worth a reply?
-  - 0–30: No evidence, no specifics, sounds like a script.
-  - 31–50: Credibility implied but not supported.
-  - 51–70: Some specificity but claims feel generic.
-  - 71–85: Concrete evidence, outcome, or reference point.
-  - 86–100: Highly specific proof — named customers, metrics, or social proof.
+credibility (0–100): Trust signals and proof.
+  0–30: Sounds scripted. 31–50: Implied credibility. 51–70: Generic specificity.
+  71–85: Concrete evidence. 86–100: Named customers, metrics, or social proof.
 
-ctaStrength (0–100): How easy is it for the prospect to take the next step?
-  - 0–30: No clear ask, or the ask is too big.
-  - 31–50: Vague ask ("let me know if interested").
-  - 51–70: Clear ask but framed awkwardly or with friction.
-  - 71–85: Low-friction ask with a clear, specific next step.
-  - 86–100: Perfect ask — specific, easy to say yes to, low commitment.
+ctaStrength (0–100): Ease of next step.
+  0–30: No clear ask. 31–50: Vague ("let me know"). 51–70: Clear but friction.
+  71–85: Low-friction specific ask. 86–100: Easy, specific, low commitment.
 
 BENCHMARKS:
-  - Generic cold email: clarity 45–58, relevance 20–35, credibility 15–30, ctaStrength 25–45.
-  - Well-personalized email: clarity 60–72, relevance 55–70, credibility 40–60, ctaStrength 55–70.
-  - Only achieve 85+ if the email demonstrates clear mastery of that dimension.
+  Generic cold email: clarity 45–58, relevance 20–35, credibility 15–30, ctaStrength 25–45.
+  Well-personalized: clarity 60–72, relevance 55–70, credibility 40–60, ctaStrength 55–70.
+  Only 85+ if email demonstrates clear mastery of that dimension.
 
 DIAGNOSIS RULES:
-  - Always return at least 3 diagnosis items, ordered from highest to lowest impact.
-  - issue field must be a short noun phrase (max 8 words). Not a sentence.
-  - whyItMatters must explain the failure mechanism, not just state the problem.
-  - fix must be specific and immediately actionable.
-  - Do not hallucinate company facts not provided.
-  - Do not exaggerate outcomes or invent metrics.
+  At least 3 items, ordered critical → low. Issue = short noun phrase (max 8 words).
+  whyItMatters = failure mechanism, not just the problem. fix = immediately actionable.
+  No hallucinated facts. No invented metrics.
 
 REWRITE RULES:
-  - 120–160 words max.
-  - Remove filler: "hope you're doing well", "quick question", "just reaching out", "I wanted to".
-  - Include one specific hook grounded only in provided context.
-  - No hype language. No marketing copy tone.
-  - subjectLines: 4 distinct lines with clearly different approaches.
-  - whyThisWorks: explain specific structural changes made.
-  - Follow-ups must add a genuinely new angle. Not a repeat.`,
+  120–160 words. Remove filler phrases. One specific hook from provided context.
+  No hype. 4 subject line variants with different approaches. Follow-ups add new angles.`,
         },
         {
           role: "user",
@@ -424,11 +433,11 @@ REWRITE RULES:
           remaining: usage.remaining,
           limit: usage.limit,
         },
-        { status: 502 },
+        { status: 502 }
       );
     }
 
-    // ── 5. Parse and normalise LLM output ─────────────────────────────────────
+    // 5. Parse & normalise ────────────────────────────────────────────────────
     let parsed: unknown;
     try {
       parsed = JSON.parse(extractJsonObject(content));
@@ -439,7 +448,7 @@ REWRITE RULES:
           remaining: usage.remaining,
           limit: usage.limit,
         },
-        { status: 502 },
+        { status: 502 }
       );
     }
 
@@ -451,18 +460,27 @@ REWRITE RULES:
       remaining: usage.remaining,
       limit: usage.limit,
     });
-
   } catch (err: unknown) {
-    // Last-resort catch — ensures we always return JSON, never an HTML error page.
-    const message = err instanceof Error ? err.message : "Server error, try again";
+    // Detect Upstash / Redis rate-limit errors and surface the correct UI copy
+    const errMsg = err instanceof Error ? err.message.toLowerCase() : "";
+    if (
+      errMsg.includes("ratelimit") ||
+      errMsg.includes("rate limit") ||
+      errMsg.includes("too many") ||
+      errMsg.includes("429")
+    ) {
+      return NextResponse.json<AuditApiResponse>(
+        { error: "Daily Limit Reached", remaining: 0, limit: DAILY_ANALYSIS_LIMIT },
+        { status: 429 }
+      );
+    }
     return NextResponse.json<AuditApiResponse>(
       {
         error: "Server error, try again",
         remaining: 0,
         limit: DAILY_ANALYSIS_LIMIT,
       },
-      { status: 500 },
+      { status: 500 }
     );
-    void message; // suppress unused variable warning
   }
 }
