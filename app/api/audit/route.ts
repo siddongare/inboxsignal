@@ -349,7 +349,7 @@ export async function POST(
           content: `You are InboxSignal — a cold email failure diagnosis system for B2B SaaS outreach.
 Your job is to diagnose WHY an email fails before suggesting any improvements.
 
-Return ONLY valid JSON. No markdown. No commentary. No extra text.
+You MUST output a single, valid JSON object. Do not wrap it in markdown code blocks. Do not add conversational text. Start your response with { and end with }.
 
 Return this exact shape:
 {
@@ -406,6 +406,7 @@ BENCHMARKS:
   Generic cold email: clarity 45–58, relevance 20–35, credibility 15–30, ctaStrength 25–45.
   Well-personalized: clarity 60–72, relevance 55–70, credibility 40–60, ctaStrength 55–70.
   Only 85+ if email demonstrates clear mastery of that dimension.
+  SCORING ANCHOR: Start every dimension at 50 points. Add or subtract points strictly based on the rubric above. Do not guess. Calculate.
 
 DIAGNOSIS RULES:
   At least 3 items, ordered critical → low. Issue = short noun phrase (max 8 words).
@@ -421,7 +422,8 @@ REWRITE RULES:
           content: JSON.stringify({ email, prospect }),
         },
       ],
-      temperature: 0.3,
+      temperature: 0,
+      response_format: { type: "json_object" },
     });
 
     const content = completion.choices[0]?.message?.content;

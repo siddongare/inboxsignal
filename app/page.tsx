@@ -1325,9 +1325,9 @@ function Navbar({
         alignItems: "center",
         justifyContent: "space-between",
         padding: "0 clamp(16px, 4vw, 28px)",
-        background: "rgba(0,0,0,0.88)",
+        background: "transparent",
         backdropFilter: "blur(20px)",
-        borderBottom: "1px solid rgba(255,255,255,0.05)",
+        borderBottom: "none",
       }}
     >
       {/* Logo */}
@@ -1340,9 +1340,26 @@ function Navbar({
             fontWeight: 700,
             color: "rgba(255,255,255,0.85)",
             letterSpacing: "0.02em",
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
           }}
         >
           InboxSignal
+          <span
+            style={{
+              padding: "2px 8px",
+              borderRadius: 999,
+              background: "rgba(255,255,255,0.03)",
+              border: "1px solid rgba(255,255,255,0.08)",
+              color: "rgba(255,255,255,0.35)",
+              fontSize: 9,
+              letterSpacing: "0.08em",
+              fontWeight: 500,
+            }}
+          >
+            BETA
+          </span>
         </span>
       </div>
 
@@ -1603,7 +1620,6 @@ function InputPanel({
     WebkitTextSizeAdjust: "100%",
   };
 
-
   return (
     <motion.div
       layout
@@ -1625,6 +1641,61 @@ function InputPanel({
       }}
       transition={SPRING_SLOW}
     >
+      {/* New Metrics Bar (Landing Page Only) */}
+      {!isSidebar && (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "stretch",
+            margin: "0 auto 16px",
+            border: "1px solid rgba(255,255,255,0.05)",
+            borderRadius: 8,
+            background: "rgba(255,255,255,0.015)",
+            width: "fit-content",
+          }}
+        >
+          {[
+            { top: "< 30s", btm: "TO DIAGNOSE" },
+            { top: "0-100", btm: "SIGNAL SCORE" },
+            { top: "4 dims", btm: "OF ANALYSIS" },
+          ].map((item, i) => (
+            <div
+              key={item.top}
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                padding: "10px 24px",
+                borderRight: i < 2 ? "1px solid rgba(255,255,255,0.05)" : "none",
+              }}
+            >
+              <span
+                style={{
+                  fontFamily: "'Geist Mono', 'DM Mono', ui-monospace, monospace",
+                  fontSize: 14,
+                  fontWeight: 700,
+                  color: "rgba(255,255,255,0.85)",
+                }}
+              >
+                {item.top}
+              </span>
+              <span
+                style={{
+                  fontFamily: "'Geist Mono', 'DM Mono', ui-monospace, monospace",
+                  fontSize: 9,
+                  color: "rgba(255,255,255,0.3)",
+                  letterSpacing: "0.06em",
+                  textTransform: "uppercase",
+                  marginTop: 2,
+                }}
+              >
+                {item.btm}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
+
       {/* Cold Email textarea */}
       <div
         style={{
@@ -1638,7 +1709,7 @@ function InputPanel({
           padding: "12px 14px",
           transition: "border-color 0.18s",
           position: "relative",
-          minHeight: isSidebar ? 200 : 180,
+          minHeight: isSidebar ? 200 : 140,
           backdropFilter: "blur(4px)",
         }}
       >
@@ -1673,7 +1744,7 @@ function InputPanel({
           onFocus={() => setFocusedField("email")}
           onBlur={() => setFocusedField(null)}
           onKeyDown={handleKeyDown}
-          rows={isSidebar ? 8 : 5}
+          rows={isSidebar ? 8 : 4}
           placeholder=""
           style={{ ...textareaBase, position: "relative", zIndex: 2 }}
         />
@@ -1692,7 +1763,7 @@ function InputPanel({
           padding: "12px 14px",
           transition: "border-color 0.18s",
           position: "relative",
-          minHeight: isSidebar ? 130 : 110,
+          minHeight: isSidebar ? 130 : 90,
           backdropFilter: "blur(4px)",
         }}
       >
@@ -1789,7 +1860,7 @@ function HeroSection({ visible }: { visible: boolean }) {
             transition: { ...SPRING, delay: 0.05 },
           }}
           exit={{ opacity: 0, y: -14, transition: { duration: 0.22 } }}
-          style={{ textAlign: "center", marginBottom: 36, width: "100%" }}
+          style={{ textAlign: "center", marginBottom: 12, width: "100%" }}
         >
           {/* Status pill */}
           <motion.div
@@ -1803,7 +1874,7 @@ function HeroSection({ visible }: { visible: boolean }) {
               borderRadius: 999,
               background: "rgba(255,255,255,0.035)",
               border: "1px solid rgba(255,255,255,0.07)",
-              marginBottom: 28,
+              marginBottom: 12,
             }}
           >
             <div
@@ -1824,14 +1895,14 @@ function HeroSection({ visible }: { visible: boolean }) {
               color: "rgba(255,255,255,0.92)",
               letterSpacing: "-0.055em",
               lineHeight: 1.04,
-              margin: "0 auto 18px",
+              margin: "0 auto 8px",
               fontFamily: "'Geist Mono', 'DM Mono', ui-monospace, monospace",
               maxWidth: 700,
             }}
           >
             Turn cold emails
             <br />
-            into replies.
+            <span style={{ color: "rgba(255,255,255,0.22)" }}>into replies.</span>
           </h1>
 
           <p
@@ -1856,7 +1927,7 @@ function HeroSection({ visible }: { visible: boolean }) {
               alignItems: "flex-end",
               justifyContent: "center",
               gap: 3,
-              marginTop: 28,
+              marginTop: 16,
               height: 18,
               opacity: 0.2,
             }}
@@ -2318,7 +2389,7 @@ export default function Page() {
                 alignItems: "center",
                 justifyContent: "center",
                 minHeight: "calc(100vh - 52px)",
-                padding: "32px 20px",
+                padding: "16px 20px",
               }}
             >
               <HeroSection visible />
@@ -2344,12 +2415,14 @@ export default function Page() {
 
         {/* ── LOADING / RESULTS ── */}
         {!isLanding && (
-          <div
+          <motion.div
+            layout
             className="layout-row"
             style={{ display: "flex", minHeight: "calc(100vh - 52px)" }}
           >
             {/* Sidebar */}
-            <div
+            <motion.div
+              layout
               className="sidebar-panel"
               style={{
                 width: "clamp(280px, 28vw, 340px)",
@@ -2382,10 +2455,11 @@ export default function Page() {
                   onSignInAndAnalyze={handleSignInAndAnalyze}
                 />
               </motion.div>
-            </div>
+            </motion.div>
 
             {/* Results scroll area */}
-            <div
+            <motion.div
+              layout
               ref={resultsRef}
               className="results-scroll"
               style={{
@@ -2428,8 +2502,8 @@ export default function Page() {
                   </motion.div>
                 )}
               </AnimatePresence>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         )}
       </div>
     </>
