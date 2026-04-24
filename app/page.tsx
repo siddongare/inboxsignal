@@ -2388,9 +2388,9 @@ export default function Page() {
           z-index: 0;
           pointer-events: none;
           background:
-            radial-gradient(ellipse 55% 35% at 20% 30%, rgba(120,100,255,0.08) 0%, transparent 65%),
-            radial-gradient(ellipse 40% 50% at 80% 70%, rgba(255,255,255,0.055) 0%, transparent 60%),
-            radial-gradient(ellipse 60% 40% at 50% 50%, rgba(80,120,255,0.045) 0%, transparent 70%);
+            radial-gradient(ellipse 55% 35% at 20% 30%, rgba(255,255,255,0.045) 0%, transparent 65%),
+            radial-gradient(ellipse 40% 50% at 80% 70%, rgba(255,255,255,0.03) 0%, transparent 60%),
+            radial-gradient(ellipse 60% 40% at 50% 50%, rgba(255,255,255,0.025) 0%, transparent 70%);
           animation: meshShift 18s ease-in-out infinite;
         }
 
