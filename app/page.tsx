@@ -3,7 +3,7 @@
 import type { CSSProperties } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useAuth, SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
-import { AnimatePresence, motion, useMotionValue, useSpring } from "framer-motion";
+import { AnimatePresence, motion, useMotionValue, useSpring, useInView } from "framer-motion";
 import {
   AlertTriangle,
   ArrowRight,
@@ -205,7 +205,7 @@ function MouseGlow() {
         height: 400,
         borderRadius: "50%",
         background:
-          "radial-gradient(circle, rgba(255,255,255,0.022) 0%, transparent 70%)",
+          "radial-gradient(circle, rgba(255,255,255,0.045) 0%, transparent 70%)",
         left: springX,
         top: springY,
         filter: "blur(2px)",
@@ -355,7 +355,31 @@ function WaveformIcon({ color = "#000" }: { color?: string }) {
   );
 }
 
-// ─── Ghost typewriter ─────────────────────────────────────────────────────────
+// ─── Count-up number ──────────────────────────────────────────────────────────
+
+function CountUp({ target, duration = 1200 }: { target: number; duration?: number }) {
+  const [value, setValue] = useState(0);
+  const startRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    let raf: number;
+    const step = (ts: number) => {
+      if (!startRef.current) startRef.current = ts;
+      const elapsed = ts - startRef.current;
+      const progress = Math.min(elapsed / duration, 1);
+      // ease out cubic
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setValue(Math.round(eased * target));
+      if (progress < 1) raf = requestAnimationFrame(step);
+    };
+    raf = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(raf);
+  }, [target, duration]);
+
+  return <>{value}</>;
+}
+
+
 
 interface GhostTypewriterProps {
   examples: string[];
@@ -1326,7 +1350,8 @@ function Navbar({
         justifyContent: "space-between",
         padding: "0 clamp(16px, 4vw, 28px)",
         background: "transparent",
-        backdropFilter: "blur(20px)",
+        backdropFilter: "none",
+        WebkitBackdropFilter: "none",
         borderBottom: "none",
       }}
     >
@@ -1648,50 +1673,57 @@ function InputPanel({
             display: "flex",
             alignItems: "stretch",
             margin: "0 auto 16px",
-            border: "1px solid rgba(255,255,255,0.05)",
+            border: "1px solid rgba(255,255,255,0.07)",
             borderRadius: 8,
             background: "rgba(255,255,255,0.015)",
             width: "fit-content",
+            position: "relative",
+            overflow: "hidden",
           }}
         >
+          <BorderBeam duration={12} />
           {[
-            { top: "< 30s", btm: "TO DIAGNOSE" },
-            { top: "0-100", btm: "SIGNAL SCORE" },
-            { top: "4 dims", btm: "OF ANALYSIS" },
+            { prefix: "<", countTo: 30, suffix: "s", btm: "TO DIAGNOSE" },
+            { prefix: "0–", countTo: 100, suffix: "", btm: "SIGNAL SCORE" },
+            { prefix: "", countTo: 4, suffix: " dims", btm: "OF ANALYSIS" },
           ].map((item, i) => (
-            <div
-              key={item.top}
+            <motion.div
+              key={item.btm}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ ...SPRING, delay: 0.18 + i * 0.1 }}
               style={{
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
-                padding: "10px 24px",
-                borderRight: i < 2 ? "1px solid rgba(255,255,255,0.05)" : "none",
+                padding: "12px 28px",
+                borderRight: i < 2 ? "1px solid rgba(255,255,255,0.07)" : "none",
               }}
             >
               <span
                 style={{
                   fontFamily: "'Geist Mono', 'DM Mono', ui-monospace, monospace",
-                  fontSize: 14,
+                  fontSize: 16,
                   fontWeight: 700,
-                  color: "rgba(255,255,255,0.85)",
+                  color: "rgba(255,255,255,0.92)",
+                  letterSpacing: "-0.04em",
                 }}
               >
-                {item.top}
+                {item.prefix}<CountUp target={item.countTo} duration={900} />{item.suffix}
               </span>
               <span
                 style={{
                   fontFamily: "'Geist Mono', 'DM Mono', ui-monospace, monospace",
                   fontSize: 9,
-                  color: "rgba(255,255,255,0.3)",
-                  letterSpacing: "0.06em",
+                  color: "rgba(255,255,255,0.36)",
+                  letterSpacing: "0.08em",
                   textTransform: "uppercase",
-                  marginTop: 2,
+                  marginTop: 3,
                 }}
               >
                 {item.btm}
               </span>
-            </div>
+            </motion.div>
           ))}
         </div>
       )}
@@ -1877,42 +1909,55 @@ function HeroSection({ visible }: { visible: boolean }) {
               marginBottom: 12,
             }}
           >
-            <div
-              style={{
-                width: 5,
-                height: 5,
-                borderRadius: "50%",
-                background: "rgba(255,255,255,0.55)",
-              }}
-            />
+            <div style={{ position: "relative", width: 8, height: 8, flexShrink: 0 }}>
+              <motion.div
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  borderRadius: "50%",
+                  background: "rgba(120,255,160,0.6)",
+                }}
+                animate={{ scale: [1, 2.2], opacity: [0.5, 0] }}
+                transition={{ duration: 1.8, repeat: Infinity, ease: "easeOut" }}
+              />
+              <div
+                style={{
+                  position: "absolute",
+                  inset: 1.5,
+                  borderRadius: "50%",
+                  background: "rgba(120,255,160,0.9)",
+                }}
+              />
+            </div>
             <MonoTag>Free · 5 analyses / day · No card</MonoTag>
           </motion.div>
 
           <h1
             style={{
-              fontSize: "clamp(30px, 7.5vw, 66px)",
-              fontWeight: 700,
-              color: "rgba(255,255,255,0.92)",
-              letterSpacing: "-0.055em",
+              fontSize: "clamp(32px, 7.5vw, 68px)",
+              fontWeight: 800,
+              color: "rgba(255,255,255,0.94)",
+              letterSpacing: "-0.04em",
               lineHeight: 1.04,
               margin: "0 auto 8px",
-              fontFamily: "'Geist Mono', 'DM Mono', ui-monospace, monospace",
+              fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
               maxWidth: 700,
             }}
           >
             Turn cold emails
             <br />
-            <span style={{ color: "rgba(255,255,255,0.22)" }}>into replies.</span>
+            <span className="shimmer-text">into replies.</span>
           </h1>
 
           <p
             style={{
-              fontSize: "clamp(12px, 2vw, 15px)",
-              color: "rgba(255,255,255,0.26)",
-              lineHeight: 1.75,
-              maxWidth: 400,
+              fontSize: "clamp(13px, 2vw, 16px)",
+              color: "rgba(255,255,255,0.32)",
+              lineHeight: 1.7,
+              maxWidth: 420,
               margin: "0 auto",
-              fontFamily: "'Geist Mono', 'DM Mono', ui-monospace, monospace",
+              fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+              fontWeight: 400,
             }}
           >
             Diagnose why your outreach is being ignored.
@@ -1928,22 +1973,25 @@ function HeroSection({ visible }: { visible: boolean }) {
               justifyContent: "center",
               gap: 3,
               marginTop: 16,
-              height: 18,
-              opacity: 0.2,
+              height: 20,
+              opacity: 0.38,
             }}
           >
             {[5, 9, 14, 11, 7, 12, 16, 10, 6].map((h, i) => (
               <motion.div
                 key={i}
-                initial={{ scaleY: 0 }}
-                animate={{ scaleY: 1 }}
-                transition={{ ...SPRING, delay: 0.3 + i * 0.04 }}
                 style={{
                   width: 3,
-                  height: h,
-                  background: "rgba(255,255,255,0.7)",
                   borderRadius: 2,
+                  background: "rgba(255,255,255,0.7)",
                   originY: 1,
+                }}
+                animate={{ height: [`${h * 0.5}px`, `${h}px`, `${h * 0.65}px`, `${h}px`, `${h * 0.5}px`] }}
+                transition={{
+                  duration: 1.8,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  delay: i * 0.12,
                 }}
               />
             ))}
@@ -1957,6 +2005,9 @@ function HeroSection({ visible }: { visible: boolean }) {
 // ─── Feature grid ─────────────────────────────────────────────────────────────
 
 function FeatureGrid({ visible }: { visible: boolean }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: true, margin: "-60px" });
+
   const items = [
     {
       icon: Zap,
@@ -1988,6 +2039,7 @@ function FeatureGrid({ visible }: { visible: boolean }) {
     <AnimatePresence>
       {visible && (
         <motion.div
+          ref={ref}
           key="features"
           initial={{ opacity: 0, y: 26 }}
           animate={{
@@ -1999,26 +2051,30 @@ function FeatureGrid({ visible }: { visible: boolean }) {
           style={{
             display: "grid",
             gridTemplateColumns: "repeat(2, 1fr)",
-            gap: 9,
+            gap: 10,
             width: "100%",
             maxWidth: 600,
             marginTop: 32,
           }}
         >
-          {items.map(({ icon: Icon, n, title, desc }) => (
+          {items.map(({ icon: Icon, n, title, desc }, idx) => (
             <motion.div
               key={n}
-              whileHover={{ scale: 1.018, borderColor: "rgba(255,255,255,0.1)" }}
-              transition={{ ...SPRING, stiffness: 380, damping: 28 }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+              transition={{ ...SPRING, delay: 0.1 + idx * 0.08 }}
+              whileHover={{ scale: 1.028, borderColor: "rgba(255,255,255,0.16)", y: -2 }}
               style={{
-                padding: "15px",
-                background: "rgba(255,255,255,0.018)",
-                border: "1px solid rgba(255,255,255,0.045)",
-                borderRadius: 9,
+                padding: "16px",
+                background: "rgba(255,255,255,0.04)",
+                border: "1px solid rgba(255,255,255,0.09)",
+                borderTop: "1px solid rgba(255,255,255,0.16)",
+                borderRadius: 10,
                 display: "flex",
                 flexDirection: "column",
                 gap: 7,
                 cursor: "default",
+                boxShadow: "0 1px 0 rgba(255,255,255,0.04) inset",
               }}
             >
               <div
@@ -2271,7 +2327,7 @@ export default function Page() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@700;800&display=swap');
 
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -2298,6 +2354,27 @@ export default function Page() {
           outline-offset: 2px;
         }
 
+        /* Shimmer sweep for hero accent */
+        @keyframes shimmerSweep {
+          0%   { background-position: -200% center; }
+          100% { background-position: 200% center; }
+        }
+        .shimmer-text {
+          background: linear-gradient(
+            105deg,
+            rgba(255,255,255,0.18) 0%,
+            rgba(255,255,255,0.18) 35%,
+            rgba(255,255,255,0.72) 50%,
+            rgba(255,255,255,0.18) 65%,
+            rgba(255,255,255,0.18) 100%
+          );
+          background-size: 200% auto;
+          -webkit-background-clip: text;
+          background-clip: text;
+          -webkit-text-fill-color: transparent;
+          animation: shimmerSweep 12s linear infinite;
+        }
+
         /* Animated mesh background */
         @keyframes meshShift {
           0%   { transform: translate(0, 0); }
@@ -2311,9 +2388,9 @@ export default function Page() {
           z-index: 0;
           pointer-events: none;
           background:
-            radial-gradient(ellipse 55% 35% at 20% 30%, rgba(255,255,255,0.016) 0%, transparent 65%),
-            radial-gradient(ellipse 40% 50% at 80% 70%, rgba(255,255,255,0.01) 0%, transparent 60%),
-            radial-gradient(ellipse 60% 40% at 50% 50%, rgba(255,255,255,0.006) 0%, transparent 70%);
+            radial-gradient(ellipse 55% 35% at 20% 30%, rgba(120,100,255,0.08) 0%, transparent 65%),
+            radial-gradient(ellipse 40% 50% at 80% 70%, rgba(255,255,255,0.055) 0%, transparent 60%),
+            radial-gradient(ellipse 60% 40% at 50% 50%, rgba(80,120,255,0.045) 0%, transparent 70%);
           animation: meshShift 18s ease-in-out infinite;
         }
 
@@ -2380,9 +2457,9 @@ export default function Page() {
           {isLanding && (
             <motion.div
               key="landing"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0, transition: { duration: 0.18 } }}
+              initial={{ opacity: 0, filter: "blur(6px)" }}
+              animate={{ opacity: 1, filter: "blur(0px)", transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] } }}
+              exit={{ opacity: 0, filter: "blur(4px)", transition: { duration: 0.18 } }}
               style={{
                 display: "flex",
                 flexDirection: "column",
