@@ -400,13 +400,6 @@ function GhostTypewriter({
   const [display, setDisplay] = useState("");
   const [mode, setMode] = useState<"typing" | "erasing">("typing");
   const [cursorVisible, setCursorVisible] = useState(true);
-  const spanRef = useRef<HTMLSpanElement>(null);
-
-  // Auto-scroll the clipping container as text grows
-  useEffect(() => {
-    const el = spanRef.current?.parentElement;
-    if (el) el.scrollTop = el.scrollHeight;
-  }, [display]);
 
   useEffect(() => {
     if (!show) return;
@@ -443,7 +436,6 @@ function GhostTypewriter({
 
   return (
     <span
-      ref={spanRef}
       style={{
         fontFamily: "'Geist Mono', 'DM Mono', ui-monospace, monospace",
         fontSize: 13,
@@ -727,10 +719,9 @@ function ScoreSection({ signals }: { signals: Signals }) {
           background: "rgba(255,255,255,0.02)",
           border: "1px solid rgba(255,255,255,0.07)",
           borderRadius: 12,
-          padding: "22px",
+          padding: "28px 22px 22px",
           position: "relative",
           overflow: "hidden",
-          // drop-shadow for premium "lit" look
           filter: "drop-shadow(0 0 15px rgba(255,255,255,0.03))",
         }}
       >
@@ -751,12 +742,13 @@ function ScoreSection({ signals }: { signals: Signals }) {
             <MonoTag dim>Signal score</MonoTag>
             <div
               style={{
-                fontSize: "clamp(20px, 3vw, 26px)",
-                fontWeight: 700,
-                color: "rgba(255,255,255,0.88)",
-                letterSpacing: "-0.04em",
+                fontSize: "clamp(22px, 3vw, 28px)",
+                fontWeight: 800,
+                color: "rgba(255,255,255,0.92)",
+                letterSpacing: "-0.05em",
                 marginTop: 5,
                 marginBottom: 4,
+                fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
               }}
             >
               {scoreToLabel(avg)}
@@ -968,6 +960,7 @@ function RewriteSection({
           overflow: "hidden",
           position: "relative",
           filter: "drop-shadow(0 0 15px rgba(255,255,255,0.025))",
+          paddingBottom: 4,
         }}
       >
         <BorderBeam duration={4.5} />
@@ -1157,8 +1150,8 @@ function FollowUpSection({ followUps }: { followUps: FollowUps }) {
         className="followup-grid"
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
-          gap: 10,
+          gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+          gap: 8,
         }}
       >
         {[
@@ -1228,38 +1221,52 @@ function BreakdownSection({
       <div
         style={{
           background: "rgba(255,255,255,0.018)",
-          border: "1px solid rgba(255,255,255,0.05)",
+          border: "1px solid rgba(255,255,255,0.07)",
           borderRadius: 10,
           overflow: "hidden",
         }}
       >
         {rows.map(({ label, value }, i) => (
-          <div
+          <motion.div
             key={label}
+            whileHover={{ background: "rgba(255,255,255,0.03)" }}
+            transition={{ duration: 0.15 }}
             style={{
               display: "grid",
-              gridTemplateColumns: "96px 1fr",
-              gap: 14,
-              padding: "11px 16px",
+              gridTemplateColumns: "100px 1fr",
+              gap: 16,
+              padding: "13px 16px",
               borderBottom:
                 i < rows.length - 1
-                  ? "1px solid rgba(255,255,255,0.04)"
+                  ? "1px solid rgba(255,255,255,0.05)"
                   : "none",
               alignItems: "start",
+              cursor: "default",
             }}
           >
-            <MonoTag dim>{label}</MonoTag>
+            <span
+              style={{
+                fontFamily: "'Geist Mono', 'DM Mono', ui-monospace, monospace",
+                fontSize: 9,
+                letterSpacing: "0.08em",
+                textTransform: "uppercase" as const,
+                color: "rgba(255,255,255,0.28)",
+                paddingTop: 2,
+              }}
+            >
+              {label}
+            </span>
             <p
               style={{
                 margin: 0,
                 fontSize: 12,
-                color: "rgba(255,255,255,0.46)",
+                color: "rgba(255,255,255,0.58)",
                 lineHeight: 1.65,
               }}
             >
               {value}
             </p>
-          </div>
+          </motion.div>
         ))}
       </div>
     </motion.div>
@@ -1763,7 +1770,6 @@ function InputPanel({
 
         {email.length === 0 && focusedField !== "email" && (
           <div
-            className="ghost-scroll"
             style={{
               position: "absolute",
               top: 38,
@@ -1772,8 +1778,7 @@ function InputPanel({
               bottom: 12,
               pointerEvents: "none",
               zIndex: 1,
-              overflowY: "auto",
-              scrollbarWidth: "none",
+              overflow: "hidden",
             }}
           >
             <GhostTypewriter examples={EMAIL_TYPEWRITER_EXAMPLES} show />
@@ -2379,21 +2384,20 @@ function ResultsPanel({
       variants={containerVariants}
       initial="hidden"
       animate="visible"
-      style={{ display: "flex", flexDirection: "column", gap: 20 }}
+      style={{ display: "flex", flexDirection: "column", gap: 16 }}
     >
       {/* 2-col: score+diagnosis left, rewrite right. Stacks on narrow screens. */}
       <div className="results-grid" style={{ display: "contents" }}>
         <div
           style={{
             display: "grid",
-            // Responsive: 2-col on wide, 1-col on narrow
             gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
             gap: 16,
             alignItems: "start",
           }}
         >
           {/* Left: score + diagnosis */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             <ScoreSection signals={analysis.signals} />
             <DiagnosisSection items={analysis.diagnosis} />
           </div>
@@ -2410,7 +2414,7 @@ function ResultsPanel({
       <FollowUpSection followUps={analysis.followUps} />
       <Rule />
       <BreakdownSection breakdown={analysis.emailBreakdown} />
-      <div style={{ height: 48 }} />
+      <div style={{ height: 32 }} />
     </motion.div>
   );
 }
@@ -2581,7 +2585,6 @@ export default function Page() {
         textarea { resize: none; }
         textarea::placeholder { color: transparent; }
         textarea:focus { outline: none; }
-        .ghost-scroll::-webkit-scrollbar { display: none; }
 
         ::-webkit-scrollbar { width: 4px; height: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
