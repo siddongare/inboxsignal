@@ -2110,6 +2110,265 @@ function FeatureGrid({ visible }: { visible: boolean }) {
   );
 }
 
+// ─── Landing results preview ──────────────────────────────────────────────────
+
+function ResultPreview() {
+  const [revealed, setRevealed] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: true, margin: "-40px" });
+
+  const mockSignals = [
+    { label: "Clarity",     score: 58 },
+    { label: "Relevance",   score: 35 },
+    { label: "Credibility", score: 50 },
+    { label: "CTA",         score: 45 },
+  ];
+  const avg = 47;
+
+  const mockIssues = [
+    { level: "CRITICAL", text: "Lack of Personalization" },
+    { level: "HIGH",     text: "Weak Value Proposition" },
+    { level: "MEDIUM",   text: "Generic Subject Line" },
+  ];
+
+  const levelColor: Record<string, string> = {
+    CRITICAL: "rgba(255,255,255,0.88)",
+    HIGH:     "rgba(255,255,255,0.65)",
+    MEDIUM:   "rgba(255,255,255,0.42)",
+  };
+
+  return (
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, y: 32 }}
+      animate={inView ? { opacity: 1, y: 0 } : {}}
+      transition={{ ...SPRING, delay: 0.1 }}
+      style={{ width: "100%", maxWidth: 600, marginTop: 40 }}
+    >
+      {/* Label + CTA row */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
+          <MonoTag dim>Sample Analysis</MonoTag>
+          <div style={{
+            width: 1, height: 10,
+            background: "rgba(255,255,255,0.1)"
+          }} />
+          <MonoTag dim>AutoLead cold email → VP of Sales</MonoTag>
+        </div>
+        <motion.button
+          onClick={() => setRevealed((r) => !r)}
+          whileHover={{ scale: 1.04 }}
+          whileTap={{ scale: 0.97 }}
+          transition={SPRING}
+          style={{
+            display: "flex", alignItems: "center", gap: 5,
+            padding: "4px 10px",
+            background: revealed ? "rgba(255,255,255,0.07)" : "rgba(255,255,255,0.03)",
+            border: "1px solid rgba(255,255,255,0.1)",
+            borderRadius: 6,
+            cursor: "pointer",
+            color: "rgba(255,255,255,0.45)",
+            fontFamily: "'Geist Mono', 'DM Mono', ui-monospace, monospace",
+            fontSize: 9,
+            letterSpacing: "0.06em",
+            textTransform: "uppercase" as const,
+            transition: "background 0.15s, color 0.15s",
+          }}
+        >
+          {revealed ? "Hide preview" : "See a sample →"}
+        </motion.button>
+      </div>
+
+      {/* Preview card */}
+      <div style={{ position: "relative", borderRadius: 12, overflow: "hidden" }}>
+        {/* Frosted blur overlay — animates away when revealed */}
+        <motion.div
+          animate={{ backdropFilter: revealed ? "blur(0px)" : "blur(10px)", opacity: revealed ? 0 : 1 }}
+          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+          style={{
+            position: "absolute", inset: 0,
+            backdropFilter: "blur(10px)",
+            WebkitBackdropFilter: "blur(10px)",
+            background: "rgba(0,0,0,0.45)",
+            zIndex: 3,
+            pointerEvents: revealed ? "none" : "all",
+            borderRadius: 12,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <motion.span
+            animate={{ opacity: revealed ? 0 : 1 }}
+            style={{
+              fontFamily: "'Geist Mono','DM Mono',ui-monospace,monospace",
+              fontSize: 10,
+              color: "rgba(255,255,255,0.3)",
+              letterSpacing: "0.1em",
+              textTransform: "uppercase" as const,
+              userSelect: "none",
+            }}
+          >
+            Click "See a sample" to reveal
+          </motion.span>
+        </motion.div>
+
+        {/* Actual ghost preview content */}
+        <div
+          style={{
+            background: "rgba(255,255,255,0.02)",
+            border: "1px solid rgba(255,255,255,0.07)",
+            borderRadius: 12,
+            padding: "20px",
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: 16,
+          }}
+        >
+          {/* Left: score + bars */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            {/* Score ring block */}
+            <div style={{
+              background: "rgba(255,255,255,0.02)",
+              border: "1px solid rgba(255,255,255,0.06)",
+              borderRadius: 10, padding: "16px",
+              display: "flex", flexDirection: "column", alignItems: "center", gap: 12,
+              position: "relative", overflow: "hidden",
+            }}>
+              <BorderBeam duration={6} />
+              {/* Mini score ring */}
+              <div style={{ position: "relative", width: 80, height: 80 }}>
+                <svg width={80} height={80} style={{ transform: "rotate(-90deg)" }}>
+                  <circle cx={40} cy={40} r={37} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth={4} />
+                  <motion.circle
+                    cx={40} cy={40} r={37} fill="none"
+                    stroke="rgba(255,255,255,0.45)" strokeWidth={4} strokeLinecap="round"
+                    strokeDasharray={232.5}
+                    initial={{ strokeDashoffset: 232.5 }}
+                    animate={revealed ? { strokeDashoffset: 232.5 * (1 - avg / 100) } : { strokeDashoffset: 232.5 }}
+                    transition={{ ...SPRING_SLOW, delay: 0.2 }}
+                  />
+                </svg>
+                <div style={{
+                  position: "absolute", inset: 0,
+                  display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center"
+                }}>
+                  <span style={{
+                    fontFamily: "'Geist Mono',ui-monospace,monospace",
+                    fontSize: 20, fontWeight: 700,
+                    color: "rgba(255,255,255,0.88)", letterSpacing: "-0.05em"
+                  }}>
+                    {revealed ? <CountUp target={avg} duration={900} /> : avg}
+                  </span>
+                  <span style={{
+                    fontFamily: "'Geist Mono',ui-monospace,monospace",
+                    fontSize: 7, letterSpacing: "0.1em", textTransform: "uppercase" as const,
+                    color: "rgba(255,255,255,0.25)"
+                  }}>Weak</span>
+                </div>
+              </div>
+              {/* Signal bars */}
+              <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: 10 }}>
+                {mockSignals.map(({ label, score }, i) => (
+                  <div key={label} style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between" }}>
+                      <span style={{ fontFamily: "'Geist Mono',ui-monospace,monospace", fontSize: 8, color: "rgba(255,255,255,0.35)", letterSpacing: "0.06em" }}>{label.toUpperCase()}</span>
+                      <span style={{ fontFamily: "'Geist Mono',ui-monospace,monospace", fontSize: 8, color: "rgba(255,255,255,0.45)" }}>{score}</span>
+                    </div>
+                    <div style={{ height: 2, borderRadius: 999, background: "rgba(255,255,255,0.05)", overflow: "hidden" }}>
+                      <motion.div
+                        initial={{ width: 0 }}
+                        animate={revealed ? { width: `${score}%` } : { width: 0 }}
+                        transition={{ ...SPRING_SLOW, delay: 0.25 + i * 0.08 }}
+                        style={{ height: "100%", borderRadius: 999, background: "rgba(255,255,255,0.4)" }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Failure diagnosis block */}
+            <div style={{
+              background: "rgba(255,255,255,0.02)",
+              border: "1px solid rgba(255,255,255,0.06)",
+              borderRadius: 10, padding: "14px",
+              display: "flex", flexDirection: "column", gap: 8
+            }}>
+              <MonoTag dim>Failure Diagnosis</MonoTag>
+              {mockIssues.map(({ level, text }, i) => (
+                <motion.div
+                  key={text}
+                  initial={{ opacity: 0, x: -8 }}
+                  animate={revealed ? { opacity: 1, x: 0 } : { opacity: 0, x: -8 }}
+                  transition={{ ...SPRING, delay: 0.35 + i * 0.08 }}
+                  style={{ display: "flex", alignItems: "center", gap: 7 }}
+                >
+                  <span style={{
+                    fontFamily: "'Geist Mono',ui-monospace,monospace",
+                    fontSize: 7, letterSpacing: "0.08em",
+                    color: levelColor[level],
+                    textTransform: "uppercase" as const,
+                    minWidth: 48
+                  }}>{level}</span>
+                  <span style={{
+                    fontFamily: "'Geist Mono',ui-monospace,monospace",
+                    fontSize: 9, color: "rgba(255,255,255,0.45)"
+                  }}>{text}</span>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+
+          {/* Right: rewrite preview */}
+          <div style={{
+            background: "rgba(255,255,255,0.02)",
+            border: "1px solid rgba(255,255,255,0.06)",
+            borderRadius: 10, padding: "14px",
+            display: "flex", flexDirection: "column", gap: 10,
+            position: "relative", overflow: "hidden",
+          }}>
+            <BorderBeam duration={7} />
+            <MonoTag dim>Optimized Rewrite</MonoTag>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={revealed ? { opacity: 1 } : { opacity: 0 }}
+              transition={{ duration: 0.4, delay: 0.3 }}
+              style={{
+                fontFamily: "'Geist Mono',ui-monospace,monospace",
+                fontSize: 9, color: "rgba(255,255,255,0.38)",
+                lineHeight: 1.9,
+              }}
+            >
+              {`Hi [Name],\n\nYour SDR team spends hours researching leads. Our AI cuts that to minutes — and we've helped similar teams increase reply rates by 3×.\n\nWorth a 15-min look?`}
+            </motion.div>
+            <div style={{ marginTop: "auto", display: "flex", flexDirection: "column", gap: 5 }}>
+              <MonoTag dim>Subject variants</MonoTag>
+              {["Quick question about [Company]'s pipeline", "Saw you're scaling your sales team"].map((s, i) => (
+                <motion.div
+                  key={s}
+                  initial={{ opacity: 0, y: 4 }}
+                  animate={revealed ? { opacity: 1, y: 0 } : { opacity: 0, y: 4 }}
+                  transition={{ ...SPRING, delay: 0.45 + i * 0.07 }}
+                  style={{
+                    fontFamily: "'Geist Mono',ui-monospace,monospace",
+                    fontSize: 8, color: "rgba(255,255,255,0.3)",
+                    background: "rgba(255,255,255,0.03)",
+                    border: "1px solid rgba(255,255,255,0.06)",
+                    borderRadius: 5, padding: "4px 8px",
+                  }}
+                >
+                  {s}
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
 // ─── Loading skeletons ────────────────────────────────────────────────────────
 
 function LoadingResults() {
@@ -2486,6 +2745,8 @@ export default function Page() {
               <div className="feature-grid-inner" style={{ width: "100%", maxWidth: 600 }}>
                 <FeatureGrid visible />
               </div>
+              {/* Results preview */}
+              <ResultPreview />
             </motion.div>
           )}
         </AnimatePresence>
