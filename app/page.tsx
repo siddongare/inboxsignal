@@ -642,7 +642,7 @@ function ScoreRing({ score }: { score: number }) {
             letterSpacing: "-0.06em",
           }}
         >
-          {score}
+          <CountUp target={score} duration={1100} />
         </motion.span>
         <span
           style={{
@@ -662,7 +662,7 @@ function ScoreRing({ score }: { score: number }) {
 
 // ─── Signal bar ───────────────────────────────────────────────────────────────
 
-function SignalBar({ label, score }: { label: string; score: number }) {
+function SignalBar({ label, score, index = 0 }: { label: string; score: number; index?: number }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
       <div
@@ -684,7 +684,7 @@ function SignalBar({ label, score }: { label: string; score: number }) {
               letterSpacing: "-0.04em",
             }}
           >
-            {score}
+            <CountUp target={score} duration={900 + index * 80} />
           </span>
           <MonoTag dim>/100</MonoTag>
           <MonoTag dim>{scoreToLabel(score)}</MonoTag>
@@ -701,7 +701,7 @@ function SignalBar({ label, score }: { label: string; score: number }) {
         <motion.div
           initial={{ width: 0 }}
           animate={{ width: `${Math.max(2, score)}%` }}
-          transition={{ ...SPRING_SLOW, delay: 0.15 }}
+          transition={{ ...SPRING_SLOW, delay: 0.2 + index * 0.1 }}
           style={{
             height: "100%",
             borderRadius: 999,
@@ -766,10 +766,10 @@ function ScoreSection({ signals }: { signals: Signals }) {
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 15 }}>
-          <SignalBar label="Clarity" score={signals.clarity} />
-          <SignalBar label="Relevance" score={signals.relevance} />
-          <SignalBar label="Credibility" score={signals.credibility} />
-          <SignalBar label="CTA" score={signals.ctaStrength} />
+          <SignalBar label="Clarity" score={signals.clarity} index={0} />
+          <SignalBar label="Relevance" score={signals.relevance} index={1} />
+          <SignalBar label="Credibility" score={signals.credibility} index={2} />
+          <SignalBar label="CTA" score={signals.ctaStrength} index={3} />
         </div>
       </div>
     </motion.div>
