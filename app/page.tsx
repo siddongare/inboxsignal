@@ -1955,7 +1955,7 @@ function HeroSection({ visible }: { visible: boolean }) {
               color: "rgba(255,255,255,0.32)",
               lineHeight: 1.7,
               maxWidth: 420,
-              margin: "0 auto",
+              margin: "0 auto 20px",
               fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
               fontWeight: 400,
             }}
@@ -1964,38 +1964,6 @@ function HeroSection({ visible }: { visible: boolean }) {
             <br />
             Get the score, the fix, and the rewrite.
           </p>
-
-          {/* Decorative signal bars below headline */}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "flex-end",
-              justifyContent: "center",
-              gap: 3,
-              marginTop: 16,
-              height: 20,
-              opacity: 0.38,
-            }}
-          >
-            {[5, 9, 14, 11, 7, 12, 16, 10, 6].map((h, i) => (
-              <motion.div
-                key={i}
-                style={{
-                  width: 3,
-                  borderRadius: 2,
-                  background: "rgba(255,255,255,0.7)",
-                  originY: 1,
-                }}
-                animate={{ height: [`${h * 0.5}px`, `${h}px`, `${h * 0.65}px`, `${h}px`, `${h * 0.5}px`] }}
-                transition={{
-                  duration: 1.8,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                  delay: i * 0.12,
-                }}
-              />
-            ))}
-          </div>
         </motion.div>
       )}
     </AnimatePresence>
