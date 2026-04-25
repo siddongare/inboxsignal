@@ -400,6 +400,13 @@ function GhostTypewriter({
   const [display, setDisplay] = useState("");
   const [mode, setMode] = useState<"typing" | "erasing">("typing");
   const [cursorVisible, setCursorVisible] = useState(true);
+  const spanRef = useRef<HTMLSpanElement>(null);
+
+  // Auto-scroll the clipping container as text grows
+  useEffect(() => {
+    const el = spanRef.current?.parentElement;
+    if (el) el.scrollTop = el.scrollHeight;
+  }, [display]);
 
   useEffect(() => {
     if (!show) return;
@@ -436,6 +443,7 @@ function GhostTypewriter({
 
   return (
     <span
+      ref={spanRef}
       style={{
         fontFamily: "'Geist Mono', 'DM Mono', ui-monospace, monospace",
         fontSize: 13,
@@ -1755,6 +1763,7 @@ function InputPanel({
 
         {email.length === 0 && focusedField !== "email" && (
           <div
+            className="ghost-scroll"
             style={{
               position: "absolute",
               top: 38,
@@ -1763,7 +1772,8 @@ function InputPanel({
               bottom: 12,
               pointerEvents: "none",
               zIndex: 1,
-              overflow: "hidden",
+              overflowY: "auto",
+              scrollbarWidth: "none",
             }}
           >
             <GhostTypewriter examples={EMAIL_TYPEWRITER_EXAMPLES} show />
@@ -2571,6 +2581,7 @@ export default function Page() {
         textarea { resize: none; }
         textarea::placeholder { color: transparent; }
         textarea:focus { outline: none; }
+        .ghost-scroll::-webkit-scrollbar { display: none; }
 
         ::-webkit-scrollbar { width: 4px; height: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
