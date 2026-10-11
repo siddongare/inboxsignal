@@ -283,26 +283,31 @@ function Header({
           </div>
         </button>
 
-        {/* Seamless Floating Pill Navigation */}
-        <nav className="hidden sm:flex items-center gap-1 p-1 rounded-2xl bg-white/[0.02] border border-white/[0.06] backdrop-blur-md">
+        {/* Seamless Floating Pill Navigation (Apple Segmented Control Spring Physics) */}
+        <nav className="hidden sm:flex items-center gap-1 p-1 rounded-2xl bg-[#0D0F14]/80 border border-white/[0.08] backdrop-blur-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
           {navItems.map(({ id, label, icon: Icon }) => (
             <button
               key={id}
-              onClick={() => {
-                sfx.click();
-                onNavChange(id);
-              }}
-              className={`px-3.5 py-1.5 text-xs font-medium rounded-xl transition-all flex items-center gap-2 cursor-pointer ${
+              onPointerDown={() => sfx.click()}
+              onClick={() => onNavChange(id)}
+              className={`relative px-3.5 py-1.5 text-xs font-medium rounded-xl transition-colors flex items-center gap-2 cursor-pointer select-none active:scale-[0.96] ${
                 activeNav === id
-                  ? "bg-white/[0.1] text-white shadow-sm border border-white/[0.1] font-semibold"
-                  : "text-slate-400 hover:text-slate-200 border border-transparent"
+                  ? "text-white font-semibold"
+                  : "text-slate-400 hover:text-slate-200"
               }`}
             >
+              {activeNav === id && (
+                <motion.div
+                  layoutId="activeDesktopNavPill"
+                  className="absolute inset-0 bg-white/[0.1] rounded-xl border border-white/[0.12] -z-10 shadow-[inset_0_1px_0_rgba(255,255,255,0.15),0_2px_8px_rgba(0,0,0,0.3)]"
+                  transition={{ type: "spring", stiffness: 450, damping: 35 }}
+                />
+              )}
               <Icon
                 size={13}
                 className={activeNav === id ? "text-[#D4FF00]" : "text-slate-500"}
               />
-              <span>{label}</span>
+              <span className="relative z-10">{label}</span>
             </button>
           ))}
         </nav>
@@ -312,7 +317,7 @@ function Header({
       <div className="flex items-center gap-4">
         {signedIn ? (
           <>
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.03] border border-white/[0.06]">
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.03] border border-white/[0.06] shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
               <span className="w-1.5 h-1.5 rounded-full bg-[#D4FF00] shadow-[0_0_6px_#D4FF00] animate-pulse" />
               <span className="font-mono text-xs text-slate-300 font-medium">
                 {remaining}/{limit} left
@@ -333,16 +338,16 @@ function Header({
           <>
             <SignInButton mode="modal">
               <button
-                onClick={() => sfx.click()}
-                className="text-xs font-medium text-slate-400 hover:text-white px-3.5 py-1.5 transition cursor-pointer"
+                onPointerDown={() => sfx.click()}
+                className="text-xs font-medium text-slate-400 hover:text-white px-3.5 py-1.5 transition active:scale-[0.96] cursor-pointer"
               >
                 Log in
               </button>
             </SignInButton>
             <SignUpButton mode="modal">
               <button
-                onClick={() => sfx.click()}
-                className="text-xs font-bold bg-[#D4FF00] text-black px-4.5 py-2 rounded-xl shadow-[0_0_20px_rgba(212,255,0,0.3)] hover:shadow-[0_0_28px_rgba(212,255,0,0.45)] hover:bg-[#e2ff33] transition active:scale-98 cursor-pointer"
+                onPointerDown={() => sfx.click()}
+                className="text-xs font-bold bg-[#D4FF00] text-black px-4.5 py-2 rounded-xl shadow-[0_0_20px_rgba(212,255,0,0.3),inset_0_1px_0_rgba(255,255,255,0.4)] hover:shadow-[0_0_28px_rgba(212,255,0,0.45)] hover:bg-[#e2ff33] transition active:scale-[0.96] cursor-pointer"
               >
                 Get Started
               </button>
@@ -351,26 +356,31 @@ function Header({
         )}
       </div>
 
-      {/* ── Mobile Floating Bottom Dock (High-Precision Thumb Navigation) ── */}
-      <div className="sm:hidden fixed bottom-4 left-4 right-4 z-50 p-1.5 rounded-2xl bg-[#0D0F14]/90 border border-white/[0.1] backdrop-blur-2xl flex items-center justify-around shadow-2xl">
+      {/* ── Mobile Floating Bottom Dock (Apple-Style Spring Morphing Dock) ── */}
+      <div className="sm:hidden fixed bottom-4 left-4 right-4 z-50 p-1.5 rounded-2xl bg-[#0D0F14]/90 border border-white/[0.1] backdrop-blur-2xl flex items-center justify-around shadow-[inset_0_1px_0_rgba(255,255,255,0.12),0_20px_40px_rgba(0,0,0,0.7)]">
         {navItems.map(({ id, label, icon: Icon }) => (
           <button
             key={id}
-            onClick={() => {
-              sfx.click();
-              onNavChange(id);
-            }}
-            className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition cursor-pointer ${
+            onPointerDown={() => sfx.click()}
+            onClick={() => onNavChange(id)}
+            className={`relative flex flex-col items-center gap-1 py-1.5 px-3.5 rounded-xl transition-colors cursor-pointer select-none active:scale-[0.94] ${
               activeNav === id
-                ? "bg-white/[0.1] text-white shadow-sm border border-white/[0.1]"
+                ? "text-white font-semibold"
                 : "text-slate-400 hover:text-white"
             }`}
           >
+            {activeNav === id && (
+              <motion.div
+                layoutId="activeMobileNavPill"
+                className="absolute inset-0 bg-white/[0.1] rounded-xl border border-white/[0.12] -z-10 shadow-[inset_0_1px_0_rgba(255,255,255,0.15)]"
+                transition={{ type: "spring", stiffness: 450, damping: 35 }}
+              />
+            )}
             <Icon
-              size={15}
+              size={16}
               className={activeNav === id ? "text-[#D4FF00]" : "text-slate-400"}
             />
-            <span className="text-[10px] font-medium tracking-tight">{label}</span>
+            <span className="text-[10px] font-medium tracking-tight relative z-10">{label}</span>
           </button>
         ))}
       </div>
@@ -563,50 +573,72 @@ export default function InboxSignalShell({
       />
 
       <div className="pt-20 flex-1 flex flex-col relative z-10">
-        {/* ── TAB 1: ANALYTICS VIEW ── */}
-        {activeNav === "analytics" && (
-          <main className="flex-1 p-4 sm:p-8">
-            <AnalyticsView
-              history={history}
-              onSelectAudit={(item) => {
-                selectSaved(item);
-                setActiveNav("studio");
-              }}
-              onGoToStudio={() => {
-                setActiveNav("studio");
-                setPhase("landing");
-              }}
-            />
-          </main>
-        )}
-
-        {/* ── TAB 2: SWIPE FILE / TEMPLATES ── */}
-        {activeNav === "templates" && (
-          <main className="flex-1 p-4 sm:p-8">
-            <TemplateSwipeFile onLoadIntoStudio={handleLoadTemplate} />
-          </main>
-        )}
-
-        {/* ── TAB 3: BENCHMARK RUBRIC ── */}
-        {activeNav === "rubric" && (
-          <main className="flex-1 p-4 sm:p-8">
-            <BenchmarkRubricView
-              onGoToStudio={() => {
-                setActiveNav("studio");
-                setPhase("landing");
-              }}
-            />
-          </main>
-        )}
-
-        {/* ── TAB 4: STUDIO (DIAGNOSTIC ENGINE) ── */}
-        {activeNav === "studio" && isLanding && (
-          <AnimatePresence>
+        <AnimatePresence mode="wait">
+          {/* ── TAB 1: ANALYTICS VIEW ── */}
+          {activeNav === "analytics" && (
             <motion.main
-              key="landing"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1, transition: { duration: 0.25 } }}
-              exit={{ opacity: 0, transition: { duration: 0.15 } }}
+              key="analytics"
+              initial={{ opacity: 0, y: 10, scale: 0.995 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -6, scale: 0.995 }}
+              transition={{ type: "spring", stiffness: 420, damping: 36 }}
+              className="flex-1 p-4 sm:p-8"
+            >
+              <AnalyticsView
+                history={history}
+                onSelectAudit={(item) => {
+                  selectSaved(item);
+                  setActiveNav("studio");
+                }}
+                onGoToStudio={() => {
+                  setActiveNav("studio");
+                  setPhase("landing");
+                }}
+              />
+            </motion.main>
+          )}
+
+          {/* ── TAB 2: SWIPE FILE / TEMPLATES ── */}
+          {activeNav === "templates" && (
+            <motion.main
+              key="templates"
+              initial={{ opacity: 0, y: 10, scale: 0.995 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -6, scale: 0.995 }}
+              transition={{ type: "spring", stiffness: 420, damping: 36 }}
+              className="flex-1 p-4 sm:p-8"
+            >
+              <TemplateSwipeFile onLoadIntoStudio={handleLoadTemplate} />
+            </motion.main>
+          )}
+
+          {/* ── TAB 3: BENCHMARK RUBRIC ── */}
+          {activeNav === "rubric" && (
+            <motion.main
+              key="rubric"
+              initial={{ opacity: 0, y: 10, scale: 0.995 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -6, scale: 0.995 }}
+              transition={{ type: "spring", stiffness: 420, damping: 36 }}
+              className="flex-1 p-4 sm:p-8"
+            >
+              <BenchmarkRubricView
+                onGoToStudio={() => {
+                  setActiveNav("studio");
+                  setPhase("landing");
+                }}
+              />
+            </motion.main>
+          )}
+
+          {/* ── TAB 4: STUDIO (DIAGNOSTIC ENGINE) ── */}
+          {activeNav === "studio" && isLanding && (
+            <motion.main
+              key="studio-landing"
+              initial={{ opacity: 0, y: 10, scale: 0.995 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -6, scale: 0.995 }}
+              transition={{ type: "spring", stiffness: 420, damping: 36 }}
               className="flex flex-col items-center justify-center min-h-[calc(100vh-5rem)] px-4 py-12 relative"
             >
               <HeroSection />
@@ -636,12 +668,18 @@ export default function InboxSignalShell({
               {/* Verified Result Preview */}
               <ResultPreview />
             </motion.main>
-          </AnimatePresence>
-        )}
+          )}
 
-        {/* ── STUDIO: RESULTS DASHBOARD PHASE ── */}
-        {activeNav === "studio" && !isLanding && (
-          <div className="layout-row flex flex-1 min-h-[calc(100vh-5rem)]">
+          {/* ── STUDIO: RESULTS DASHBOARD PHASE ── */}
+          {activeNav === "studio" && !isLanding && (
+            <motion.div
+              key="studio-results"
+              initial={{ opacity: 0, y: 10, scale: 0.995 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -6, scale: 0.995 }}
+              transition={{ type: "spring", stiffness: 420, damping: 36 }}
+              className="layout-row flex flex-1 min-h-[calc(100vh-5rem)]"
+            >
             {/* Sidebar */}
             <aside className="sidebar-panel w-full md:w-[350px] shrink-0 sticky top-20 h-[calc(100vh-5rem)] overflow-y-auto flex flex-col border-r border-white/[0.08] bg-[#0A0B10]">
               {/* Sidebar Tabs */}
@@ -810,8 +848,9 @@ export default function InboxSignalShell({
                 )}
               </AnimatePresence>
             </main>
-          </div>
+          </motion.div>
         )}
+        </AnimatePresence>
       </div>
     </div>
   );

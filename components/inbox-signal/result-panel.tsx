@@ -40,13 +40,13 @@ function CopyBtn({ text, label = "Copy" }: { text: string; label?: string }) {
   const [ok, setOk] = useState(false);
   return (
     <button
+      onPointerDown={() => sfx.click()}
       onClick={() => {
-        sfx.click();
         navigator.clipboard.writeText(text);
         setOk(true);
         setTimeout(() => setOk(false), 2000);
       }}
-      className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg transition border cursor-pointer select-none ${
+      className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg transition-all border cursor-pointer select-none active:scale-[0.95] ${
         ok
           ? "bg-emerald-500/15 text-emerald-300 border-emerald-500/30"
           : "bg-white/[0.04] text-slate-300 border-white/[0.08] hover:bg-white/[0.08] hover:text-white"

@@ -128,11 +128,9 @@ export function Composer({
             ) : !isSidebar ? (
               <button
                 type="button"
-                onClick={() => {
-                  sfx.click();
-                  onUseDemo();
-                }}
-                className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-300 hover:text-white bg-white/[0.05] hover:bg-white/[0.1] px-2.5 py-1 rounded-full border border-white/[0.08] transition cursor-pointer"
+                onPointerDown={() => sfx.click()}
+                onClick={onUseDemo}
+                className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-300 hover:text-white bg-white/[0.05] hover:bg-white/[0.1] px-2.5 py-1 rounded-full border border-white/[0.08] transition active:scale-[0.96] cursor-pointer"
               >
                 <RotateCcw size={11} />
                 <span>Fill sample</span>
@@ -189,14 +187,14 @@ export function Composer({
         {signedIn ? (
           <button
             type="button"
-            onClick={() => {
-              sfx.click();
-              onAnalyze();
+            onPointerDown={() => {
+              if (canSubmit && !limitReached) sfx.click();
             }}
+            onClick={onAnalyze}
             disabled={!canSubmit || limitReached}
             className={`inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl text-xs font-bold transition-all shadow-md select-none ${
               canSubmit && !limitReached
-                ? "bg-[#D4FF00] text-black hover:bg-[#e2ff33] shadow-[0_0_22px_rgba(212,255,0,0.3)] hover:shadow-[0_0_30px_rgba(212,255,0,0.45)] active:scale-98 cursor-pointer"
+                ? "bg-[#D4FF00] text-black hover:bg-[#e2ff33] shadow-[0_0_22px_rgba(212,255,0,0.3),inset_0_1px_0_rgba(255,255,255,0.4)] hover:shadow-[0_0_30px_rgba(212,255,0,0.45)] active:scale-[0.96] cursor-pointer"
                 : "bg-[#141720] text-slate-500 border border-white/[0.06] cursor-not-allowed"
             }`}
           >
@@ -218,11 +216,9 @@ export function Composer({
           <SignInButton mode="modal" forceRedirectUrl="/">
             <button
               type="button"
-              onClick={() => {
-                sfx.click();
-                onSignInAndAnalyze();
-              }}
-              className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl text-xs font-bold bg-[#D4FF00] text-black hover:bg-[#e2ff33] shadow-[0_0_22px_rgba(212,255,0,0.3)] hover:shadow-[0_0_30px_rgba(212,255,0,0.45)] active:scale-98 transition-all cursor-pointer"
+              onPointerDown={() => sfx.click()}
+              onClick={onSignInAndAnalyze}
+              className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl text-xs font-bold bg-[#D4FF00] text-black hover:bg-[#e2ff33] shadow-[0_0_22px_rgba(212,255,0,0.3),inset_0_1px_0_rgba(255,255,255,0.4)] hover:shadow-[0_0_30px_rgba(212,255,0,0.45)] active:scale-[0.96] transition-all cursor-pointer"
             >
               <span>Dissect Specimen Free</span>
               <ArrowRight size={13} />

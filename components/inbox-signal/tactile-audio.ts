@@ -40,6 +40,11 @@ class SoundFX {
 
       osc.start();
       osc.stop(ctx.currentTime + 0.04);
+
+      // Multimodal audio-haptic harmony (Apple WWDC Principle #13)
+      if (typeof navigator !== "undefined" && typeof navigator.vibrate === "function") {
+        try { navigator.vibrate(8); } catch {}
+      }
     } catch {
       // AudioContext policy safe
     }
