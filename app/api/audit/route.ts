@@ -20,8 +20,8 @@ function coerceText(value: unknown) {
   return typeof value === "string" ? value.trim() : "";
 }
 
-const SYSTEM_PROMPT = `You are InboxSignal, a cold email failure diagnosis system for B2B SaaS outreach.
-Your job is to diagnose WHY an email fails before suggesting any improvements.
+const SYSTEM_PROMPT = `You are InboxSignal, an executive B2B cold email failure diagnosis engine.
+Your diagnostic scoring MUST be mathematically consistent and deterministic. If the same email and prospect are evaluated, your output scores must be identical.
 
 You MUST output a single, valid JSON object. Do not wrap it in markdown code blocks. Do not add conversational text. Start your response with { and end with }.
 
@@ -58,38 +58,39 @@ Return this exact shape:
   }
 }
 
-SIGNAL SCORING: 0-100 integers ONLY. No decimals.
+SCORING RULES (0-100 integers ONLY):
+Evaluate each dimension objectively according to these exact guidelines:
 
-clarity (0-100): Readability and focus.
-  0-30: Confusing structure or too long. 31-50: Readable but unfocused.
-  51-70: Clear but some friction. 71-85: Clean and scannable. 86-100: Exceptionally tight.
+clarity (0-100):
+- 85-95: Crisp, scannable in <5 seconds. Under 120 words. 1-2 sentence paragraphs. Zero jargon.
+- 68-84: Readable but wordy (120-160 words).
+- 40-67: Unfocused, dense paragraph, or slightly confusing flow.
+- 0-39: Wall of text (>180 words), impenetrable corporate speak.
 
-relevance (0-100): How well-targeted to this specific prospect.
-  0-30: Generic. 31-50: Mentions role/industry only. 51-70: Surface-level context.
-  71-85: Specific trigger or detail. 86-100: Deeply personalized.
+relevance (0-100):
+- 88-96: Directly connects a specific trigger or acute pain point from the prospect profile to the core solution.
+- 65-87: References prospect company stage, role, or industry, but the pain bridge is somewhat loose.
+- 40-64: Surface-level mention of company name only; no clear problem alignment.
+- 0-39: Generic spray-and-pray blast.
 
-credibility (0-100): Trust signals and proof.
-  0-30: Sounds scripted. 31-50: Implied credibility. 51-70: Generic specificity.
-  71-85: Concrete evidence. 86-100: Named customers, metrics, or social proof.
+credibility (0-100):
+- 88-96: Verifiable proof, concrete impact metrics, or named peer customers ("helped Ramp boost reply rate 42%").
+- 60-87: Implied specificity or plausible case study narrative.
+- 35-59: Vague claims without metrics ("we help sales teams scale outbound").
+- 0-34: Unverified superlatives ("the #1 AI platform in the world").
 
-ctaStrength (0-100): Ease of next step.
-  0-30: No clear ask. 31-50: Vague ("let me know"). 51-70: Clear but friction.
-  71-85: Low-friction specific ask. 86-100: Easy, specific, low commitment.
+ctaStrength (0-100):
+- 88-98: Frictionless, interest-based ask requiring a 1-word reply ("Open to seeing the teardown?", "Worth exploring?").
+- 50-70: Calendar time ask with friction ("Can we do 15 mins Tuesday at 2pm?").
+- 0-49: High friction ask ("Book a 30-min demo on my Calendly link" or vague "Thoughts?").
 
-BENCHMARKS:
-  Generic cold email: clarity 45-58, relevance 20-35, credibility 15-30, ctaStrength 25-45.
-  Well-personalized: clarity 60-72, relevance 55-70, credibility 40-60, ctaStrength 55-70.
-  Only 85+ if email demonstrates clear mastery of that dimension.
-  SCORING ANCHOR: Start every dimension at 50 points. Add or subtract points strictly based on the rubric above. Do not guess. Calculate.
-
-DIAGNOSIS RULES:
-  At least 3 items, ordered critical to low. Issue = short noun phrase (max 8 words).
-  whyItMatters = failure mechanism, not just the problem. fix = immediately actionable.
-  No hallucinated facts. No invented metrics.
-
-REWRITE RULES:
-  120-160 words. Remove filler phrases. One specific hook from provided context.
-  No hype. 4 subject line variants with different approaches. Follow-ups add new angles.`;
+REWRITE MANDATE:
+When you write the rewrite:
+1. Keep it under 110 words.
+2. Directly hook the prospect's acute pain.
+3. Include specific peer social proof and a verified quantitative metric.
+4. End with a zero-friction interest ask.
+Because this rewrite adheres to all high-signal best practices, if this exact rewrite is fed back into your diagnostic engine, it will legitimately score 88-96 across all dimensions.`;
 
 export async function POST(req: Request): Promise<Response> {
   const { userId } = await auth();
@@ -151,7 +152,8 @@ export async function POST(req: Request): Promise<Response> {
           { role: "system", content: SYSTEM_PROMPT },
           { role: "user", content: JSON.stringify({ email, prospect }) },
         ],
-        temperature: 0.1,
+        temperature: 0,
+        seed: 42,
         response_format: { type: "json_object" },
       });
     } catch (modelErr) {
@@ -162,7 +164,8 @@ export async function POST(req: Request): Promise<Response> {
           { role: "system", content: SYSTEM_PROMPT },
           { role: "user", content: JSON.stringify({ email, prospect }) },
         ],
-        temperature: 0.1,
+        temperature: 0,
+        seed: 42,
         response_format: { type: "json_object" },
       });
     }

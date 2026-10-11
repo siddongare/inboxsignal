@@ -353,6 +353,7 @@ interface InboxSignalShellProps {
   initialHistory: SavedAnalysis[];
   initialLimit: number;
   initialRemaining: number;
+  initialNav?: NavTab;
 }
 
 type ApiState = "idle" | "loading" | "error";
@@ -363,11 +364,12 @@ export default function InboxSignalShell({
   initialHistory,
   initialLimit,
   initialRemaining,
+  initialNav = "studio",
 }: InboxSignalShellProps) {
   const { isLoaded, isSignedIn } = useAuth();
   const signedIn = Boolean(isLoaded && isSignedIn);
 
-  const [activeNav, setActiveNav] = useState<NavTab>("studio");
+  const [activeNav, setActiveNav] = useState<NavTab>(initialNav);
   const [history, setHistory] = useState(initialHistory);
   const [email, setEmail] = useState("");
   const [prospect, setProspect] = useState("");
@@ -521,6 +523,10 @@ export default function InboxSignalShell({
         activeNav={activeNav}
         onNavChange={(tab) => {
           setActiveNav(tab);
+          if (typeof window !== "undefined") {
+            const url = tab === "studio" ? "/" : `/?tab=${tab}`;
+            window.history.pushState(null, "", url);
+          }
           window.scrollTo({ top: 0, behavior: "smooth" });
         }}
         onReset={handleReset}
