@@ -211,32 +211,66 @@ function Header({
   signedIn,
   remaining,
   limit,
+  activeNav,
+  onNavChange,
   onReset,
 }: {
   signedIn: boolean;
   remaining: number;
   limit: number;
+  activeNav: "studio" | "analytics" | "templates" | "rubric";
+  onNavChange: (tab: "studio" | "analytics" | "templates" | "rubric") => void;
   onReset: () => void;
 }) {
+  const navItems: { id: "studio" | "analytics" | "templates" | "rubric"; label: string; icon: any }[] = [
+    { id: "studio", label: "Studio", icon: Zap },
+    { id: "analytics", label: "Analytics", icon: TrendingUp },
+    { id: "templates", label: "Swipe File", icon: FileText },
+    { id: "rubric", label: "Rubric", icon: ShieldCheck },
+  ];
+
   return (
     <header className="fixed top-0 left-0 right-0 z-50 h-14 px-4 sm:px-8 bg-[#090A0F]/80 backdrop-blur-xl border-b border-white/[0.06] flex items-center justify-between select-none">
-      <button
-        onClick={() => {
-          sfx.click();
-          onReset();
-        }}
-        className="flex items-center gap-2.5 bg-transparent border-none cursor-pointer p-0 group"
-      >
-        <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-500 text-white flex items-center justify-center font-bold text-xs shadow-md group-hover:scale-105 transition">
-          IS
-        </div>
-        <span className="text-sm font-bold tracking-tight text-white">
-          InboxSignal
-        </span>
-        <span className="font-mono text-[10px] text-slate-400 bg-white/[0.04] px-2 py-0.5 rounded-full border border-white/[0.06] uppercase">
-          Beta
-        </span>
-      </button>
+      <div className="flex items-center gap-6">
+        <button
+          onClick={() => {
+            sfx.click();
+            onReset();
+          }}
+          className="flex items-center gap-2.5 bg-transparent border-none cursor-pointer p-0 group"
+        >
+          <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-500 text-white flex items-center justify-center font-bold text-xs shadow-md group-hover:scale-105 transition">
+            IS
+          </div>
+          <span className="text-sm font-bold tracking-tight text-white hidden sm:inline">
+            InboxSignal
+          </span>
+          <span className="font-mono text-[10px] text-slate-400 bg-white/[0.04] px-2 py-0.5 rounded-full border border-white/[0.06] uppercase">
+            SaaS
+          </span>
+        </button>
+
+        {/* Global Navigation Tabs */}
+        <nav className="flex items-center gap-1 bg-white/[0.02] p-1 rounded-xl border border-white/[0.06]">
+          {navItems.map(({ id, label, icon: Icon }) => (
+            <button
+              key={id}
+              onClick={() => {
+                sfx.click();
+                onNavChange(id);
+              }}
+              className={`px-3 py-1 text-xs font-medium rounded-lg transition flex items-center gap-1.5 cursor-pointer ${
+                activeNav === id
+                  ? "bg-white/[0.1] text-white shadow-sm"
+                  : "text-slate-400 hover:text-slate-200"
+              }`}
+            >
+              <Icon size={13} />
+              <span>{label}</span>
+            </button>
+          ))}
+        </nav>
+      </div>
 
       <div className="flex items-center gap-3">
         {signedIn ? (
@@ -280,6 +314,10 @@ function Header({
   );
 }
 
+import { AnalyticsView } from "@/components/inbox-signal/analytics-view";
+import { TemplateSwipeFile, type SwipeTemplate } from "@/components/inbox-signal/template-swipe-file";
+import { BenchmarkRubricView } from "@/components/inbox-signal/benchmark-rubric-view";
+
 // ─── Main Shell Component ────────────────────────────────────────────────────
 interface InboxSignalShellProps {
   initialHistory: SavedAnalysis[];
@@ -289,6 +327,7 @@ interface InboxSignalShellProps {
 
 type ApiState = "idle" | "loading" | "error";
 type SidebarTab = "edit" | "history";
+type NavTab = "studio" | "analytics" | "templates" | "rubric";
 
 export default function InboxSignalShell({
   initialHistory,
@@ -298,6 +337,7 @@ export default function InboxSignalShell({
   const { isLoaded, isSignedIn } = useAuth();
   const signedIn = Boolean(isLoaded && isSignedIn);
 
+  const [activeNav, setActiveNav] = useState<NavTab>("studio");
   const [history, setHistory] = useState(initialHistory);
   const [email, setEmail] = useState("");
   const [prospect, setProspect] = useState("");
@@ -427,6 +467,16 @@ export default function InboxSignalShell({
     setActive(null);
     setError("");
     setStatus("idle");
+    setActiveNav("studio");
+  }
+
+  function handleLoadTemplate(tpl: SwipeTemplate) {
+    sfx.click();
+    setEmail(tpl.email);
+    setProspect(`Target: ${tpl.targetPersona}`);
+    setActiveNav("studio");
+    setSidebarTab("edit");
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   const isLanding = phase === "landing";
@@ -438,13 +488,54 @@ export default function InboxSignalShell({
         signedIn={signedIn}
         remaining={remaining}
         limit={initialLimit}
+        activeNav={activeNav}
+        onNavChange={(tab) => {
+          setActiveNav(tab);
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }}
         onReset={handleReset}
       />
 
       <div className="pt-14 flex-1 flex flex-col relative z-10">
-        {/* ── LANDING PHASE ── */}
-        <AnimatePresence>
-          {isLanding && (
+        {/* ── TAB 1: ANALYTICS VIEW ── */}
+        {activeNav === "analytics" && (
+          <main className="flex-1 p-4 sm:p-8">
+            <AnalyticsView
+              history={history}
+              onSelectAudit={(item) => {
+                selectSaved(item);
+                setActiveNav("studio");
+              }}
+              onGoToStudio={() => {
+                setActiveNav("studio");
+                setPhase("landing");
+              }}
+            />
+          </main>
+        )}
+
+        {/* ── TAB 2: SWIPE FILE / TEMPLATES ── */}
+        {activeNav === "templates" && (
+          <main className="flex-1 p-4 sm:p-8">
+            <TemplateSwipeFile onLoadIntoStudio={handleLoadTemplate} />
+          </main>
+        )}
+
+        {/* ── TAB 3: BENCHMARK RUBRIC ── */}
+        {activeNav === "rubric" && (
+          <main className="flex-1 p-4 sm:p-8">
+            <BenchmarkRubricView
+              onGoToStudio={() => {
+                setActiveNav("studio");
+                setPhase("landing");
+              }}
+            />
+          </main>
+        )}
+
+        {/* ── TAB 4: STUDIO (DIAGNOSTIC ENGINE) ── */}
+        {activeNav === "studio" && isLanding && (
+          <AnimatePresence>
             <motion.main
               key="landing"
               initial={{ opacity: 0 }}
@@ -479,11 +570,11 @@ export default function InboxSignalShell({
               {/* Verified Result Preview */}
               <ResultPreview />
             </motion.main>
-          )}
-        </AnimatePresence>
+          </AnimatePresence>
+        )}
 
-        {/* ── RESULTS DASHBOARD PHASE ── */}
-        {!isLanding && (
+        {/* ── STUDIO: RESULTS DASHBOARD PHASE ── */}
+        {activeNav === "studio" && !isLanding && (
           <div className="layout-row flex flex-1 min-h-[calc(100vh-56px)]">
             {/* Sidebar */}
             <aside className="sidebar-panel w-full md:w-[350px] shrink-0 sticky top-14 h-[calc(100vh-56px)] overflow-y-auto flex flex-col border-r border-white/[0.08] bg-[#0A0B10]">

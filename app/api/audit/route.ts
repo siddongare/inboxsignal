@@ -143,15 +143,29 @@ export async function POST(req: Request): Promise<Response> {
   }
 
   try {
-    const completion = await groqClient.chat.completions.create({
-      model: "llama-3.3-70b-versatile",
-      messages: [
-        { role: "system", content: SYSTEM_PROMPT },
-        { role: "user", content: JSON.stringify({ email, prospect }) },
-      ],
-      temperature: 0,
-      response_format: { type: "json_object" },
-    });
+    let completion;
+    try {
+      completion = await groqClient.chat.completions.create({
+        model: "openai/gpt-oss-120b",
+        messages: [
+          { role: "system", content: SYSTEM_PROMPT },
+          { role: "user", content: JSON.stringify({ email, prospect }) },
+        ],
+        temperature: 0.1,
+        response_format: { type: "json_object" },
+      });
+    } catch (modelErr) {
+      console.warn("Retrying with backup model openai/gpt-oss-20b", modelErr);
+      completion = await groqClient.chat.completions.create({
+        model: "openai/gpt-oss-20b",
+        messages: [
+          { role: "system", content: SYSTEM_PROMPT },
+          { role: "user", content: JSON.stringify({ email, prospect }) },
+        ],
+        temperature: 0.1,
+        response_format: { type: "json_object" },
+      });
+    }
 
     const content = completion.choices[0]?.message?.content;
 
