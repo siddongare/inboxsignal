@@ -21,6 +21,10 @@ import type {
 } from "@/lib/analysis-types";
 import { getSignalScore } from "@/lib/analysis-types";
 import { sfx } from "./tactile-audio";
+import { GsapTiltCard } from "@/components/gsap/gsap-tilt-card";
+import { GsapCounter } from "@/components/gsap/gsap-counter";
+import { GsapScrambleText } from "@/components/gsap/gsap-scramble";
+import { GsapMagnetic } from "@/components/gsap/gsap-magnetic";
 
 // ─── Luma-Style Score Helpers ─────────────────────────────────────────────────
 function getScoreColor(s: number) {
@@ -39,22 +43,24 @@ function getVerdictText(s: number) {
 function CopyBtn({ text, label = "Copy" }: { text: string; label?: string }) {
   const [ok, setOk] = useState(false);
   return (
-    <button
-      onPointerDown={() => sfx.click()}
-      onClick={() => {
-        navigator.clipboard.writeText(text);
-        setOk(true);
-        setTimeout(() => setOk(false), 2000);
-      }}
-      className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg transition-all border cursor-pointer select-none active:scale-[0.95] ${
-        ok
-          ? "bg-emerald-500/15 text-emerald-300 border-emerald-500/30"
-          : "bg-white/[0.04] text-slate-300 border-white/[0.08] hover:bg-white/[0.08] hover:text-white"
-      }`}
-    >
-      {ok ? <Check size={12} /> : <Copy size={12} />}
-      <span>{ok ? "Copied" : label}</span>
-    </button>
+    <GsapMagnetic strength={0.25}>
+      <button
+        onPointerDown={() => sfx.click()}
+        onClick={() => {
+          navigator.clipboard.writeText(text);
+          setOk(true);
+          setTimeout(() => setOk(false), 2000);
+        }}
+        className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg transition-all border cursor-pointer select-none active:scale-[0.95] ${
+          ok
+            ? "bg-emerald-500/15 text-emerald-300 border-emerald-500/30"
+            : "bg-white/[0.04] text-slate-300 border-white/[0.08] hover:bg-white/[0.08] hover:text-white"
+        }`}
+      >
+        {ok ? <Check size={12} /> : <Copy size={12} />}
+        <span>{ok ? "Copied" : label}</span>
+      </button>
+    </GsapMagnetic>
   );
 }
 
@@ -98,7 +104,7 @@ function ScoreSection({ signals }: { signals: Signals }) {
   ];
 
   return (
-    <div className="relative p-6 rounded-3xl bg-[#111319]/90 border border-white/[0.08] shadow-2xl backdrop-blur-xl overflow-hidden">
+    <GsapTiltCard maxTilt={3} className="relative p-6 rounded-3xl bg-[#111319]/90 border border-white/[0.08] shadow-2xl backdrop-blur-xl overflow-hidden">
       {/* Soft Ambient Radial Glow behind score */}
       <div
         style={{ background: cfg.glow }}
@@ -136,7 +142,7 @@ function ScoreSection({ signals }: { signals: Signals }) {
             </svg>
             <div className="absolute inset-0 flex flex-col items-center justify-center">
               <span className="font-mono text-3xl font-bold tracking-tight text-white leading-none">
-                {avg}
+                <GsapCounter value={avg} />
               </span>
               <span className="font-mono text-[10px] text-slate-400 mt-1">
                 / 100
@@ -147,7 +153,7 @@ function ScoreSection({ signals }: { signals: Signals }) {
           <div>
             <div className="flex items-center gap-2.5">
               <span className="text-xl font-bold text-white tracking-tight">
-                {getVerdictText(avg)}
+                <GsapScrambleText text={getVerdictText(avg)} />
               </span>
               <span
                 className={`font-mono text-xs font-semibold px-2.5 py-0.5 rounded-full border ${cfg.bg} ${cfg.text} ${cfg.border}`}
@@ -190,7 +196,7 @@ function ScoreSection({ signals }: { signals: Signals }) {
                   {label}
                 </span>
                 <span className={`font-mono text-xs font-bold ${mcfg.text}`}>
-                  {value}%
+                  <GsapCounter value={value} suffix="%" />
                 </span>
               </div>
               <div className="h-1.5 w-full bg-white/[0.06] rounded-full overflow-hidden">
@@ -206,7 +212,7 @@ function ScoreSection({ signals }: { signals: Signals }) {
           );
         })}
       </div>
-    </div>
+    </GsapTiltCard>
   );
 }
 

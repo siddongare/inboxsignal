@@ -13,6 +13,9 @@ import {
 } from "lucide-react";
 import type { SavedAnalysis } from "@/lib/analysis-types";
 import { getSignalScore } from "@/lib/analysis-types";
+import { GsapTiltCard } from "@/components/gsap/gsap-tilt-card";
+import { GsapCounter } from "@/components/gsap/gsap-counter";
+import { GsapMagnetic } from "@/components/gsap/gsap-magnetic";
 
 interface AnalyticsViewProps {
   history: SavedAnalysis[];
@@ -126,25 +129,27 @@ export function AnalyticsView({
           </p>
         </div>
 
-        <button
-          onClick={onGoToStudio}
-          className="self-start sm:self-auto inline-flex items-center gap-2 px-4.5 py-2 rounded-xl bg-[#D4FF00] text-black hover:bg-[#e2ff33] font-bold text-xs shadow-[0_0_15px_rgba(212,255,0,0.25)] transition cursor-pointer"
-        >
-          <span>+ Dissect New Vector</span>
-          <ArrowUpRight size={13} />
-        </button>
+        <GsapMagnetic strength={0.25}>
+          <button
+            onClick={onGoToStudio}
+            className="self-start sm:self-auto inline-flex items-center gap-2 px-4.5 py-2 rounded-xl bg-[#D4FF00] text-black hover:bg-[#e2ff33] font-bold text-xs shadow-[0_0_15px_rgba(212,255,0,0.25)] transition cursor-pointer"
+          >
+            <span>+ Dissect New Vector</span>
+            <ArrowUpRight size={13} />
+          </button>
+        </GsapMagnetic>
       </div>
 
-      {/* Primary KPI Bento */}
+      {/* Primary KPI Bento with GSAP 3D Tilt & Smooth Counters */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5">
-        <div className="p-5 rounded-2xl bg-[#0A0C10]/90 border border-white/[0.08] backdrop-blur-xl">
+        <GsapTiltCard maxTilt={5} className="p-5 rounded-2xl bg-[#0A0C10]/90 border border-white/[0.08] backdrop-blur-xl h-full">
           <div className="flex items-center justify-between text-slate-400 mb-2">
             <span className="text-xs font-medium">Avg Signal Score</span>
             <Target size={14} className="text-[#D4FF00]" />
           </div>
           <div className="flex items-baseline gap-2">
             <span className="text-3xl font-mono font-bold text-white tracking-tight">
-              {stats.avgScore}
+              <GsapCounter value={stats.avgScore} />
             </span>
             <span className="text-xs text-slate-500 font-mono">/100</span>
           </div>
@@ -153,49 +158,49 @@ export function AnalyticsView({
               ? "Strong conversion probability"
               : "Friction in outreach angle"}
           </p>
-        </div>
+        </GsapTiltCard>
 
-        <div className="p-5 rounded-2xl bg-[#0A0C10]/90 border border-white/[0.08] backdrop-blur-xl">
+        <GsapTiltCard maxTilt={5} className="p-5 rounded-2xl bg-[#0A0C10]/90 border border-white/[0.08] backdrop-blur-xl h-full">
           <div className="flex items-center justify-between text-slate-400 mb-2">
             <span className="text-xs font-medium">Top High-Water Mark</span>
             <Award size={14} className="text-[#D4FF00]" />
           </div>
           <div className="flex items-baseline gap-2">
             <span className="text-3xl font-mono font-bold text-[#D4FF00] tracking-tight">
-              {stats.highestScore}
+              <GsapCounter value={stats.highestScore} />
             </span>
             <span className="text-xs text-slate-500 font-mono">/100</span>
           </div>
           <p className="text-[11px] text-slate-400 mt-2">Best audited variation</p>
-        </div>
+        </GsapTiltCard>
 
-        <div className="p-5 rounded-2xl bg-[#111319]/60 border border-white/[0.08] backdrop-blur-xl">
+        <GsapTiltCard maxTilt={5} className="p-5 rounded-2xl bg-[#111319]/60 border border-white/[0.08] backdrop-blur-xl h-full">
           <div className="flex items-center justify-between text-slate-400 mb-2">
             <span className="text-xs font-medium">Audits Recorded</span>
             <Compass size={14} className="text-indigo-400" />
           </div>
           <div className="flex items-baseline gap-2">
             <span className="text-3xl font-mono font-bold text-white tracking-tight">
-              {stats.totalAudits}
+              <GsapCounter value={stats.totalAudits} />
             </span>
             <span className="text-xs text-slate-500 font-mono">drafts</span>
           </div>
           <p className="text-[11px] text-slate-400 mt-2">Persistent history</p>
-        </div>
+        </GsapTiltCard>
 
-        <div className="p-5 rounded-2xl bg-[#111319]/60 border border-white/[0.08] backdrop-blur-xl">
+        <GsapTiltCard maxTilt={5} className="p-5 rounded-2xl bg-[#111319]/60 border border-white/[0.08] backdrop-blur-xl h-full">
           <div className="flex items-center justify-between text-slate-400 mb-2">
             <span className="text-xs font-medium">Rejection Delta</span>
             <Zap size={14} className="text-amber-400" />
           </div>
           <div className="flex items-baseline gap-2">
             <span className="text-3xl font-mono font-bold text-amber-300 tracking-tight">
-              +{stats.highestScore - stats.lowestScore}
+              +<GsapCounter value={stats.highestScore - stats.lowestScore} />
             </span>
             <span className="text-xs text-slate-500 font-mono">pts</span>
           </div>
           <p className="text-[11px] text-slate-400 mt-2">Improvement span</p>
-        </div>
+        </GsapTiltCard>
       </div>
 
       {/* Dimensions & Failure Anatomy */}

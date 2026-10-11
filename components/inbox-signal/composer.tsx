@@ -11,6 +11,8 @@ import {
   Sparkles,
 } from "lucide-react";
 import { sfx } from "./tactile-audio";
+import { GsapMagnetic } from "@/components/gsap/gsap-magnetic";
+import { GsapTiltCard } from "@/components/gsap/gsap-tilt-card";
 
 interface ComposerProps {
   displayMode: "landing" | "sidebar";
@@ -81,32 +83,32 @@ export function Composer({
       {/* Haute Architecture Metrics Bar (Electric Acid Lime & Carbon Glass) */}
       {!isSidebar && (
         <div className="grid grid-cols-3 gap-2.5 p-1.5 rounded-2xl bg-[#0D0F14]/95 border border-white/[0.08] backdrop-blur-2xl mb-1 shadow-2xl">
-          <div className="flex flex-col items-center justify-center py-3 px-2 rounded-xl bg-white/[0.02] border border-white/[0.04]">
+          <GsapTiltCard maxTilt={5} className="flex flex-col items-center justify-center py-3 px-2 rounded-xl bg-white/[0.02] border border-white/[0.04] h-full">
             <span className="font-mono text-base sm:text-lg font-bold text-white tracking-tight">
               &lt; 30s
             </span>
             <span className="text-[10px] font-mono font-medium text-slate-400 tracking-wider mt-0.5 uppercase">
               Latency
             </span>
-          </div>
+          </GsapTiltCard>
 
-          <div className="flex flex-col items-center justify-center py-3 px-2 rounded-xl bg-[#D4FF00]/[0.08] border border-[#D4FF00]/[0.25]">
+          <GsapTiltCard maxTilt={5} className="flex flex-col items-center justify-center py-3 px-2 rounded-xl bg-[#D4FF00]/[0.08] border border-[#D4FF00]/[0.25] h-full">
             <span className="font-mono text-base sm:text-lg font-bold text-[#D4FF00] tracking-tight">
               0–100
             </span>
             <span className="text-[10px] font-mono font-medium text-[#D4FF00]/80 tracking-wider mt-0.5 uppercase">
               Signal Index
             </span>
-          </div>
+          </GsapTiltCard>
 
-          <div className="flex flex-col items-center justify-center py-3 px-2 rounded-xl bg-white/[0.02] border border-white/[0.04]">
+          <GsapTiltCard maxTilt={5} className="flex flex-col items-center justify-center py-3 px-2 rounded-xl bg-white/[0.02] border border-white/[0.04] h-full">
             <span className="font-mono text-base sm:text-lg font-bold text-emerald-300 tracking-tight">
               4 Vectors
             </span>
             <span className="text-[10px] font-mono font-medium text-emerald-200/80 tracking-wider mt-0.5 uppercase">
               Forensics
             </span>
-          </div>
+          </GsapTiltCard>
         </div>
       )}
 
@@ -185,44 +187,48 @@ export function Composer({
         </div>
 
         {signedIn ? (
-          <button
-            type="button"
-            onPointerDown={() => {
-              if (canSubmit && !limitReached) sfx.click();
-            }}
-            onClick={onAnalyze}
-            disabled={!canSubmit || limitReached}
-            className={`inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl text-xs font-bold transition-all shadow-md select-none ${
-              canSubmit && !limitReached
-                ? "bg-[#D4FF00] text-black hover:bg-[#e2ff33] shadow-[0_0_22px_rgba(212,255,0,0.3),inset_0_1px_0_rgba(255,255,255,0.4)] hover:shadow-[0_0_30px_rgba(212,255,0,0.45)] active:scale-[0.96] cursor-pointer"
-                : "bg-[#141720] text-slate-500 border border-white/[0.06] cursor-not-allowed"
-            }`}
-          >
-            {loading ? (
-              <>
-                <Loader2 size={13} className="animate-spin text-black" />
-                <span>Dissecting vector...</span>
-              </>
-            ) : limitReached ? (
-              <span>Daily Limit Reached</span>
-            ) : (
-              <>
-                <Sparkles size={13} className="text-black" />
-                <span>Run Diagnostic Dissection</span>
-              </>
-            )}
-          </button>
-        ) : (
-          <SignInButton mode="modal" forceRedirectUrl="/">
+          <GsapMagnetic strength={0.3}>
             <button
               type="button"
-              onPointerDown={() => sfx.click()}
-              onClick={onSignInAndAnalyze}
-              className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl text-xs font-bold bg-[#D4FF00] text-black hover:bg-[#e2ff33] shadow-[0_0_22px_rgba(212,255,0,0.3),inset_0_1px_0_rgba(255,255,255,0.4)] hover:shadow-[0_0_30px_rgba(212,255,0,0.45)] active:scale-[0.96] transition-all cursor-pointer"
+              onPointerDown={() => {
+                if (canSubmit && !limitReached) sfx.click();
+              }}
+              onClick={onAnalyze}
+              disabled={!canSubmit || limitReached}
+              className={`inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl text-xs font-bold transition-all shadow-md select-none ${
+                canSubmit && !limitReached
+                  ? "bg-[#D4FF00] text-black hover:bg-[#e2ff33] shadow-[0_0_22px_rgba(212,255,0,0.3),inset_0_1px_0_rgba(255,255,255,0.4)] hover:shadow-[0_0_30px_rgba(212,255,0,0.45)] active:scale-[0.96] cursor-pointer"
+                  : "bg-[#141720] text-slate-500 border border-white/[0.06] cursor-not-allowed"
+              }`}
             >
-              <span>Dissect Specimen Free</span>
-              <ArrowRight size={13} />
+              {loading ? (
+                <>
+                  <Loader2 size={13} className="animate-spin text-black" />
+                  <span>Dissecting vector...</span>
+                </>
+              ) : limitReached ? (
+                <span>Daily Limit Reached</span>
+              ) : (
+                <>
+                  <Sparkles size={13} className="text-black" />
+                  <span>Run Diagnostic Dissection</span>
+                </>
+              )}
             </button>
+          </GsapMagnetic>
+        ) : (
+          <SignInButton mode="modal" forceRedirectUrl="/">
+            <GsapMagnetic strength={0.3}>
+              <button
+                type="button"
+                onPointerDown={() => sfx.click()}
+                onClick={onSignInAndAnalyze}
+                className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl text-xs font-bold bg-[#D4FF00] text-black hover:bg-[#e2ff33] shadow-[0_0_22px_rgba(212,255,0,0.3),inset_0_1px_0_rgba(255,255,255,0.4)] hover:shadow-[0_0_30px_rgba(212,255,0,0.45)] active:scale-[0.96] transition-all cursor-pointer"
+              >
+                <span>Dissect Specimen Free</span>
+                <ArrowRight size={13} />
+              </button>
+            </GsapMagnetic>
           </SignInButton>
         )}
       </div>

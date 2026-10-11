@@ -34,22 +34,31 @@ import { TemplateSwipeFile, type SwipeTemplate } from "@/components/inbox-signal
 import { BenchmarkRubricView } from "@/components/inbox-signal/benchmark-rubric-view";
 import { demoEmail, demoProspect } from "@/components/inbox-signal/utils";
 import { sfx } from "@/components/inbox-signal/tactile-audio";
+import { GsapCursor } from "@/components/gsap/gsap-cursor";
+import { GsapSignalCanvas } from "@/components/gsap/gsap-signal-canvas";
+import { GsapMagnetic } from "@/components/gsap/gsap-magnetic";
+import { GsapTiltCard } from "@/components/gsap/gsap-tilt-card";
+import { GsapScrambleText } from "@/components/gsap/gsap-scramble";
+import { GsapCounter } from "@/components/gsap/gsap-counter";
 
 // ─── Haute Hero Section (Issey Miyake × Mikalai Precision) ───────────────────
 function HeroSection() {
   return (
     <div className="relative text-center mb-8 w-full max-w-3xl mx-auto select-none pt-4">
-      {/* Sleek Minimalist Status Pill */}
-      <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 mb-6 rounded-full bg-white/[0.03] border border-white/[0.08] backdrop-blur-xl">
-        <span className="w-1.5 h-1.5 rounded-full bg-[#D4FF00] shadow-[0_0_8px_#D4FF00] animate-pulse" />
-        <span className="font-mono text-[11px] font-medium tracking-wider text-slate-300 uppercase">
-          Signal Laboratory
-        </span>
-        <span className="text-white/20">/</span>
-        <span className="text-[11px] text-slate-400 font-normal">
-          Executive Outbound Teardown
-        </span>
-      </div>
+      {/* Sleek Minimalist Status Pill with GSAP Magnetism & Scramble */}
+      <GsapMagnetic strength={0.25}>
+        <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 mb-6 rounded-full bg-white/[0.03] border border-white/[0.08] backdrop-blur-xl cursor-default">
+          <span className="w-1.5 h-1.5 rounded-full bg-[#D4FF00] shadow-[0_0_8px_#D4FF00] animate-pulse" />
+          <GsapScrambleText
+            text="SIGNAL LABORATORY"
+            className="text-[11px] font-medium tracking-wider text-slate-300 uppercase"
+          />
+          <span className="text-white/20">/</span>
+          <span className="text-[11px] text-slate-400 font-normal">
+            Executive Outbound Teardown
+          </span>
+        </div>
+      </GsapMagnetic>
 
       {/* Main Sculpted Headline with Electric Acid Lime Accent */}
       <h1 className="text-4xl sm:text-6xl md:text-[5.2rem] font-extrabold text-white tracking-[-0.04em] leading-[0.96] font-sans">
@@ -67,7 +76,7 @@ function HeroSection() {
   );
 }
 
-// ─── Feature Bento Grid (Architectural Haute Minimalism) ─────────────────────
+// ─── Feature Bento Grid (Architectural Haute Minimalism + GSAP 3D Tilt) ──────
 function FeatureGrid() {
   const items = [
     {
@@ -103,10 +112,11 @@ function FeatureGrid() {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-2xl mx-auto mt-12">
       {items.map(({ icon: Icon, accent, tag, title, desc }) => (
-        <div
+        <GsapTiltCard
           key={title}
           onClick={() => sfx.click()}
-          className="p-6 rounded-3xl bg-[#0D0F14]/90 border border-white/[0.08] hover:border-white/[0.16] hover:bg-[#12151D] transition-all duration-300 shadow-xl backdrop-blur-2xl group cursor-default relative overflow-hidden"
+          maxTilt={6}
+          className="p-6 rounded-3xl bg-[#0D0F14]/90 border border-white/[0.08] hover:border-white/[0.18] transition-colors duration-300 shadow-xl backdrop-blur-2xl group cursor-default relative overflow-hidden h-full"
         >
           {/* Subtle corner light reflection */}
           <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-white/[0.03] to-transparent pointer-events-none" />
@@ -117,22 +127,23 @@ function FeatureGrid() {
             >
               <Icon size={18} />
             </div>
-            <span className="font-mono text-[10px] tracking-widest uppercase text-slate-500 bg-white/[0.02] px-2 py-0.5 rounded border border-white/[0.04]">
-              {tag}
-            </span>
+            <GsapScrambleText
+              text={tag}
+              className="text-[10px] tracking-widest uppercase text-slate-500 bg-white/[0.02] px-2 py-0.5 rounded border border-white/[0.04]"
+            />
           </div>
 
           <h3 className="text-sm font-semibold text-white tracking-tight mb-1.5">
             {title}
           </h3>
           <p className="text-xs text-slate-400 leading-relaxed">{desc}</p>
-        </div>
+        </GsapTiltCard>
       ))}
     </div>
   );
 }
 
-// ─── Result Preview (Haute Teardown Mockup) ──────────────────────────────────
+// ─── Result Preview (Haute Teardown Mockup + GSAP Counter Physics) ───────────
 function ResultPreview() {
   const [revealed, setRevealed] = useState(false);
 
@@ -145,18 +156,23 @@ function ResultPreview() {
             Teardown Dossier · SDR to VP of Revenue
           </span>
         </div>
-        <button
-          onClick={() => {
-            sfx.click();
-            setRevealed((r) => !r);
-          }}
-          className="px-3 py-1 text-xs font-semibold rounded-lg bg-white/[0.04] hover:bg-white/[0.08] text-slate-300 border border-white/[0.08] transition cursor-pointer"
-        >
-          {revealed ? "Conceal Teardown" : "Examine Specimen →"}
-        </button>
+        <GsapMagnetic strength={0.3}>
+          <button
+            onClick={() => {
+              sfx.click();
+              setRevealed((r) => !r);
+            }}
+            className="px-3 py-1 text-xs font-semibold rounded-lg bg-white/[0.04] hover:bg-white/[0.08] text-slate-300 border border-white/[0.08] transition cursor-pointer"
+          >
+            {revealed ? "Conceal Teardown" : "Examine Specimen →"}
+          </button>
+        </GsapMagnetic>
       </div>
 
-      <div className="relative rounded-3xl bg-[#0D0F14]/95 border border-white/[0.08] p-6 shadow-2xl backdrop-blur-2xl overflow-hidden">
+      <GsapTiltCard
+        maxTilt={5}
+        className="relative rounded-3xl bg-[#0D0F14]/95 border border-white/[0.08] p-6 shadow-2xl backdrop-blur-2xl overflow-hidden"
+      >
         {/* Conceal overlay */}
         {!revealed && (
           <div
@@ -179,32 +195,40 @@ function ResultPreview() {
         )}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {/* Left Column: Radial score teaser */}
+          {/* Left Column: Radial score teaser with GSAP Counter */}
           <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/[0.05] flex flex-col justify-between">
             <div className="flex items-center justify-between mb-3">
               <span className="text-xs font-semibold text-slate-300">
                 Composite Signal
               </span>
               <span className="font-mono text-sm font-bold text-[#FF2A55]">
-                47 / 100
+                {revealed ? <GsapCounter value={47} suffix=" / 100" /> : "47 / 100"}
               </span>
             </div>
             <div className="space-y-2 text-xs">
               <div className="flex justify-between text-slate-400">
                 <span>Clarity</span>
-                <span className="font-mono text-amber-400 font-semibold">58%</span>
+                <span className="font-mono text-amber-400 font-semibold">
+                  {revealed ? <GsapCounter value={58} suffix="%" /> : "58%"}
+                </span>
               </div>
               <div className="flex justify-between text-slate-400">
                 <span>Relevance</span>
-                <span className="font-mono text-[#FF2A55] font-semibold">35%</span>
+                <span className="font-mono text-[#FF2A55] font-semibold">
+                  {revealed ? <GsapCounter value={35} suffix="%" /> : "35%"}
+                </span>
               </div>
               <div className="flex justify-between text-slate-400">
                 <span>Credibility</span>
-                <span className="font-mono text-amber-400 font-semibold">50%</span>
+                <span className="font-mono text-amber-400 font-semibold">
+                  {revealed ? <GsapCounter value={50} suffix="%" /> : "50%"}
+                </span>
               </div>
               <div className="flex justify-between text-slate-400">
                 <span>CTA Friction</span>
-                <span className="font-mono text-amber-400 font-semibold">45%</span>
+                <span className="font-mono text-amber-400 font-semibold">
+                  {revealed ? <GsapCounter value={45} suffix="%" /> : "45%"}
+                </span>
               </div>
             </div>
           </div>
@@ -221,7 +245,7 @@ function ResultPreview() {
             </div>
           </div>
         </div>
-      </div>
+      </GsapTiltCard>
     </div>
   );
 }
@@ -251,64 +275,68 @@ function Header({
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 h-20 px-6 sm:px-12 bg-gradient-to-b from-[#060709]/95 via-[#060709]/80 to-transparent backdrop-blur-xl flex items-center justify-between select-none transition-all">
-      {/* Brand: Mikalai-Style Geometric Haute Monogram */}
+      {/* Brand: Mikalai-Style Geometric Haute Monogram with GSAP Magnetism */}
       <div className="flex items-center gap-10">
-        <button
-          onClick={() => {
-            sfx.click();
-            onReset();
-          }}
-          className="flex items-center gap-3 bg-transparent border-none cursor-pointer p-0 group"
-        >
-          {/* Mikalai Geometric Icon: Precision origami fold & radar pulse */}
-          <div className="relative w-9 h-9 rounded-xl bg-[#0D0F14] border border-white/[0.1] flex items-center justify-center overflow-hidden shadow-[0_0_20px_rgba(212,255,0,0.15)] group-hover:border-[#D4FF00]/60 transition-all duration-300">
-            <div className="absolute inset-0 bg-gradient-to-br from-[#D4FF00]/10 via-transparent to-transparent pointer-events-none" />
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="transform group-hover:scale-105 transition-transform duration-300">
-              {/* Outer structural diamond/hexagon */}
-              <polygon points="12,2 22,8.5 22,15.5 12,22 2,15.5 2,8.5" stroke="#D4FF00" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-              {/* Center signal core */}
-              <circle cx="12" cy="12" r="3.2" fill="#D4FF00" />
-              <line x1="12" y1="2" x2="12" y2="7" stroke="rgba(255,255,255,0.4)" strokeWidth="1.4" />
-              <line x1="12" y1="17" x2="12" y2="22" stroke="rgba(255,255,255,0.4)" strokeWidth="1.4" />
-            </svg>
-          </div>
+        <GsapMagnetic strength={0.25}>
+          <button
+            onClick={() => {
+              sfx.click();
+              onReset();
+            }}
+            className="flex items-center gap-3 bg-transparent border-none cursor-pointer p-0 group"
+          >
+            {/* Mikalai Geometric Icon: Precision origami fold & radar pulse */}
+            <div className="relative w-9 h-9 rounded-xl bg-[#0D0F14] border border-white/[0.1] flex items-center justify-center overflow-hidden shadow-[0_0_20px_rgba(212,255,0,0.15)] group-hover:border-[#D4FF00]/60 transition-all duration-300">
+              <div className="absolute inset-0 bg-gradient-to-br from-[#D4FF00]/10 via-transparent to-transparent pointer-events-none" />
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="transform group-hover:scale-105 transition-transform duration-300">
+                {/* Outer structural diamond/hexagon */}
+                <polygon points="12,2 22,8.5 22,15.5 12,22 2,15.5 2,8.5" stroke="#D4FF00" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                {/* Center signal core */}
+                <circle cx="12" cy="12" r="3.2" fill="#D4FF00" />
+                <line x1="12" y1="2" x2="12" y2="7" stroke="rgba(255,255,255,0.4)" strokeWidth="1.4" />
+                <line x1="12" y1="17" x2="12" y2="22" stroke="rgba(255,255,255,0.4)" strokeWidth="1.4" />
+              </svg>
+            </div>
 
-          <div className="flex items-baseline gap-2">
-            <span className="text-base font-extrabold tracking-[-0.03em] text-white">
-              InboxSignal
-            </span>
-            <span className="font-mono text-[9px] text-[#D4FF00] font-bold tracking-widest uppercase opacity-90 px-1.5 py-0.5 rounded bg-[#D4FF00]/10 border border-[#D4FF00]/20">
-              Lab
-            </span>
-          </div>
-        </button>
+            <div className="flex items-baseline gap-2">
+              <span className="text-base font-extrabold tracking-[-0.03em] text-white">
+                InboxSignal
+              </span>
+              <GsapScrambleText
+                text="LAB"
+                className="text-[9px] text-[#D4FF00] font-bold tracking-widest uppercase opacity-90 px-1.5 py-0.5 rounded bg-[#D4FF00]/10 border border-[#D4FF00]/20"
+              />
+            </div>
+          </button>
+        </GsapMagnetic>
 
-        {/* Seamless Floating Pill Navigation (Apple Segmented Control Spring Physics) */}
+        {/* Seamless Floating Pill Navigation (Apple Segmented Control + GSAP Magnetism) */}
         <nav className="hidden sm:flex items-center gap-1 p-1 rounded-2xl bg-[#0D0F14]/80 border border-white/[0.08] backdrop-blur-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
           {navItems.map(({ id, label, icon: Icon }) => (
-            <button
-              key={id}
-              onPointerDown={() => sfx.click()}
-              onClick={() => onNavChange(id)}
-              className={`relative px-3.5 py-1.5 text-xs font-medium rounded-xl transition-colors flex items-center gap-2 cursor-pointer select-none active:scale-[0.96] ${
-                activeNav === id
-                  ? "text-white font-semibold"
-                  : "text-slate-400 hover:text-slate-200"
-              }`}
-            >
-              {activeNav === id && (
-                <motion.div
-                  layoutId="activeDesktopNavPill"
-                  className="absolute inset-0 bg-white/[0.1] rounded-xl border border-white/[0.12] -z-10 shadow-[inset_0_1px_0_rgba(255,255,255,0.15),0_2px_8px_rgba(0,0,0,0.3)]"
-                  transition={{ type: "spring", stiffness: 450, damping: 35 }}
+            <GsapMagnetic key={id} strength={0.15}>
+              <button
+                onPointerDown={() => sfx.click()}
+                onClick={() => onNavChange(id)}
+                className={`relative px-3.5 py-1.5 text-xs font-medium rounded-xl transition-colors flex items-center gap-2 cursor-pointer select-none active:scale-[0.96] ${
+                  activeNav === id
+                    ? "text-white font-semibold"
+                    : "text-slate-400 hover:text-slate-200"
+                }`}
+              >
+                {activeNav === id && (
+                  <motion.div
+                    layoutId="activeDesktopNavPill"
+                    className="absolute inset-0 bg-white/[0.1] rounded-xl border border-white/[0.12] -z-10 shadow-[inset_0_1px_0_rgba(255,255,255,0.15),0_2px_8px_rgba(0,0,0,0.3)]"
+                    transition={{ type: "spring", stiffness: 450, damping: 35 }}
+                  />
+                )}
+                <Icon
+                  size={13}
+                  className={activeNav === id ? "text-[#D4FF00]" : "text-slate-500"}
                 />
-              )}
-              <Icon
-                size={13}
-                className={activeNav === id ? "text-[#D4FF00]" : "text-slate-500"}
-              />
-              <span className="relative z-10">{label}</span>
-            </button>
+                <span className="relative z-10">{label}</span>
+              </button>
+            </GsapMagnetic>
           ))}
         </nav>
       </div>
@@ -323,27 +351,29 @@ function Header({
               <span className="tracking-wider uppercase">Free Lab Tier</span>
             </div>
 
-            {/* Quota Gauge Pill */}
-            <div
-              className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#0D0F14]/90 border border-white/[0.08] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] select-none cursor-help"
-              title="Daily free allocation. Quota resets daily at 00:00 UTC."
-            >
-              <span
-                className={`w-1.5 h-1.5 rounded-full ${
-                  remaining > 2
-                    ? "bg-[#D4FF00] shadow-[0_0_8px_#D4FF00]"
-                    : remaining > 0
-                    ? "bg-amber-400 shadow-[0_0_8px_#F59E0B]"
-                    : "bg-rose-500 shadow-[0_0_8px_#FF2A55]"
-                } animate-pulse`}
-              />
-              <span className="font-mono text-xs text-slate-200 font-bold">
-                {remaining}/{limit}
-              </span>
-              <span className="text-[10px] font-mono text-slate-400 hidden sm:inline uppercase">
-                left
-              </span>
-            </div>
+            {/* Quota Gauge Pill with GSAP Magnetism */}
+            <GsapMagnetic strength={0.2}>
+              <div
+                className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#0D0F14]/90 border border-white/[0.08] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] select-none cursor-help"
+                title="Daily free allocation. Quota resets daily at 00:00 UTC."
+              >
+                <span
+                  className={`w-1.5 h-1.5 rounded-full ${
+                    remaining > 2
+                      ? "bg-[#D4FF00] shadow-[0_0_8px_#D4FF00]"
+                      : remaining > 0
+                      ? "bg-amber-400 shadow-[0_0_8px_#F59E0B]"
+                      : "bg-rose-500 shadow-[0_0_8px_#FF2A55]"
+                  } animate-pulse`}
+                />
+                <span className="font-mono text-xs text-slate-200 font-bold">
+                  {remaining}/{limit}
+                </span>
+                <span className="text-[10px] font-mono text-slate-400 hidden sm:inline uppercase">
+                  left
+                </span>
+              </div>
+            </GsapMagnetic>
 
             {/* Haute Customized UserButton */}
             <UserButton
@@ -595,7 +625,13 @@ export default function InboxSignalShell({
   const isLanding = phase === "landing";
 
   return (
-    <div className="min-h-screen flex flex-col relative bg-[#060709] text-slate-100">
+    <div className="min-h-screen flex flex-col relative bg-[#060709] text-slate-100 overflow-x-hidden">
+      {/* GSAP Interactive Precision Reticle Cursor Follower */}
+      <GsapCursor />
+
+      {/* GSAP Ambient Signal Matrix Canvas */}
+      <GsapSignalCanvas />
+
       {/* Header */}
       <Header
         signedIn={signedIn}
