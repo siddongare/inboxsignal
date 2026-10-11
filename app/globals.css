@@ -1,18 +1,18 @@
 @import "tailwindcss";
 
-/* ─── Haute Minimalist Design Tokens (Issey Miyake × Mikalai × Luma) ────── */
+/* ─── Haute Minimalist Design Tokens (Issey Miyake × Mikalai × SYNC) ────── */
 :root {
   /* Canvas & Glass Surfaces */
-  --bg-canvas: #050608;
-  --surface-card: #0D0F14;
-  --surface-card-hover: #12151D;
-  --surface-glass: rgba(13, 15, 20, 0.72);
-  --surface-input: #090A0E;
+  --bg-canvas: #040507;
+  --surface-card: #0A0C10;
+  --surface-card-hover: #0F1218;
+  --surface-glass: rgba(10, 12, 16, 0.75);
+  --surface-input: #07080B;
 
   /* Precision Architectural Micro-Borders */
   --border-subtle: rgba(255, 255, 255, 0.08);
   --border-hover: rgba(255, 255, 255, 0.16);
-  --border-active: rgba(212, 255, 0, 0.45);
+  --border-active: rgba(255, 107, 0, 0.5);
 
   /* Typography */
   --text-primary: #FFFFFF;
@@ -20,13 +20,13 @@
   --text-muted: #8E9BAE;
   --text-faint: #475569;
 
-  /* Haute Signature Accents */
+  /* Haute Signature Accents (Molten Ember & Solar Electric) */
+  --accent-ember: #FF5500;
+  --accent-ember-glow: rgba(255, 85, 0, 0.22);
+  --accent-solar: #FF9900;
   --accent-lime: #D4FF00;
-  --accent-lime-glow: rgba(212, 255, 0, 0.18);
-  --accent-violet: #8B5CF6;
-  --accent-violet-glow: rgba(139, 92, 246, 0.20);
+  --accent-crimson: #FF2A55;
   --accent-emerald: #10B981;
-  --accent-rose: #FF3366;
 }
 
 *, *::before, *::after {
@@ -48,22 +48,22 @@ body::before {
   content: "";
   position: fixed;
   inset: 0;
-  background-image: radial-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px);
-  background-size: 28px 28px;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-size: 32px 32px;
   pointer-events: none;
   z-index: 0;
 }
 
-/* Haute Ambient Radial Luminosity (Acid Lime & Deep Indigo) */
+/* Haute Solar Atmospheric Glow (SYNC / Issey Miyake Warm Ember) */
 body::after {
   content: "";
   position: fixed;
-  top: -150px;
+  top: -160px;
   left: 50%;
   transform: translateX(-50%);
-  width: 1000px;
-  height: 550px;
-  background: radial-gradient(ellipse 650px 320px at 50% 20%, rgba(212, 255, 0, 0.07), rgba(139, 92, 246, 0.05), transparent 75%);
+  width: 1100px;
+  height: 520px;
+  background: radial-gradient(ellipse 700px 300px at 50% 15%, rgba(255, 85, 0, 0.08), rgba(255, 153, 0, 0.04), transparent 70%);
   pointer-events: none;
   z-index: 0;
 }
