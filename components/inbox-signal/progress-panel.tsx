@@ -4,10 +4,9 @@ import { useMemo } from "react";
 import { TrendingUp } from "lucide-react";
 import type { SavedAnalysis } from "@/lib/analysis-types";
 import { formatDate } from "@/components/inbox-signal/utils";
-import { CropMarkCorner, RubberStamp } from "./tactile-elements";
 
 function getBarColor(score: number) {
-  if (score < 45) return "#EF4444";
+  if (score < 45) return "#F43F5E";
   if (score < 68) return "#F59E0B";
   return "#10B981";
 }
@@ -37,44 +36,41 @@ export function ProgressPanel({ history }: { history: SavedAnalysis[] }) {
   }, [history]);
 
   return (
-    <section className="relative rounded-[2px] border-2 border-zinc-800 bg-[#0E0E12] p-4 font-mono shadow-sm">
-      <CropMarkCorner position="top-right" />
-      <CropMarkCorner position="bottom-left" />
-
-      <div className="mb-3.5 flex items-center justify-between pb-2.5 border-b-2 border-zinc-800">
+    <section className="rounded-2xl border border-white/[0.08] bg-[#111319]/80 p-4 shadow-sm backdrop-blur-xl">
+      <div className="mb-3.5 flex items-center justify-between pb-2.5 border-b border-white/[0.06]">
         <div>
-          <span className="text-[9px] font-black uppercase tracking-widest text-zinc-500 block">
-            HISTORICAL VELOCITY
+          <span className="text-[10px] font-mono font-medium uppercase tracking-wider text-slate-500 block">
+            Progress Tracking
           </span>
-          <h2 className="text-xs font-bold text-white uppercase tracking-wider">
-            SIGNAL PROGRESSION
+          <h2 className="text-xs font-semibold text-white tracking-tight">
+            Signal Velocity
           </h2>
         </div>
-        <TrendingUp className="text-zinc-400" size={15} />
+        <TrendingUp className="text-blue-400" size={16} />
       </div>
 
       <div className="grid grid-cols-3 gap-2">
-        <div className="bg-[#141418] border border-zinc-800 p-2.5 rounded-[2px] flex flex-col items-center">
-          <span className="text-[9px] font-bold text-zinc-500 uppercase">[COUNT]</span>
-          <span className="text-base font-black text-white mt-0.5">
+        <div className="bg-white/[0.02] border border-white/[0.05] p-2.5 rounded-xl flex flex-col items-center">
+          <span className="text-[10px] text-slate-400 font-medium">Total</span>
+          <span className="font-mono text-base font-bold text-white mt-0.5">
             {stats.total}
           </span>
         </div>
-        <div className="bg-[#141418] border border-zinc-800 p-2.5 rounded-[2px] flex flex-col items-center">
-          <span className="text-[9px] font-bold text-zinc-500 uppercase">[LATEST]</span>
-          <span className="text-base font-black text-white mt-0.5">
+        <div className="bg-white/[0.02] border border-white/[0.05] p-2.5 rounded-xl flex flex-col items-center">
+          <span className="text-[10px] text-slate-400 font-medium">Latest</span>
+          <span className="font-mono text-base font-bold text-white mt-0.5">
             {stats.latest ? stats.latest : "-"}
           </span>
         </div>
-        <div className="bg-[#141418] border border-zinc-800 p-2.5 rounded-[2px] flex flex-col items-center">
-          <span className="text-[9px] font-bold text-zinc-500 uppercase">[DELTA]</span>
+        <div className="bg-white/[0.02] border border-white/[0.05] p-2.5 rounded-xl flex flex-col items-center">
+          <span className="text-[10px] text-slate-400 font-medium">Delta</span>
           <span
-            className={`text-base font-black mt-0.5 ${
+            className={`font-mono text-base font-bold mt-0.5 ${
               stats.improvement > 0
                 ? "text-emerald-400"
                 : stats.improvement < 0
-                  ? "text-red-400"
-                  : "text-zinc-400"
+                  ? "text-rose-400"
+                  : "text-slate-400"
             }`}
           >
             {stats.improvement > 0
@@ -84,10 +80,10 @@ export function ProgressPanel({ history }: { history: SavedAnalysis[] }) {
         </div>
       </div>
 
-      <div className="mt-3.5 flex h-24 items-end gap-1.5 rounded-[2px] border border-zinc-800 bg-[#09090C] p-2.5">
+      <div className="mt-3.5 flex h-24 items-end gap-1.5 rounded-xl border border-white/[0.05] bg-[#090A0F]/60 p-2.5">
         {stats.series.length === 0 ? (
-          <p className="self-center text-[10px] text-zinc-500 text-center w-full">
-            [HISTOGRAM POPULATES AFTER RUNNING AUDITS]
+          <p className="self-center text-xs text-slate-500 text-center w-full">
+            Histogram populates after running audits
           </p>
         ) : (
           stats.series.map((item) => {
@@ -100,10 +96,10 @@ export function ProgressPanel({ history }: { history: SavedAnalysis[] }) {
                 title={`${item.score} score on ${formatDate(item.createdAt)}`}
               >
                 <div
-                  style={{ height: `${barH}px`, background: color }}
-                  className="w-full max-w-[16px] transition-opacity opacity-85 group-hover:opacity-100"
+                  style={{ height: `${barH}px`, backgroundColor: color }}
+                  className="w-full max-w-[14px] rounded-full transition-all opacity-80 group-hover:opacity-100"
                 />
-                <span className="text-[8px] text-zinc-500 font-bold">
+                <span className="text-[9px] text-slate-500 font-mono font-medium">
                   {item.score}
                 </span>
               </div>
@@ -112,9 +108,9 @@ export function ProgressPanel({ history }: { history: SavedAnalysis[] }) {
         )}
       </div>
 
-      <div className="mt-2.5 flex items-center justify-between text-[10px] text-zinc-500">
-        <span>PEAK SCORE ACHIEVED:</span>
-        <span className="font-bold text-emerald-400">
+      <div className="mt-2.5 flex items-center justify-between text-xs text-slate-400">
+        <span>Best score achieved:</span>
+        <span className="font-mono font-semibold text-emerald-400">
           {stats.best || "-"} / 100
         </span>
       </div>

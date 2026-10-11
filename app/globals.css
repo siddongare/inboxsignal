@@ -1,26 +1,34 @@
 @import "tailwindcss";
 
-/* ─── Editorial Brutalist Print Tokens (Issey Miyake / Zinezo / Wander) ──── */
+/* ─── Luma-Inspired Luxury Minimalist Design Tokens ────────────────────── */
 :root {
-  --bg: #08080B;
-  --surface: #0E0E12;
-  --surface-hover: #14141A;
-  --surface-raised: #181820;
+  /* Canvas & Glass Surfaces */
+  --bg-canvas: #090A0F;
+  --surface-card: #111319;
+  --surface-card-hover: #161822;
+  --surface-glass: rgba(18, 20, 28, 0.65);
+  --surface-input: #0D0E14;
 
-  --border: #27272A;
-  --border-strong: #3F3F46;
+  /* Precision Borders */
+  --border-subtle: rgba(255, 255, 255, 0.07);
+  --border-hover: rgba(255, 255, 255, 0.14);
+  --border-active: rgba(255, 255, 255, 0.22);
 
-  --text-primary: #FAFAFA;
-  --text-secondary: #D4D4D8;
-  --text-muted: #A1A1AA;
-  --text-faint: #71717A;
+  /* Typography */
+  --text-primary: #FFFFFF;
+  --text-secondary: #CBD5E1;
+  --text-muted: #94A3B8;
+  --text-faint: #64748B;
 
-  /* High-Contrast Print Inks */
-  --ink-red: #EF4444;
-  --ink-orange: #F97316;
-  --ink-yellow: #EAB308;
-  --ink-green: #10B981;
-  --ink-blue: #3B82F6;
+  /* Luminous Accents */
+  --accent-blue: #3B82F6;
+  --accent-blue-glow: rgba(59, 130, 246, 0.15);
+  --accent-emerald: #10B981;
+  --accent-emerald-glow: rgba(16, 185, 129, 0.15);
+  --accent-rose: #F43F5E;
+  --accent-rose-glow: rgba(244, 63, 94, 0.15);
+  --accent-amber: #F59E0B;
+  --accent-amber-glow: rgba(245, 158, 11, 0.15);
 }
 
 *, *::before, *::after {
@@ -29,9 +37,7 @@
 
 html, body {
   height: 100%;
-  background-color: var(--bg);
-  background-image: radial-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px);
-  background-size: 24px 24px;
+  background-color: var(--bg-canvas);
   color: var(--text-primary);
   font-family: var(--font-sans), 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -39,10 +45,23 @@ html, body {
   overflow-x: hidden;
 }
 
-/* Tactile Yellow Highlighter Selection */
+/* Subtle Ambient Gradient at Top of Canvas */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 900px;
+  height: 450px;
+  background: radial-gradient(circle 450px at 50% 0%, rgba(59, 130, 246, 0.08), transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
 ::selection {
-  background: #FEF08A;
-  color: #09090B;
+  background: rgba(59, 130, 246, 0.25);
+  color: #FFFFFF;
 }
 
 textarea, input, button {
@@ -53,11 +72,11 @@ textarea:focus, input:focus {
   outline: none;
 }
 
-/* ─── Minimal Scrollbar ─────────────────────────────────────────────────── */
-::-webkit-scrollbar { width: 4px; height: 4px; }
+/* ─── Refined Minimal Scrollbar ─────────────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #27272A; }
-::-webkit-scrollbar-thumb:hover { background: #3F3F46; }
+::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.12); border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.22); }
 
 /* ─── Typography Utility ────────────────────────────────────────────────── */
 .font-mono {
@@ -72,7 +91,7 @@ textarea:focus, input:focus {
     height: auto !important;
     max-height: none !important;
     border-right: none !important;
-    border-bottom: 2px solid #27272A !important;
+    border-bottom: 1px solid var(--border-subtle) !important;
     overflow-y: visible !important;
   }
   .results-scroll {

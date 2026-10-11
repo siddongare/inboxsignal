@@ -1,119 +1,113 @@
-```
- ⌜                                                                             ⌝
-   INBOXSIGNAL // 受信箱のシグナル                                       ISSUE 04
-   A FORENSIC AUTOPSY INSTRUMENT FOR COLD OUTREACH               VOL. 2026 / ED. B2B
- ⌞                                                                             ⌟
-```
+<div align="center">
 
-# INBOXSIGNAL // THE OUTREACH AUTOPSY
+# InboxSignal
 
-> **"98% of cold outreach doesn't die in spam filters. It dies in the preview line."**
-> A brutalist diagnostic engine designed to dissect, benchmark, and rewrite B2B sales outreach before it burns pipeline.
+**AI-Powered Outreach Diagnostic Engine & Conversion Optimizer**
+
+*Objective B2B cold email failure analysis, multi-vector signal scoring, and conversion-focused copy rewrites.*
+
+[Explore Live Demo](https://inboxsignal.vercel.app) · [Report Issue](https://github.com/siddongare/inboxsignal/issues)
+
+</div>
+
+---
+
+## Overview
+
+Most sales emails fail not because of deliverability or spam filters, but because of **subtle cognitive friction** in the copy:
+- **Generic Value Propositions:** Pitching product features rather than solving acute executive pain.
+- **Surface-Level Personalization:** Quoting LinkedIn profile headlines without contextual relevance.
+- **High-Friction Calls-to-Action:** Demanding 30 minutes on an executive's calendar before establishing value.
+
+**InboxSignal** is a diagnostic engine for sales leaders, founders, and SDRs. Built with a minimalist, human-centric design approach inspired by high-end modern SaaS interfaces (such as Luma by Arounda), it provides an immediate radial health readout, Pinpointed Failure Diagnostics, and an actionable revision workflow.
+
+---
+
+## Key Capabilities
+
+### 1. Radial Signal Scoring (0–100)
+A quick-scan composite meter evaluating drafts across four foundational dimensions:
+- **Clarity:** Structural cadence, brevity, and cognitive load.
+- **Relevance:** Pain-point alignment and buyer triggers.
+- **Credibility:** Concrete metrics and authentic trust proof.
+- **CTA Friction:** Ease and commitment level of the next step.
+
+### 2. Forensic Failure Diagnostics
+Actionable failure analysis ranked by severity (`Critical`, `High`, `Medium`, `Low`):
+- **Failure Mechanism:** Explains why an executive buyer ignores or deletes the message.
+- **Actionable Correction:** Direct guidance to eliminate the identified flaw.
+
+### 3. Conversion-Focused Copy Rewrite
+- **Side-by-Side Review:** Instant toggle between Original Draft and Optimized Rewrite.
+- **4 Subject Line Hooks:** Direct, curiosity, trigger-based, and benchmark hooks.
+- **Iterate V2 Workflow:** One-click transfer of the generated rewrite back into the editor to re-analyze and track score progression.
+
+### 4. 2-Touch Follow-Up Cadence
+- **Day 3 Soft Bump:** Low-friction context touch that adds a fresh angle without generic filler.
+- **Day 7 Breakup Angle:** Courteous takeaway closing the loop while preserving pipeline opportunity.
+
+### 5. Historical Velocity Tracking
+- Real-time delta visualization (`+Score Delta`) comparing successive iterations.
+- Persistent analysis timeline powered by Vercel KV Redis.
+
+---
+
+## Tech Stack & Architecture
+
+- **Framework:** Next.js 16.2.4 (App Router, Turbopack)
+- **UI & Animation:** React 19.2.4, Tailwind CSS v4, Framer Motion v12
+- **Typography:** Plus Jakarta Sans & Geist Mono
+- **Authentication:** Clerk (`@clerk/nextjs` v7)
+- **AI Diagnostics:** Groq SDK (`llama-3.3-70b-versatile` structured JSON)
+- **Database / Cache:** Vercel KV (`@vercel/kv` Redis)
 
 ```
-+-------------------------------------------------------------------------------+
-|  STATUS: [CLASSIFIED FIELD MANUAL]      SPEC: 4-VECTOR DIAGNOSTIC ENGINE     |
-|  INSPECTION: [VERIFIED CALIBRATION]     STACK: NEXT.JS 16 // GROQ 70B // KV   |
-+-------------------------------------------------------------------------------+
+┌────────────────────────────────────────────────────────┐
+│                   Next.js 16 App                       │
+│        (React 19 Frontend & Luma-Style Bento UI)       │
+└───────────────────────────┬────────────────────────────┘
+                            │
+           ┌────────────────┴────────────────┐
+           ▼                                 ▼
+┌──────────────────────┐          ┌──────────────────────┐
+│    Clerk Auth v7     │          │    Next.js Proxy     │
+│  (Session Tokens)    │          │  (Route Protection)  │
+└──────────┬───────────┘          └──────────┬───────────┘
+           │                                 │
+           └────────────────┬────────────────┘
+                            ▼
+┌────────────────────────────────────────────────────────┐
+│          Next.js Route Handlers (/api/audit)           │
+└───────────────────────────┬────────────────────────────┘
+                            │
+           ┌────────────────┴────────────────┐
+           ▼                                 ▼
+┌──────────────────────┐          ┌──────────────────────┐
+│       Groq SDK       │          │      Vercel KV       │
+│ (Llama 3.3 70B JSON) │          │ (Atomic Daily Quota  │
+│  Diagnostic Engine   │          │  & Analysis Store)   │
+└──────────────────────┘          └──────────────────────┘
 ```
 
 ---
 
-### [MANIFESTO // 01] · WHY MOST COLD EMAILS ARE DEAD ON ARRIVAL
+## Getting Started
 
-Most founders and SDRs write cold emails like corporate pitch decks:
-1. **The Ego Hook:** Starting with *"My name is X and we are the leading platform for Y..."* — immediate archive.
-2. **The 30-Minute Trap:** Demanding calendar commitments before earning 30 seconds of cognitive trust.
-3. **The Template Echo Chamber:** Relying on generic AI prompts that churn out robotic, hyper-polished corporate drivel.
+### Prerequisites
+- Node.js 20.x or higher
+- Clerk, Groq, and Vercel KV accounts
 
-**InboxSignal is not an AI email writer.** It is a forensic autopsy instrument. You feed it your cold draft and your prospect context; it runs a calibrated diagnosis across 4 failure vectors, stamps the fatal flaws, and issues an optimized revision plus an automated follow-up cadence.
-
----
-
-### [DIAGNOSTIC MATRIX // 02] · THE 4 SIGNAL VECTORS
-
-```
-[VEC.01] CLARITY (0–100)        --> Cognitive friction, reading cadence, brevity.
-[VEC.02] RELEVANCE (0–100)      --> Pain-point alignment & company trigger events.
-[VEC.03] CREDIBILITY (0–100)    --> Proof points, tangible metrics, zero hype.
-[VEC.04] CTA STRENGTH (0–100)   --> Frictionless next steps vs. calendar demands.
-```
-
-```
-           [00 - 45]               [46 - 69]               [70 - 100]
-     +-------------------+   +-------------------+   +-------------------+
-     |  FATAL / ARCHIVE  |   | SUBOPTIMAL SIGNAL |   | CONVERSION CLEARED|
-     |  High spam & burn |   | Friction in body  |   | Ready for dispatch|
-     +-------------------+   +-------------------+   +-------------------+
-```
-
----
-
-### [TACTILE SPEC // 03] · WHAT THE ENGINE OUTPUTS
-
-* **Forensic Failure Diagnosis:** Every weakness tagged by severity (`[CRITICAL]`, `[HIGH]`, `[MEDIUM]`, `[LOW]`) with the psychological failure mechanism exposed.
-* **Conversion Rewrite:** An edited draft stripping filler phrases, anchored on verified customer outcomes.
-* **4 Distinct Subject Line Angles:**
-  * `[HOOK A]` — Direct / Question hook
-  * `[HOOK B]` — Hiring / Funding trigger
-  * `[HOOK C]` — Contrarian observation
-  * `[HOOK D]` — Peer benchmark
-* **Iterate V2 Loop:** One-click feedback loop that loads the generated rewrite back into the editor to test and measure score deltas.
-* **Multi-Touch Cadence:**
-  * `TOUCH 02 // DAY 3:` Soft context bump (no *"just bumping this"* filler).
-  * `TOUCH 03 // DAY 7:` Value takeaway & respectful breakup angle.
-
----
-
-### [SYSTEM BLUEPRINT // 04] · ARCHITECTURE & SPEC
-
-```
- ┌────────────────────────────────────────────────────────┐
- │                   NEXT.JS 16 RUNTIME                   │
- │       (React 19 Concurrent / Turbopack / App Router)   │
- └───────────────────────────┬────────────────────────────┘
-                             │
-            ┌────────────────┴────────────────┐
-            ▼                                 ▼
- ┌──────────────────────┐          ┌──────────────────────┐
- │    CLERK AUTH V7     │          │    NEXT.JS PROXY     │
- │  (Session & Tokens)  │          │   (Route Shield)     │
- └──────────┬───────────┘          └──────────┬───────────┘
-            │                                 │
-            └────────────────┬────────────────┘
-                             ▼
- ┌────────────────────────────────────────────────────────┐
- │           POST /api/audit  &  /api/history             │
- └───────────────────────────┬────────────────────────────┘
-                             │
-            ┌────────────────┴────────────────┐
-            ▼                                 ▼
- ┌──────────────────────┐          ┌──────────────────────┐
- │       GROQ SDK       │          │      VERCEL KV       │
- │ (Llama 3.3 70B JSON) │          │(Atomic Daily Quotas) │
- │ Forensic Diagnostic  │          │(Case History Store)  │
- └──────────────────────┘          └──────────────────────┘
-```
-
----
-
-### [RUNBOOK // 05] · LOCAL INSTALLATION
-
-#### 1. Clone the Specimen Repo
+### 1. Clone & Install
 ```bash
 git clone https://github.com/siddongare/inboxsignal.git
 cd inboxsignal
-```
-
-#### 2. Provision Dependencies
-```bash
 npm install
 ```
 
-#### 3. Configure Environmental Keys
-Create `.env.local` at repository root:
+### 2. Configure Environment Variables
+Create `.env.local` in the project root:
 ```env
-# Clerk Authentication Keys
+# Clerk Authentication
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
 CLERK_SECRET_KEY=sk_test_...
 NEXT_PUBLIC_CLERK_SIGN_IN_URL=/
@@ -121,60 +115,37 @@ NEXT_PUBLIC_CLERK_SIGN_UP_URL=/
 NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/
 NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/
 
-# Groq Diagnostic Engine Key
+# Groq API Key
 GROQ_API_KEY=gsk_...
 
-# Vercel KV / Redis (Optional in local dev, in-memory fallback enabled)
+# Vercel KV Redis (Optional for local dev, in-memory fallback enabled)
 KV_REST_API_URL=https://...kv.vercel-storage.com
 KV_REST_API_TOKEN=...
 ```
 
-#### 4. Ignite Local Laboratory
+### 3. Run Development Server
 ```bash
 npm run dev
 ```
-Navigate to `http://localhost:3000` to review the autopsy deck.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-#### 5. Verify Production Build
+### 4. Build for Production
 ```bash
 npm run build
+npm run start
 ```
 
 ---
 
-### [DIRECTORY TAXONOMY // 06]
+## Design Standards & Methodology
 
-```
-inboxsignal/
-├── app/
-│   ├── api/
-│   │   ├── audit/route.ts          # Forensic AI diagnostic engine (Groq)
-│   │   └── history/route.ts        # Archival CRUD endpoints
-│   ├── globals.css                 # Print brutalist tokens & micro-dot textures
-│   ├── layout.tsx                  # Font loading (Plus Jakarta Sans & Geist Mono)
-│   ├── opengraph-image.tsx         # Edge-rendered social dossier card
-│   ├── page.tsx                    # Page controller & telemetry prefetch
-│   └── sitemap.ts                  # Production XML sitemap generator
-├── components/
-│   ├── inbox-signal/
-│   │   ├── composer.tsx            # Tactile dossier composer & word/char metrics
-│   │   ├── history-panel.tsx       # Case file history with status stamps
-│   │   ├── progress-panel.tsx      # Signal progression histogram & delta velocity
-│   │   ├── result-panel.tsx        # Forensic autopsy readout & V2 iteration action
-│   │   ├── tactile-audio.ts        # Web Audio API mechanical clicks & stamp thuds
-│   │   ├── tactile-elements.tsx    # Rubber stamps, masking tape, sticky critique note
-│   │   └── utils.ts                # Formatting & sample case data
-│   └── inbox-signal-shell.tsx      # Primary view orchestrator & zine layout
-├── proxy.ts                        # Next.js 16 route shield proxy
-├── package.json
-└── README.md
-```
+This project incorporates the design principles of **[Impeccable](https://impeccable.style/)** and **[Taste Skill](https://github.com/Leonxlnx/taste-skill)**:
+- **No Template Slop:** Avoids generic AI purple gradients, redundant cards-in-cards, and status-chip soup.
+- **Intentional Contrast:** Deep obsidian background tinted with slate/blue ambient glow, clean 1px borders (`border-white/[0.08]`), and luminous semantic accents.
+- **Human-Centric Clarity:** Radial health visualization delivering actionable clarity in under 4 seconds.
 
 ---
 
-```
- ⌜                                                                             ⌝
-   INBOXSIGNAL // EDITED & COMPILED BY SIDDHARTH DONGARE
-   ALL RIGHTS RESERVED // DISTRIBUTED UNDER MIT LICENSE
- ⌞                                                                             ⌟
-```
+## License
+
+Distributed under the [MIT License](LICENSE).
