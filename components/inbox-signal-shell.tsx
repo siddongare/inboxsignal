@@ -15,9 +15,12 @@ import {
   FileText,
   Layers,
   Clock,
-  RotateCcw,
+  Sparkles,
+  Flame,
+  Volume2,
+  VolumeX,
 } from "lucide-react";
-import { motion, AnimatePresence, useInView } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import type {
   AnalysisResult,
   AuditApiResponse,
@@ -28,351 +31,329 @@ import { HistoryPanel } from "@/components/inbox-signal/history-panel";
 import { ProgressPanel } from "@/components/inbox-signal/progress-panel";
 import { ResultPanel } from "@/components/inbox-signal/result-panel";
 import { demoEmail, demoProspect } from "@/components/inbox-signal/utils";
+import { sfx } from "@/components/inbox-signal/tactile-audio";
+import {
+  RubberStamp,
+  MaskingTape,
+  StickyCritique,
+  BarcodeTicket,
+  CropMarkCorner,
+  VerticalEditorialLabel,
+} from "@/components/inbox-signal/tactile-elements";
 
-const SPRING = { type: "spring" as const, stiffness: 260, damping: 30 };
-
-// ─── Score helpers ───────────────────────────────────────────────────────────
-function scoreColor(s: number) {
-  if (s < 45) return "var(--critical)";
-  if (s < 68) return "var(--medium)";
-  return "var(--low)";
-}
-
-// ─── Hero Section ────────────────────────────────────────────────────────────
-function HeroSection() {
+// ─── Hero Section (Issey Miyake / Zinezo Editorial Style) ──────────────────────
+function HeroSection({
+  onSampleClick,
+}: {
+  onSampleClick: () => void;
+}) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-      style={{ textAlign: "center", marginBottom: 16, width: "100%" }}
-    >
-      {/* Status pill */}
-      <div
-        style={{
-          display: "inline-flex",
-          alignItems: "center",
-          gap: 8,
-          padding: "6px 14px",
-          borderRadius: 999,
-          background: "var(--surface)",
-          border: "1px solid var(--border)",
-          marginBottom: 20,
-          fontSize: 12,
-          color: "var(--text-muted)",
-          fontWeight: 500,
-        }}
-      >
-        <span
-          style={{
-            width: 6,
-            height: 6,
-            borderRadius: "50%",
-            background: "var(--low)",
-            flexShrink: 0,
-          }}
-        />
-        Free · 3 analyses / day · No card needed
+    <div className="relative text-center mb-6 w-full max-w-2xl mx-auto select-none">
+      {/* Classification Tag Pill */}
+      <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 mb-5 bg-[#121216] border-2 border-zinc-800 rounded-[2px] font-mono text-[11px] text-zinc-300 shadow-sm">
+        <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+        <span className="font-bold tracking-wider uppercase text-zinc-100">
+          FREE TIER · 3 DIAGNOSTIC AUDITS / DAY
+        </span>
+        <span className="text-zinc-600">//</span>
+        <span className="text-zinc-400">NO CARD REQUIRED</span>
       </div>
 
-      <h1
-        style={{
-          fontSize: "clamp(36px, 7vw, 64px)",
-          fontWeight: 800,
-          color: "var(--text-primary)",
-          letterSpacing: "-0.04em",
-          lineHeight: 1.05,
-          margin: "0 auto 12px",
-          maxWidth: 660,
-        }}
-      >
-        Turn cold emails{" "}
-        <span style={{ color: "var(--accent)" }}>into replies.</span>
-      </h1>
+      {/* Main Stark Editorial Headline */}
+      <div className="relative inline-block mb-3">
+        <h1 className="text-4xl sm:text-6xl md:text-7xl font-black text-white tracking-tighter uppercase leading-[0.95] font-sans">
+          TURN COLD EMAILS
+          <br />
+          <span className="text-zinc-400 underline decoration-zinc-700 decoration-wavy underline-offset-8">
+            INTO REPLIES.
+          </span>
+        </h1>
 
-      <p
-        style={{
-          fontSize: "clamp(14px, 2vw, 17px)",
-          color: "var(--text-muted)",
-          lineHeight: 1.7,
-          maxWidth: 440,
-          margin: "0 auto",
-          fontWeight: 400,
-        }}
-      >
-        Diagnose why your outreach is being ignored.
-        <br />
-        Get the score, the fix, and the rewrite.
+        {/* Tilted Stamp Offset (Breaks the grid) */}
+        <div className="absolute -top-3.5 -right-6 sm:-right-12 hidden xs:block">
+          <RubberStamp
+            text="SPECIMEN: HIGH FRICTION"
+            variant="critical"
+            angle={6}
+          />
+        </div>
+      </div>
+
+      <p className="text-sm sm:text-base text-zinc-400 max-w-md mx-auto leading-relaxed mt-2 font-sans font-medium">
+        An editorial autopsy instrument for cold sales outreach. Diagnose why
+        your messages get ignored — then rewrite them for reply velocity.
       </p>
-    </motion.div>
+
+      {/* Quick Interactive Stamped Tags */}
+      <div className="flex flex-wrap items-center justify-center gap-2 mt-4 font-mono">
+        <RubberStamp
+          text="[4 DIAGNOSTIC VECTORS]"
+          variant="neutral"
+          angle={-1.5}
+        />
+        <RubberStamp
+          text="[BENCHMARK CALIBRATED]"
+          variant="low"
+          angle={1.8}
+        />
+        <RubberStamp
+          text="[CADENCE GENERATOR]"
+          variant="caution"
+          angle={-2}
+        />
+      </div>
+    </div>
   );
 }
 
-// ─── Feature Grid ────────────────────────────────────────────────────────────
+// ─── Feature Grid (Editorial Brutalist Wireframe) ────────────────────────────
 function FeatureGrid() {
-  const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-60px" });
-
   const items = [
-    { icon: Zap, color: "var(--accent)", title: "Signal Score", desc: "0–100 composite across clarity, relevance, credibility, CTA." },
-    { icon: AlertTriangle, color: "var(--critical)", title: "Failure Diagnosis", desc: "Each weak point ranked Critical → High → Medium → Low." },
-    { icon: FileText, color: "var(--low)", title: "Optimized Rewrite", desc: "Better email + 4 subject line variants, copy-ready." },
-    { icon: Layers, color: "var(--indigo)", title: "Follow-Up Sequence", desc: "Day 3 & Day 7 emails that add new angles, not repeats." },
+    {
+      n: "VEC.01",
+      icon: Zap,
+      stamp: "0–100 SCORE",
+      color: "text-blue-400",
+      title: "Signal Score Engine",
+      desc: "Mathematical composite across clarity, relevance, credibility, and call-to-action friction.",
+    },
+    {
+      n: "VEC.02",
+      icon: AlertTriangle,
+      stamp: "FORENSIC AUTOPSY",
+      color: "text-red-400",
+      title: "Failure Diagnosis",
+      desc: "Exact failure mechanisms ranked Critical → Low with the psychological mechanism explained.",
+    },
+    {
+      n: "VEC.03",
+      icon: FileText,
+      stamp: "REWRITE + 4 HOOKS",
+      color: "text-emerald-400",
+      title: "Conversion Rewrite",
+      desc: "Flawless copy rewrite plus 4 distinct subject line angles ready for immediate A/B deployment.",
+    },
+    {
+      n: "VEC.04",
+      icon: Layers,
+      stamp: "CADENCE SEQUENCE",
+      color: "text-amber-400",
+      title: "Multi-Touch Cadence",
+      desc: "Day 3 context bump & Day 7 breakup sequence adding fresh leverage instead of 'just checking in'.",
+    },
   ];
 
   return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay: 0.15 }}
-      style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(2, 1fr)",
-        gap: 12,
-        width: "100%",
-        maxWidth: 600,
-        marginTop: 40,
-      }}
-      className="feature-grid-inner"
-    >
-      {items.map(({ icon: Icon, color, title, desc }, idx) => (
-        <motion.div
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 w-full max-w-xl mx-auto mt-10 font-mono">
+      {items.map(({ n, icon: Icon, stamp, color, title, desc }) => (
+        <div
           key={title}
-          initial={{ opacity: 0, y: 16 }}
-          animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.3, delay: 0.1 + idx * 0.06 }}
-          style={{
-            padding: 16,
-            background: "var(--surface)",
-            border: "1px solid var(--border)",
-            borderRadius: 10,
-            display: "flex",
-            flexDirection: "column",
-            gap: 8,
-            transition: "border-color 0.15s",
-          }}
-          className="hover:border-[var(--border-hover)]"
+          onClick={() => sfx.click()}
+          className="relative p-4 rounded-[2px] bg-[#0E0E12] border-2 border-zinc-800 hover:border-zinc-500 transition shadow-sm cursor-default group"
         >
-          <Icon size={16} strokeWidth={1.8} style={{ color }} />
-          <div style={{ fontSize: 14, fontWeight: 600, color: "var(--text-primary)" }}>
+          <CropMarkCorner position="top-left" />
+          <CropMarkCorner position="bottom-right" />
+
+          <div className="flex items-center justify-between pb-2 border-b border-zinc-800/80 mb-2.5">
+            <div className="flex items-center gap-2">
+              <Icon size={14} className={color} />
+              <span className="text-[10px] font-black text-zinc-400">{n}</span>
+            </div>
+            <span className="text-[9px] font-bold text-zinc-500 uppercase tracking-wider">
+              {stamp}
+            </span>
+          </div>
+
+          <h3 className="text-sm font-bold text-zinc-100 font-sans tracking-tight mb-1">
             {title}
-          </div>
-          <div style={{ fontSize: 13, color: "var(--text-muted)", lineHeight: 1.6 }}>
+          </h3>
+          <p className="text-xs text-zinc-400 font-sans leading-relaxed">
             {desc}
-          </div>
-        </motion.div>
+          </p>
+        </div>
       ))}
-    </motion.div>
+    </div>
   );
 }
 
-// ─── Result Preview (Landing) ────────────────────────────────────────────────
+// ─── Result Preview (Editorial Zine Sample Dossier) ──────────────────────────
 function ResultPreview() {
   const [revealed, setRevealed] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-40px" });
-
-  const mockSignals = [
-    { label: "Clarity", score: 58, color: "var(--medium)" },
-    { label: "Relevance", score: 35, color: "var(--critical)" },
-    { label: "Credibility", score: 50, color: "var(--medium)" },
-    { label: "CTA", score: 45, color: "var(--medium)" },
-  ];
-
-  const mockIssues = [
-    { level: "CRITICAL", text: "Lack of Personalization", color: "var(--critical)" },
-    { level: "HIGH", text: "Weak Value Proposition", color: "var(--high)" },
-    { level: "MEDIUM", text: "Generic Subject Line", color: "var(--medium)" },
-  ];
 
   return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 24 }}
-      animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.4, delay: 0.1 }}
-      style={{ width: "100%", maxWidth: 600, marginTop: 48 }}
-    >
-      {/* Header */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-        <span style={{ fontSize: 12, color: "var(--text-faint)", fontWeight: 500 }}>
-          Sample Analysis · AutoLead → VP of Sales
+    <div className="relative w-full max-w-xl mx-auto mt-12 mb-8">
+      {/* Tape on Top-Left */}
+      <MaskingTape width={100} angle={-3} className="absolute -top-3 -left-3 hidden sm:block" />
+
+      {/* Header Bar */}
+      <div className="flex items-center justify-between pb-2 mb-2 font-mono text-[11px] border-b border-zinc-800">
+        <span className="text-zinc-400 font-bold uppercase tracking-wider">
+          CASE FILE // 0984 · SDR DRAFT AUTOPSY
         </span>
         <button
-          onClick={() => setRevealed((r) => !r)}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 6,
-            padding: "6px 12px",
-            background: revealed ? "var(--surface-hover)" : "var(--surface)",
-            border: "1px solid var(--border)",
-            borderRadius: 6,
-            cursor: "pointer",
-            color: revealed ? "var(--text-secondary)" : "var(--text-muted)",
-            fontSize: 12,
-            fontWeight: 500,
-            transition: "all 0.15s",
+          onClick={() => {
+            sfx.paper();
+            setRevealed((r) => !r);
           }}
+          className="px-2.5 py-1 text-[10px] font-mono font-bold uppercase tracking-wider bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 rounded-[2px] transition"
         >
-          {revealed ? "Hide preview" : "See a sample →"}
+          {revealed ? "[CONCEAL DOSSIER]" : "[EXAMINE CASE FILE →]"}
         </button>
       </div>
 
-      {/* Preview card */}
-      <div style={{ position: "relative", borderRadius: 12, overflow: "hidden" }}>
-        {/* Blur overlay */}
-        <motion.div
-          animate={{ opacity: revealed ? 0 : 1 }}
-          transition={{ duration: 0.3 }}
-          style={{
-            position: "absolute",
-            inset: 0,
-            backdropFilter: "blur(8px)",
-            WebkitBackdropFilter: "blur(8px)",
-            background: "rgba(9,9,11,0.6)",
-            zIndex: 3,
-            pointerEvents: revealed ? "none" : "all",
-            borderRadius: 12,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <span style={{ fontSize: 12, color: "var(--text-faint)", fontWeight: 500 }}>
-            Click "See a sample" to reveal
-          </span>
-        </motion.div>
+      {/* Dossier Card Container */}
+      <div className="relative rounded-[2px] bg-[#0E0E12] border-2 border-zinc-800 p-5 shadow-lg overflow-hidden font-mono">
+        <CropMarkCorner position="top-left" />
+        <CropMarkCorner position="top-right" />
+        <CropMarkCorner position="bottom-left" />
+        <CropMarkCorner position="bottom-right" />
 
-        <div
-          style={{
-            background: "var(--surface)",
-            border: "1px solid var(--border)",
-            borderRadius: 12,
-            padding: 20,
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: 16,
-          }}
-        >
-          {/* Left: Score + Issues */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            {/* Score ring */}
-            <div style={{ background: "var(--bg)", border: "1px solid var(--border)", borderRadius: 10, padding: 16, display: "flex", flexDirection: "column", alignItems: "center", gap: 14 }}>
-              <div style={{ position: "relative", width: 72, height: 72 }}>
-                <svg width={72} height={72} style={{ transform: "rotate(-90deg)" }}>
-                  <circle cx={36} cy={36} r={33} fill="none" stroke="var(--border)" strokeWidth={4} />
-                  <motion.circle
-                    cx={36} cy={36} r={33} fill="none"
-                    stroke="var(--critical)" strokeWidth={4} strokeLinecap="round"
-                    strokeDasharray={207}
-                    initial={{ strokeDashoffset: 207 }}
-                    animate={revealed ? { strokeDashoffset: 207 * (1 - 47 / 100) } : { strokeDashoffset: 207 }}
-                    transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
-                  />
-                </svg>
-                <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-                  <span className="font-mono" style={{ fontSize: 20, fontWeight: 700, color: "var(--critical)" }}>47</span>
-                  <span className="font-mono" style={{ fontSize: 9, color: "var(--text-faint)", letterSpacing: "0.06em" }}>/ 100</span>
+        {/* Conceal overlay */}
+        {!revealed && (
+          <div
+            onClick={() => {
+              sfx.paper();
+              setRevealed(true);
+            }}
+            className="absolute inset-0 bg-[#0A0A0C]/85 backdrop-blur-[4px] z-30 flex flex-col items-center justify-center p-6 text-center cursor-pointer"
+          >
+            <RubberStamp
+              text="CLASSIFIED CASE // CLICK TO UNSEAL"
+              variant="caution"
+              angle={-2}
+              className="mb-3 text-xs"
+            />
+            <p className="text-xs text-zinc-400 font-sans max-w-xs">
+              Review a verified failure autopsy: original draft scored at 47/100,
+              reasons it failed, and the conversion rewrite.
+            </p>
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {/* Left Column: Forensic Metric Readout */}
+          <div className="flex flex-col gap-3">
+            <div className="p-3 bg-[#141418] border border-zinc-800 rounded-[2px]">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[10px] text-zinc-400 uppercase font-bold">
+                  SIGNAL READOUT
+                </span>
+                <span className="text-sm font-black text-red-400 font-mono">
+                  47 / 100
+                </span>
+              </div>
+              <div className="space-y-1.5 text-[10px]">
+                <div className="flex justify-between text-zinc-400">
+                  <span>CLARITY</span>
+                  <span className="font-bold text-amber-400">58%</span>
+                </div>
+                <div className="flex justify-between text-zinc-400">
+                  <span>RELEVANCE</span>
+                  <span className="font-bold text-red-400">35%</span>
+                </div>
+                <div className="flex justify-between text-zinc-400">
+                  <span>CREDIBILITY</span>
+                  <span className="font-bold text-amber-400">50%</span>
+                </div>
+                <div className="flex justify-between text-zinc-400">
+                  <span>CTA STRENGTH</span>
+                  <span className="font-bold text-amber-400">45%</span>
                 </div>
               </div>
-              {mockSignals.map(({ label, score, color }) => (
-                <div key={label} style={{ width: "100%", display: "flex", flexDirection: "column", gap: 4 }}>
-                  <div style={{ display: "flex", justifyContent: "space-between" }}>
-                    <span style={{ fontSize: 11, color: "var(--text-muted)" }}>{label}</span>
-                    <span className="font-mono" style={{ fontSize: 11, color, fontWeight: 600 }}>{score}</span>
-                  </div>
-                  <div style={{ height: 3, borderRadius: 999, background: "var(--border)", overflow: "hidden" }}>
-                    <motion.div
-                      initial={{ width: 0 }}
-                      animate={revealed ? { width: `${score}%` } : { width: 0 }}
-                      transition={{ duration: 0.6, delay: 0.3 }}
-                      style={{ height: "100%", borderRadius: 999, background: color }}
-                    />
-                  </div>
-                </div>
-              ))}
             </div>
 
-            {/* Issues */}
-            <div style={{ background: "var(--bg)", border: "1px solid var(--border)", borderRadius: 10, padding: 14, display: "flex", flexDirection: "column", gap: 8 }}>
-              <span style={{ fontSize: 11, fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.06em" }}>Failure Diagnosis</span>
-              {mockIssues.map(({ level, text, color }) => (
-                <div key={text} style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <span style={{ width: 6, height: 6, borderRadius: "50%", background: color, flexShrink: 0 }} />
-                  <span className="font-mono" style={{ fontSize: 10, color, fontWeight: 600, minWidth: 56, textTransform: "uppercase", letterSpacing: "0.04em" }}>{level}</span>
-                  <span style={{ fontSize: 12, color: "var(--text-secondary)" }}>{text}</span>
+            <div className="p-3 bg-[#141418] border border-zinc-800 rounded-[2px] flex flex-col gap-1.5">
+              <span className="text-[10px] text-zinc-400 uppercase font-bold">
+                DIAGNOSED THREATS
+              </span>
+              <div className="text-[10px] space-y-1 text-zinc-300 font-sans">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-red-400 font-mono font-bold">[CRITICAL]</span>
+                  <span>Zero prospect pain alignment</span>
                 </div>
-              ))}
+                <div className="flex items-center gap-1.5">
+                  <span className="text-orange-400 font-mono font-bold">[HIGH]</span>
+                  <span>Self-centered company pitch</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-yellow-400 font-mono font-bold">[MEDIUM]</span>
+                  <span>High friction 30-min calendar ask</span>
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Right: Rewrite preview */}
-          <div style={{ background: "var(--bg)", border: "1px solid var(--border)", borderRadius: 10, padding: 14, display: "flex", flexDirection: "column", gap: 12 }}>
-            <span style={{ fontSize: 11, fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.06em" }}>Optimized Rewrite</span>
-            <p style={{ fontSize: 12, color: "var(--text-secondary)", lineHeight: 1.8, margin: 0 }}>
-              Hi [Name],{"\n\n"}Your SDR team spends hours researching leads. Our AI cuts that to minutes — and we&apos;ve helped similar teams increase reply rates by 3x.{"\n\n"}Worth a 15-min look?
-            </p>
-            <div style={{ marginTop: "auto", display: "flex", flexDirection: "column", gap: 6 }}>
-              <span style={{ fontSize: 11, fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.06em" }}>Subject variants</span>
-              {["Quick question about [Company]'s pipeline", "Saw you're scaling your sales team"].map((s) => (
-                <div key={s} style={{ fontSize: 11, color: "var(--text-muted)", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 6, padding: "5px 8px" }}>{s}</div>
-              ))}
+          {/* Right Column: Case Rewrite Dossier */}
+          <div className="p-3 bg-[#141418] border border-zinc-800 rounded-[2px] flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between pb-1.5 border-b border-zinc-800 mb-2">
+                <span className="text-[10px] font-bold text-emerald-400 uppercase">
+                  VERIFIED REWRITE
+                </span>
+                <span className="text-[9px] text-zinc-500">[REV. 02]</span>
+              </div>
+              <p className="text-xs text-zinc-200 font-sans leading-relaxed whitespace-pre-wrap">
+                {`Hi Sarah,\n\nSaw you're scaling outbound to 12 AEs this quarter. Most revenue leaders find reply rates crater when reps send generic templates.\n\nWe helped Ramp boost cold pipeline by 42% without extra reps.\n\nOpen to seeing the teardown?`}
+              </p>
+            </div>
+            <div className="mt-3 pt-2 border-t border-zinc-800 text-[10px] text-zinc-500 flex justify-between">
+              <span>HOOK: HIRING TRIGGER</span>
+              <span className="text-emerald-400 font-bold">PASS · 88/100</span>
             </div>
           </div>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }
 
-// ─── Header ──────────────────────────────────────────────────────────────────
-function Header({ signedIn, remaining, limit, onReset }: { signedIn: boolean; remaining: number; limit: number; onReset: () => void }) {
+// ─── Header Navigation ───────────────────────────────────────────────────────
+function Header({
+  signedIn,
+  remaining,
+  limit,
+  onReset,
+}: {
+  signedIn: boolean;
+  remaining: number;
+  limit: number;
+  onReset: () => void;
+}) {
   return (
-    <header
-      style={{
-        position: "fixed",
-        top: 0,
-        left: 0,
-        right: 0,
-        zIndex: 100,
-        height: 52,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        padding: "0 clamp(16px, 4vw, 28px)",
-        borderBottom: "1px solid var(--border)",
-        background: "rgba(9,9,11,0.8)",
-        backdropFilter: "blur(12px)",
-        WebkitBackdropFilter: "blur(12px)",
-      }}
-    >
+    <header className="fixed top-0 left-0 right-0 z-50 h-13 px-4 sm:px-8 bg-[#09090C]/90 backdrop-blur-md border-b-2 border-zinc-800 flex items-center justify-between select-none">
       <button
-        onClick={onReset}
-        style={{ display: "flex", alignItems: "center", gap: 10, background: "none", border: "none", cursor: "pointer", padding: 0 }}
+        onClick={() => {
+          sfx.click();
+          onReset();
+        }}
+        className="flex items-center gap-3 bg-transparent border-none cursor-pointer p-0 group"
       >
-        <div style={{ width: 28, height: 28, borderRadius: 7, background: "var(--accent)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <Mail size={14} strokeWidth={2} color="#fff" />
+        <div className="w-7 h-7 rounded-[2px] bg-white text-black flex items-center justify-center font-mono font-black text-sm group-hover:scale-105 transition">
+          IS
         </div>
-        <span style={{ fontSize: 14, fontWeight: 700, color: "var(--text-primary)", letterSpacing: "-0.01em" }}>
-          InboxSignal
-        </span>
-        <span style={{ fontSize: 10, fontWeight: 600, color: "var(--text-faint)", padding: "2px 8px", borderRadius: 999, background: "var(--surface)", border: "1px solid var(--border)", textTransform: "uppercase", letterSpacing: "0.06em" }}>
-          Beta
-        </span>
+        <div className="flex items-baseline gap-2">
+          <span className="font-mono text-sm font-black tracking-wider text-white uppercase">
+            INBOXSIGNAL
+          </span>
+          <span className="hidden sm:inline font-mono text-[9px] text-zinc-500 uppercase tracking-widest">
+            // REV. 2026
+          </span>
+        </div>
       </button>
 
-      <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+      <div className="flex items-center gap-3.5 font-mono">
         {signedIn ? (
           <>
-            <span className="font-mono" style={{ fontSize: 12, color: "var(--text-muted)" }}>
-              {remaining}/{limit} left
+            <span className="text-xs font-bold text-zinc-400 bg-zinc-900 px-2.5 py-1 border border-zinc-800 rounded-[2px]">
+              [{remaining}/{limit} LEFT TODAY]
             </span>
             <UserButton
               appearance={{
                 elements: {
-                  userButtonTrigger: { border: "1px solid var(--border)", borderRadius: "50%" },
+                  userButtonTrigger: {
+                    border: "2px solid #27272A",
+                    borderRadius: "2px",
+                  },
                 },
               }}
             />
@@ -380,13 +361,19 @@ function Header({ signedIn, remaining, limit, onReset }: { signedIn: boolean; re
         ) : (
           <>
             <SignInButton mode="modal">
-              <button style={{ background: "none", border: "none", color: "var(--text-muted)", fontSize: 13, fontWeight: 500, cursor: "pointer", padding: "6px 12px", borderRadius: 6, transition: "color 0.15s" }}>
-                Log in
+              <button
+                onClick={() => sfx.click()}
+                className="text-xs font-bold uppercase tracking-wider text-zinc-400 hover:text-white px-3 py-1.5 transition cursor-pointer"
+              >
+                [SIGN IN]
               </button>
             </SignInButton>
             <SignUpButton mode="modal">
-              <button style={{ background: "var(--accent)", border: "none", color: "#fff", fontSize: 13, fontWeight: 600, cursor: "pointer", padding: "7px 16px", borderRadius: 7, transition: "background 0.15s" }}>
-                Sign up free
+              <button
+                onClick={() => sfx.click()}
+                className="text-xs font-bold uppercase tracking-wider bg-white text-black hover:bg-zinc-200 px-3.5 py-1.5 border border-white rounded-[2px] shadow-[2px_2px_0px_rgba(255,255,255,0.2)] active:translate-x-[1px] active:translate-y-[1px] transition cursor-pointer"
+              >
+                START FREE
               </button>
             </SignUpButton>
           </>
@@ -396,7 +383,7 @@ function Header({ signedIn, remaining, limit, onReset }: { signedIn: boolean; re
   );
 }
 
-// ─── Main Shell ──────────────────────────────────────────────────────────────
+// ─── Main Shell Component ────────────────────────────────────────────────────
 interface InboxSignalShellProps {
   initialHistory: SavedAnalysis[];
   initialLimit: number;
@@ -425,11 +412,16 @@ export default function InboxSignalShell({
   const [submittedEmail, setSubmittedEmail] = useState("");
   const [phase, setPhase] = useState<"landing" | "loading" | "results">("landing");
   const [sidebarTab, setSidebarTab] = useState<SidebarTab>("edit");
+  const [autopsyMode, setAutopsyMode] = useState(false);
 
   const resultsRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => { setRemaining(initialRemaining); }, [initialRemaining]);
-  useEffect(() => { setHistory(initialHistory); }, [initialHistory]);
+  useEffect(() => {
+    setRemaining(initialRemaining);
+  }, [initialRemaining]);
+  useEffect(() => {
+    setHistory(initialHistory);
+  }, [initialHistory]);
 
   // Restore prefill after Clerk redirect
   useEffect(() => {
@@ -443,6 +435,7 @@ export default function InboxSignalShell({
 
   async function analyze() {
     if (!email.trim() || !prospect.trim() || !signedIn) return;
+    sfx.stamp();
     setPhase("loading");
     setStatus("loading");
     setError("");
@@ -464,9 +457,10 @@ export default function InboxSignalShell({
       setRemaining(data.remaining);
 
       if (!res.ok || data.error || !data.data || !data.savedAnalysis) {
-        throw new Error(data.error ?? "Server error, try again");
+        throw new Error(data.error ?? "Server error, please try again");
       }
 
+      sfx.stamp();
       setAnalysis(data.data);
       setActive(data.savedAnalysis);
       setHistory((h) => [data.savedAnalysis!, ...h].slice(0, 50));
@@ -479,19 +473,17 @@ export default function InboxSignalShell({
     }
   }
 
-  // ── Iterate V2: pre-fill rewrite back into composer ──
+  // ── Iterate V2 Action: load rewrite into composer for next revision ──
   function handleIterateV2() {
     if (!analysis?.rewrite?.email) return;
+    sfx.paper();
     setEmail(analysis.rewrite.email);
-    setAnalysis(null);
-    setActive(null);
-    setSubmittedEmail("");
     setSidebarTab("edit");
-    // Stay on results page so user can immediately re-analyze
-    setPhase("landing");
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   async function deleteSaved(id: string) {
+    sfx.click();
     const next = history.filter((i) => i.id !== id);
     setHistory(next);
     if (active?.id === id) {
@@ -500,16 +492,24 @@ export default function InboxSignalShell({
       setAnalysis(n?.result ?? null);
       if (!n) setPhase("landing");
     }
-    await fetch(`/api/history?id=${encodeURIComponent(id)}`, { method: "DELETE" });
+    await fetch(`/api/history?id=${encodeURIComponent(id)}`, {
+      method: "DELETE",
+    });
   }
 
   async function renameSaved(id: string, title: string) {
+    sfx.click();
     setHistory((h) => h.map((i) => (i.id === id ? { ...i, title } : i)));
     if (active?.id === id) setActive((a) => (a ? { ...a, title } : a));
-    await fetch("/api/history", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id, title }) });
+    await fetch("/api/history", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, title }),
+    });
   }
 
   function selectSaved(item: SavedAnalysis) {
+    sfx.paper();
     setActive(item);
     setAnalysis(item.result);
     setEmail(item.email);
@@ -520,10 +520,13 @@ export default function InboxSignalShell({
   }
 
   function handleSignInAndAnalyze() {
-    if (email.trim()) sessionStorage.setItem("inboxsignal_prefill", email.trim());
+    if (email.trim()) {
+      sessionStorage.setItem("inboxsignal_prefill", email.trim());
+    }
   }
 
   function handleReset() {
+    sfx.click();
     setPhase("landing");
     setAnalysis(null);
     setActive(null);
@@ -534,28 +537,51 @@ export default function InboxSignalShell({
   const isLanding = phase === "landing";
 
   return (
-    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", position: "relative" }}>
-      <Header signedIn={signedIn} remaining={remaining} limit={initialLimit} onReset={handleReset} />
+    <div className="min-h-screen flex flex-col relative bg-[#08080B] text-zinc-100 selection:bg-yellow-300 selection:text-black">
+      {/* Vertical Japanese / Magazine Editorial Margin Label */}
+      <VerticalEditorialLabel text="INBOXSIGNAL // 受信箱のシグナル // FORENSIC OUTREACH UNIT" />
 
-      <div style={{ paddingTop: 52, flex: 1, display: "flex", flexDirection: "column" }}>
-        {/* ── LANDING ── */}
+      {/* Header */}
+      <Header
+        signedIn={signedIn}
+        remaining={remaining}
+        limit={initialLimit}
+        onReset={handleReset}
+      />
+
+      <div className="pt-13 flex-1 flex flex-col relative">
+        {/* Top Print Ticket Header */}
+        <div className="max-w-4xl w-full mx-auto px-4 mt-2 mb-2">
+          <BarcodeTicket code="IS-902847-B2B" edition="VOL. 04 / ED. 2026" />
+        </div>
+
+        {/* ── LANDING PHASE ── */}
         <AnimatePresence>
           {isLanding && (
-            <motion.div
+            <motion.main
               key="landing"
               initial={{ opacity: 0 }}
-              animate={{ opacity: 1, transition: { duration: 0.3 } }}
+              animate={{ opacity: 1, transition: { duration: 0.25 } }}
               exit={{ opacity: 0, transition: { duration: 0.15 } }}
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-                minHeight: "calc(100vh - 52px)",
-                padding: "24px 20px 56px",
-              }}
+              className="flex flex-col items-center justify-center min-h-[calc(100vh-52px)] px-4 py-8 relative"
             >
-              <HeroSection />
+              <HeroSection
+                onSampleClick={() => {
+                  setEmail(demoEmail);
+                  setProspect(demoProspect);
+                }}
+              />
+
+              {/* Asymmetrical Floating Sticky Critique Note (Easter egg) */}
+              <div className="w-full max-w-xl mx-auto flex justify-end -mb-3 z-30 pr-2">
+                <StickyCritique
+                  title="CRITIQUE // FIELD RULE"
+                  content="'I hope this email finds you well' = immediate archive. If your CTA asks for 30 minutes before proving measurable outcome, you're dead."
+                  angle={2.2}
+                />
+              </div>
+
+              {/* Composer */}
               <Composer
                 displayMode="landing"
                 email={email}
@@ -568,64 +594,59 @@ export default function InboxSignalShell({
                 onProspectChange={setProspect}
                 onAnalyze={analyze}
                 onSignInAndAnalyze={handleSignInAndAnalyze}
-                onUseDemo={() => { setEmail(demoEmail); setProspect(demoProspect); }}
+                onUseDemo={() => {
+                  setEmail(demoEmail);
+                  setProspect(demoProspect);
+                }}
               />
+
+              {/* Editorial Feature Wireframe */}
               <FeatureGrid />
+
+              {/* Verifiable Case Dossier Preview */}
               <ResultPreview />
-            </motion.div>
+            </motion.main>
           )}
         </AnimatePresence>
 
-        {/* ── RESULTS ── */}
+        {/* ── RESULTS & AUTOPSY DASHBOARD PHASE ── */}
         {!isLanding && (
-          <div className="layout-row" style={{ display: "flex", flex: 1, minHeight: "calc(100vh - 52px)" }}>
-            {/* Sidebar */}
-            <div
-              className="sidebar-panel"
-              style={{
-                width: "clamp(300px, 28vw, 360px)",
-                flexShrink: 0,
-                position: "sticky",
-                top: 52,
-                height: "calc(100vh - 52px)",
-                overflowY: "auto",
-                display: "flex",
-                flexDirection: "column",
-                borderRight: "1px solid var(--border)",
-                background: "var(--bg)",
-              }}
-            >
-              {/* Tabs */}
-              <div style={{ display: "flex", padding: 8, gap: 4, borderBottom: "1px solid var(--border)", position: "sticky", top: 0, zIndex: 10, background: "var(--bg)" }}>
-                {([["edit", Mail, "Edit"], ["history", Clock, "History"]] as const).map(([id, Icon, label]) => (
-                  <button
-                    key={id}
-                    onClick={() => setSidebarTab(id)}
-                    style={{
-                      flex: 1,
-                      padding: "8px 0",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      gap: 6,
-                      fontSize: 12,
-                      fontWeight: 600,
-                      borderRadius: 6,
-                      border: sidebarTab === id ? "1px solid var(--border)" : "1px solid transparent",
-                      background: sidebarTab === id ? "var(--surface)" : "transparent",
-                      color: sidebarTab === id ? "var(--text-primary)" : "var(--text-muted)",
-                      cursor: "pointer",
-                      transition: "all 0.15s",
-                    }}
-                  >
-                    <Icon size={13} />
-                    {label}
-                    {id === "history" && history.length > 0 && ` (${history.length})`}
-                  </button>
-                ))}
+          <div className="layout-row flex flex-1 min-h-[calc(100vh-52px)]">
+            {/* Sidebar (Tactile Filing Cabinet) */}
+            <aside className="sidebar-panel w-full md:w-[350px] shrink-0 sticky top-13 h-[calc(100vh-52px)] overflow-y-auto flex flex-col border-r-2 border-zinc-800 bg-[#0B0B0E]">
+              {/* Sidebar Tabs */}
+              <div className="flex p-2 gap-2 border-b-2 border-zinc-800 sticky top-0 z-10 bg-[#0B0B0E] font-mono">
+                <button
+                  onClick={() => {
+                    sfx.click();
+                    setSidebarTab("edit");
+                  }}
+                  className={`flex-1 py-2 text-center text-xs font-bold uppercase tracking-wider rounded-[2px] transition flex items-center justify-center gap-1.5 cursor-pointer ${
+                    sidebarTab === "edit"
+                      ? "bg-white text-black border border-white shadow-[2px_2px_0px_rgba(255,255,255,0.2)]"
+                      : "text-zinc-500 hover:text-zinc-300"
+                  }`}
+                >
+                  <Mail size={12} />
+                  <span>[SPEC EDIT]</span>
+                </button>
+                <button
+                  onClick={() => {
+                    sfx.click();
+                    setSidebarTab("history");
+                  }}
+                  className={`flex-1 py-2 text-center text-xs font-bold uppercase tracking-wider rounded-[2px] transition flex items-center justify-center gap-1.5 cursor-pointer ${
+                    sidebarTab === "history"
+                      ? "bg-white text-black border border-white shadow-[2px_2px_0px_rgba(255,255,255,0.2)]"
+                      : "text-zinc-500 hover:text-zinc-300"
+                  }`}
+                >
+                  <Clock size={12} />
+                  <span>CASE LOGS {history.length > 0 && `(${history.length})`}</span>
+                </button>
               </div>
 
-              <div style={{ flex: 1, padding: 16, display: "flex", flexDirection: "column", gap: 16, overflowY: "auto" }}>
+              <div className="flex-1 p-4 flex flex-col gap-4 overflow-y-auto">
                 {sidebarTab === "edit" && (
                   <Composer
                     displayMode="sidebar"
@@ -639,7 +660,10 @@ export default function InboxSignalShell({
                     onProspectChange={setProspect}
                     onAnalyze={analyze}
                     onSignInAndAnalyze={handleSignInAndAnalyze}
-                    onUseDemo={() => { setEmail(demoEmail); setProspect(demoProspect); }}
+                    onUseDemo={() => {
+                      setEmail(demoEmail);
+                      setProspect(demoProspect);
+                    }}
                   />
                 )}
 
@@ -657,15 +681,21 @@ export default function InboxSignalShell({
                       />
                     </>
                   ) : (
-                    <div style={{ padding: "40px 16px", textAlign: "center", border: "1px solid var(--border)", borderRadius: 10, background: "var(--surface)" }}>
-                      <Layers style={{ color: "var(--text-faint)", margin: "0 auto 12px" }} size={24} />
-                      <h3 style={{ fontSize: 14, fontWeight: 600, color: "var(--text-primary)", margin: "0 0 8px" }}>Save your history</h3>
-                      <p style={{ fontSize: 13, color: "var(--text-muted)", lineHeight: 1.6, margin: "0 0 20px" }}>
-                        Create a free account to track analyses and compare scores over time.
+                    <div className="p-6 text-center border-2 border-zinc-800 rounded-[2px] bg-[#111115] font-mono">
+                      <Layers className="text-zinc-500 mx-auto mb-3" size={24} />
+                      <h3 className="text-xs font-bold text-white uppercase tracking-wider mb-2">
+                        ARCHIVE PROTECTED
+                      </h3>
+                      <p className="text-xs text-zinc-400 font-sans leading-relaxed mb-4">
+                        Sign in to preserve your diagnostic timeline and track
+                        signal velocity over time.
                       </p>
                       <SignUpButton mode="modal">
-                        <button style={{ width: "100%", padding: "9px 0", background: "var(--accent)", color: "#fff", border: "none", borderRadius: 7, fontSize: 13, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
-                          Start saving <ArrowRight size={14} />
+                        <button
+                          onClick={() => sfx.click()}
+                          className="w-full py-2 bg-white text-black text-xs font-bold uppercase tracking-wider rounded-[2px] hover:bg-zinc-200 transition cursor-pointer"
+                        >
+                          CREATE ACCOUNT
                         </button>
                       </SignUpButton>
                     </div>
@@ -673,54 +703,83 @@ export default function InboxSignalShell({
                 )}
               </div>
 
-              {/* Sidebar footer */}
-              <div style={{ padding: 12, borderTop: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                <button onClick={handleReset} style={{ fontSize: 12, color: "var(--text-muted)", background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}>
-                  ← Back
+              {/* Sidebar Footer */}
+              <div className="p-3 border-t-2 border-zinc-800 flex items-center justify-between font-mono text-[11px] text-zinc-500">
+                <button
+                  onClick={handleReset}
+                  className="hover:text-zinc-200 transition flex items-center gap-1.5 cursor-pointer"
+                >
+                  ← [EXIT TO COVER]
                 </button>
+                <span>UTC MIDNIGHT RESET</span>
               </div>
-            </div>
+            </aside>
 
             {/* Results pane */}
-            <div
+            <main
               ref={resultsRef}
-              className="results-scroll"
-              style={{ flex: 1, overflowY: "auto", position: "sticky", top: 52, height: "calc(100vh - 52px)", padding: "24px clamp(16px, 4vw, 44px)" }}
+              className="results-scroll flex-1 overflow-y-auto sticky top-13 h-[calc(100vh-52px)] p-4 sm:p-8"
             >
               <AnimatePresence mode="wait">
                 {status === "loading" && (
-                  <motion.div key="loading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} style={{ maxWidth: 840, margin: "0 auto" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 24 }}>
-                      <div className="animate-spin" style={{ width: 16, height: 16, border: "2px solid var(--accent)", borderTopColor: "transparent", borderRadius: "50%" }} />
-                      <span style={{ fontSize: 13, fontWeight: 600, color: "var(--accent)" }}>Analyzing...</span>
+                  <motion.div
+                    key="loading"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="max-w-3xl mx-auto py-12 font-mono"
+                  >
+                    <div className="flex items-center gap-3 mb-6 p-4 border-2 border-zinc-800 bg-[#111115]">
+                      <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
+                      <span className="text-xs font-bold tracking-widest uppercase text-white">
+                        RUNNING FORENSIC AUTOPSY ON COLD OUTREACH SPEC...
+                      </span>
                     </div>
-                    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                      {[180, 120, 120].map((h, i) => (
-                        <div key={i} className="animate-pulse" style={{ height: h, background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 10 }} />
+                    <div className="space-y-4">
+                      {[140, 100, 100].map((h, i) => (
+                        <div
+                          key={i}
+                          className="animate-pulse bg-[#111115] border border-zinc-800 rounded-[2px]"
+                          style={{ height: h }}
+                        />
                       ))}
                     </div>
                   </motion.div>
                 )}
 
                 {status === "error" && (
-                  <motion.div key="error" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} style={{ maxWidth: 840, margin: "0 auto" }}>
-                    <div style={{ padding: 16, border: "1px solid var(--critical)", background: "var(--critical-dim)", borderRadius: 10, display: "flex", alignItems: "flex-start", gap: 12 }}>
-                      <AlertTriangle style={{ color: "var(--critical)", flexShrink: 0, marginTop: 2 }} size={16} />
-                      <div>
-                        <h4 style={{ fontSize: 14, fontWeight: 600, color: "var(--text-primary)", margin: "0 0 4px" }}>Analysis failed</h4>
-                        <p style={{ fontSize: 13, color: "var(--text-secondary)", margin: 0 }}>{error}</p>
-                      </div>
+                  <motion.div
+                    key="error"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="max-w-3xl mx-auto p-4 border-2 border-red-500/80 bg-red-950/20 font-mono"
+                  >
+                    <div className="flex items-center gap-2 text-red-400 font-bold text-xs uppercase mb-1">
+                      <AlertTriangle size={14} />
+                      <span>[AUTOPSY HALTED // SYSTEM ERROR]</span>
                     </div>
+                    <p className="text-xs text-red-200 font-sans">{error}</p>
                   </motion.div>
                 )}
 
                 {status === "idle" && (
-                  <motion.div key="results" initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ maxWidth: 840, margin: "0 auto" }}>
-                    <ResultPanel analysis={analysis} selected={active} originalEmail={submittedEmail} onIterateV2={handleIterateV2} />
+                  <motion.div
+                    key="results"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="max-w-3xl mx-auto"
+                  >
+                    <ResultPanel
+                      analysis={analysis}
+                      selected={active}
+                      originalEmail={submittedEmail}
+                      onIterateV2={handleIterateV2}
+                    />
                   </motion.div>
                 )}
               </AnimatePresence>
-            </div>
+            </main>
           </div>
         )}
       </div>

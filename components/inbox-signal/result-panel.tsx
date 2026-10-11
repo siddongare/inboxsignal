@@ -7,7 +7,8 @@ import {
   AlertTriangle,
   RotateCcw,
   Sparkles,
-  ArrowRight,
+  Flame,
+  FileText,
   TrendingUp,
 } from "lucide-react";
 import { motion } from "framer-motion";
@@ -18,89 +19,46 @@ import type {
   Signals,
 } from "@/lib/analysis-types";
 import { getSignalScore } from "@/lib/analysis-types";
+import { sfx } from "./tactile-audio";
+import {
+  RubberStamp,
+  MaskingTape,
+  CropMarkCorner,
+  BarcodeTicket,
+} from "./tactile-elements";
 
-// ─── Design Tokens & Helpers ──────────────────────────────────────────────────
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 function scoreColor(s: number) {
-  if (s < 45) return "#EF4444"; // Red
-  if (s < 68) return "#F59E0B"; // Amber
-  return "#10B981"; // Emerald
+  if (s < 45) return "#EF4444";
+  if (s < 68) return "#F59E0B";
+  return "#10B981";
 }
 
-function scoreBg(s: number) {
-  if (s < 45) return "rgba(239, 68, 68, 0.10)";
-  if (s < 68) return "rgba(245, 158, 11, 0.10)";
-  return "rgba(16, 185, 129, 0.10)";
+function scoreVerdict(s: number) {
+  if (s < 45) return "FATAL // LOW ODDS";
+  if (s < 68) return "SUBOPTIMAL FRICTION";
+  if (s < 80) return "ACCEPTABLE SIGNAL";
+  return "HIGH CONVERSION SIGNAL";
 }
 
-function scoreBorder(s: number) {
-  if (s < 45) return "rgba(239, 68, 68, 0.25)";
-  if (s < 68) return "rgba(245, 158, 11, 0.25)";
-  return "rgba(16, 185, 129, 0.25)";
-}
-
-function scoreLabel(s: number) {
-  if (s < 45) return "Low reply odds";
-  if (s < 68) return "Needs work";
-  if (s < 80) return "Recoverable";
-  return "High signal";
-}
-
-function verdictLabel(s: number) {
-  if (s < 45) return "Failing";
-  if (s < 68) return "Suboptimal";
-  if (s < 80) return "Average";
-  return "Exceptional";
-}
-
-const IMPACT = {
-  critical: {
-    dot: "#EF4444",
-    text: "#F87171",
-    bg: "rgba(239,68,68,0.10)",
-    border: "rgba(239,68,68,0.25)",
-    label: "CRITICAL",
-  },
-  high: {
-    dot: "#F97316",
-    text: "#FB923C",
-    bg: "rgba(249,115,22,0.10)",
-    border: "rgba(249,115,22,0.25)",
-    label: "HIGH",
-  },
-  medium: {
-    dot: "#F59E0B",
-    text: "#FBBF24",
-    bg: "rgba(245,158,11,0.10)",
-    border: "rgba(245,158,11,0.22)",
-    label: "MEDIUM",
-  },
-  low: {
-    dot: "#10B981",
-    text: "#34D399",
-    bg: "rgba(16,185,129,0.10)",
-    border: "rgba(16,185,129,0.22)",
-    label: "LOW",
-  },
-};
-
-// ─── Shared UI Helpers ───────────────────────────────────────────────────────
-function CopyBtn({ text, label = "Copy" }: { text: string; label?: string }) {
+function CopyBtn({ text, label = "COPY" }: { text: string; label?: string }) {
   const [ok, setOk] = useState(false);
   return (
     <button
       onClick={() => {
+        sfx.click();
         navigator.clipboard.writeText(text);
         setOk(true);
         setTimeout(() => setOk(false), 2000);
       }}
-      className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition border ${
+      className={`inline-flex items-center gap-1.5 px-3 py-1 text-[11px] font-mono font-bold uppercase tracking-wider rounded-[2px] transition border cursor-pointer select-none ${
         ok
-          ? "bg-emerald-500/15 text-emerald-300 border-emerald-500/30"
-          : "bg-[#18181B] text-zinc-300 border-[#27272A] hover:bg-zinc-800 hover:text-white"
+          ? "bg-emerald-500/20 text-emerald-300 border-emerald-500"
+          : "bg-zinc-800 text-zinc-300 border-zinc-700 hover:bg-zinc-700 hover:text-white"
       }`}
     >
-      {ok ? <Check size={12} /> : <Copy size={12} />}
-      <span>{ok ? "Copied" : label}</span>
+      {ok ? <Check size={11} /> : <Copy size={11} />}
+      <span>{ok ? "[COPIED]" : `[${label}]`}</span>
     </button>
   );
 }
@@ -115,16 +73,18 @@ function SectionHeading({
   count?: number;
 }) {
   return (
-    <div className="flex items-center gap-2.5 mb-3">
-      <span className="font-mono text-xs font-semibold text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded border border-blue-500/20">
-        {n}
-      </span>
-      <h2 className="text-sm font-semibold text-zinc-100 tracking-tight">
-        {title}
-      </h2>
+    <div className="flex items-center justify-between pb-2 mb-3 border-b-2 border-zinc-800 font-mono">
+      <div className="flex items-center gap-2">
+        <span className="text-[10px] font-black text-white bg-zinc-800 px-2 py-0.5 border border-zinc-700">
+          {n}
+        </span>
+        <h2 className="text-xs font-bold text-zinc-100 uppercase tracking-wider">
+          {title}
+        </h2>
+      </div>
       {count !== undefined && (
-        <span className="font-mono text-xs text-zinc-400 bg-zinc-800/80 px-2 py-0.5 rounded-full border border-zinc-700/50">
-          {count}
+        <span className="text-[10px] text-zinc-500 font-bold uppercase">
+          [{count} ITEMS DIAGNOSED]
         </span>
       )}
     </div>
@@ -136,116 +96,108 @@ function ScoreSection({ signals }: { signals: Signals }) {
   const avg = getSignalScore(signals);
   const c = scoreColor(avg);
   const metrics = [
-    { label: "Clarity", value: signals.clarity },
-    { label: "Relevance", value: signals.relevance },
-    { label: "Credibility", value: signals.credibility },
-    { label: "CTA Strength", value: signals.ctaStrength },
+    { label: "CLARITY", value: signals.clarity },
+    { label: "RELEVANCE", value: signals.relevance },
+    { label: "CREDIBILITY", value: signals.credibility },
+    { label: "CTA STRENGTH", value: signals.ctaStrength },
   ];
 
   return (
-    <div className="p-5 rounded-xl bg-[#111113] border border-[#27272A] shadow-sm">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5 pb-5 border-b border-[#27272A]">
+    <div className="relative p-5 rounded-[2px] bg-[#0E0E12] border-2 border-zinc-800 font-mono shadow-md overflow-hidden">
+      <CropMarkCorner position="top-left" />
+      <CropMarkCorner position="top-right" />
+      <CropMarkCorner position="bottom-left" />
+      <CropMarkCorner position="bottom-right" />
+
+      {/* Top Dossier Barcode */}
+      <div className="pb-3 mb-4 border-b border-zinc-800 flex items-center justify-between text-[10px] text-zinc-500">
+        <span className="font-bold text-zinc-400">
+          AUTOPSY SPECIMEN NO. 4892 // FORENSIC READOUT
+        </span>
+        <span className="text-zinc-600">// METRIC AUDIT</span>
+      </div>
+
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5 pb-5 border-b border-zinc-800">
         {/* Score Ring & Summary */}
-        <div className="flex items-center gap-4">
-          <div className="relative w-20 h-20 shrink-0">
-            <svg width={80} height={80} className="-rotate-90">
+        <div className="flex items-center gap-5">
+          <div className="relative w-22 h-22 shrink-0">
+            <svg width={88} height={88} className="-rotate-90">
               <circle
-                cx={40}
-                cy={40}
-                r={36}
+                cx={44}
+                cy={44}
+                r={39}
                 fill="none"
-                stroke="#27272A"
-                strokeWidth={5}
+                stroke="#1F1F24"
+                strokeWidth={6}
               />
               <motion.circle
-                cx={40}
-                cy={40}
-                r={36}
+                cx={44}
+                cy={44}
+                r={39}
                 fill="none"
                 stroke={c}
-                strokeWidth={5}
-                strokeLinecap="round"
-                strokeDasharray={226}
-                initial={{ strokeDashoffset: 226 }}
-                animate={{ strokeDashoffset: 226 * (1 - avg / 100) }}
-                transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+                strokeWidth={6}
+                strokeLinecap="square"
+                strokeDasharray={245}
+                initial={{ strokeDashoffset: 245 }}
+                animate={{ strokeDashoffset: 245 * (1 - avg / 100) }}
+                transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
               />
             </svg>
             <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <span className="font-mono text-2xl font-bold tracking-tight text-white leading-none">
+              <span className="text-2xl font-black tracking-tight text-white leading-none">
                 {avg}
               </span>
-              <span className="font-mono text-[9px] text-zinc-500 uppercase mt-0.5">
+              <span className="text-[9px] text-zinc-500 uppercase mt-0.5 font-bold">
                 / 100
               </span>
             </div>
           </div>
 
           <div>
-            <div className="flex items-center gap-2">
-              <span className="text-xl font-bold text-white tracking-tight">
-                {verdictLabel(avg)}
-              </span>
-              <span
-                style={{
-                  color: c,
-                  background: scoreBg(avg),
-                  borderColor: scoreBorder(avg),
-                }}
-                className="font-mono text-[11px] font-semibold px-2 py-0.5 rounded-full border"
-              >
-                {scoreLabel(avg)}
-              </span>
+            <div className="flex items-center gap-2 flex-wrap">
+              <RubberStamp
+                text={scoreVerdict(avg)}
+                variant={avg >= 70 ? "low" : avg >= 50 ? "caution" : "critical"}
+                angle={-1.5}
+              />
             </div>
-            <p className="text-xs text-zinc-400 mt-1 leading-relaxed">
-              Composite signal across 4 B2B outbound dimensions.
+            <p className="text-xs text-zinc-400 font-sans mt-2 max-w-sm leading-relaxed">
+              Mathematical composite calibrated against verified B2B outbound
+              conversion benchmarks.
             </p>
           </div>
         </div>
 
-        {/* Quick health tag */}
-        <div className="flex items-center gap-2 sm:self-center">
-          <div
-            style={{ background: c }}
-            className="w-2.5 h-2.5 rounded-full animate-pulse"
+        {/* Status Callout Stamp */}
+        <div className="sm:self-center">
+          <RubberStamp
+            text={avg >= 70 ? "CLEARED // DISPATCHABLE" : "HOLD // ACTION REQUIRED"}
+            variant={avg >= 70 ? "low" : "critical"}
+            angle={2}
           />
-          <span className="text-xs font-medium text-zinc-300">
-            {avg >= 70
-              ? "Ready for outreach"
-              : avg >= 50
-                ? "Fix primary threat before sending"
-                : "High spam / rejection risk"}
-          </span>
         </div>
       </div>
 
-      {/* Metric Breakdown Bars */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4">
+      {/* 4 Vector Readouts */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mt-4">
         {metrics.map(({ label, value }) => {
           const sc = scoreColor(value);
           return (
             <div
               key={label}
-              className="bg-[#18181B] border border-[#27272A] p-3 rounded-lg"
+              className="bg-[#141418] border border-zinc-800 p-2.5 rounded-[2px]"
             >
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-xs font-medium text-zinc-400">
-                  {label}
-                </span>
-                <span
-                  style={{ color: sc }}
-                  className="font-mono text-xs font-bold"
-                >
-                  {value}
+              <div className="flex justify-between items-center mb-1.5 text-[10px]">
+                <span className="font-bold text-zinc-400">{label}</span>
+                <span style={{ color: sc }} className="font-black">
+                  {value}%
                 </span>
               </div>
-              <div className="h-1.5 w-full bg-zinc-800 rounded-full overflow-hidden">
-                <motion.div
-                  initial={{ width: 0 }}
-                  animate={{ width: `${value}%` }}
-                  transition={{ duration: 0.6, ease: "easeOut" }}
-                  style={{ background: sc }}
-                  className="h-full rounded-full"
+              <div className="h-1.5 w-full bg-zinc-900 overflow-hidden rounded-[1px]">
+                <div
+                  style={{ width: `${value}%`, background: sc }}
+                  className="h-full"
                 />
               </div>
             </div>
@@ -256,57 +208,40 @@ function ScoreSection({ signals }: { signals: Signals }) {
   );
 }
 
-// ─── Top Priority Callout ─────────────────────────────────────────────────────
+// ─── Top Priority Threat Callout ──────────────────────────────────────────────
 function TopPriorityCallout({ items }: { items: DiagnosisItem[] }) {
   const top = items[0];
   if (!top) return null;
-  const cfg = IMPACT[top.impact];
 
   return (
-    <div
-      style={{
-        background: cfg.bg,
-        borderColor: cfg.border,
-      }}
-      className="p-4 rounded-xl border flex items-start gap-3.5 shadow-sm"
-    >
-      <div
-        style={{ background: cfg.dot }}
-        className="w-2 h-2 rounded-full shrink-0 mt-1.5"
-      />
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-          <span
-            style={{ color: cfg.text }}
-            className="text-xs font-semibold uppercase tracking-wider"
-          >
-            Primary Threat
-          </span>
-          <span
-            style={{
-              color: cfg.text,
-              borderColor: cfg.border,
-              background: cfg.bg,
-            }}
-            className="font-mono text-[10px] font-bold px-2 py-0.5 rounded border"
-          >
-            {cfg.label}
-          </span>
-        </div>
-        <h3 className="text-sm font-semibold text-white mb-1">{top.issue}</h3>
-        <p className="text-xs text-zinc-300 leading-relaxed mb-2.5">
-          {top.whyItMatters}
-        </p>
-        <div className="inline-flex items-center gap-1.5 text-xs font-medium text-blue-300 bg-blue-500/10 px-2.5 py-1 rounded border border-blue-500/20">
-          <Sparkles size={12} className="shrink-0 text-blue-400" />
-          <span>Recommended Fix: {top.fix}</span>
-        </div>
+    <div className="relative p-4 rounded-[2px] border-2 border-red-500/80 bg-red-950/20 font-mono shadow-sm">
+      <MaskingTape width={70} angle={-1} className="absolute -top-2.5 right-6" />
+
+      <div className="flex items-center justify-between gap-2 mb-2 flex-wrap">
+        <RubberStamp text="[CRITICAL OUTREACH KILLER]" variant="critical" angle={-1} />
+        <span className="text-[10px] text-red-400 uppercase font-bold">
+          SEVERITY: HIGHEST THREAT
+        </span>
+      </div>
+
+      <h3 className="text-sm font-bold text-white mb-1.5 font-sans">
+        {top.issue}
+      </h3>
+      <p className="text-xs text-red-200/90 leading-relaxed font-sans mb-3">
+        {top.whyItMatters}
+      </p>
+
+      <div className="p-2.5 bg-black/60 border border-red-500/40 text-xs text-red-300 font-mono">
+        <span className="text-red-400 font-bold block mb-0.5 text-[10px] uppercase">
+          → SURGICAL FIX:
+        </span>
+        <span className="font-sans text-xs">{top.fix}</span>
       </div>
     </div>
   );
 }
 
-// ─── Diagnosis Card ───────────────────────────────────────────────────────────
+// ─── Forensic Diagnosis Card ──────────────────────────────────────────────────
 function DiagnosisCard({
   item,
   index,
@@ -314,53 +249,53 @@ function DiagnosisCard({
   item: DiagnosisItem;
   index: number;
 }) {
-  const cfg = IMPACT[item.impact];
+  const impactVariants: Record<
+    string,
+    "critical" | "high" | "caution" | "low"
+  > = {
+    critical: "critical",
+    high: "high",
+    medium: "caution",
+    low: "low",
+  };
 
   return (
-    <div className="bg-[#111113] border border-[#27272A] rounded-xl p-4 shadow-sm transition hover:border-[#3F3F46]">
-      <div className="flex items-start justify-between gap-3 mb-2.5">
-        <div className="flex items-center gap-2.5">
-          <span className="font-mono text-xs font-bold text-zinc-400 bg-[#18181B] w-6 h-6 rounded flex items-center justify-center border border-[#27272A]">
-            {String(index + 1).padStart(2, "0")}
+    <div className="relative p-4 rounded-[2px] bg-[#0E0E12] border-2 border-zinc-800 hover:border-zinc-600 transition shadow-sm font-mono">
+      <div className="flex items-start justify-between gap-3 mb-2">
+        <div className="flex items-center gap-2">
+          <span className="w-5 h-5 bg-zinc-800 text-zinc-300 border border-zinc-700 flex items-center justify-center text-[10px] font-black">
+            {index + 1}
           </span>
-          <h4 className="text-sm font-semibold text-zinc-100">{item.issue}</h4>
+          <h4 className="text-sm font-bold text-zinc-100 font-sans tracking-tight">
+            {item.issue}
+          </h4>
         </div>
-        <span
-          style={{
-            color: cfg.text,
-            background: cfg.bg,
-            borderColor: cfg.border,
-          }}
-          className="font-mono text-[10px] font-bold px-2 py-0.5 rounded border shrink-0 flex items-center gap-1.5"
-        >
-          <span
-            style={{ background: cfg.dot }}
-            className="w-1.5 h-1.5 rounded-full"
-          />
-          {cfg.label}
-        </span>
+
+        <RubberStamp
+          text={item.impact.toUpperCase()}
+          variant={impactVariants[item.impact] ?? "neutral"}
+          angle={index % 2 === 0 ? -1.5 : 1.5}
+        />
       </div>
 
-      <div className="mb-3">
-        <span className="text-[11px] font-medium text-zinc-400 uppercase tracking-wide">
-          Failure Mechanism
+      <div className="mb-3 font-sans">
+        <span className="text-[10px] font-mono text-zinc-500 uppercase font-bold block mb-0.5">
+          FAILURE MECHANISM:
         </span>
-        <p className="text-xs text-zinc-300 leading-relaxed mt-0.5">
-          {item.whyItMatters}
-        </p>
+        <p className="text-xs text-zinc-300 leading-relaxed">{item.whyItMatters}</p>
       </div>
 
-      <div className="p-3 rounded-lg bg-blue-500/5 border border-blue-500/15 border-l-2 border-l-blue-500">
-        <span className="text-[10px] font-mono font-semibold text-blue-400 uppercase tracking-wider block mb-0.5">
-          Actionable Correction
+      <div className="p-2.5 bg-[#141418] border border-zinc-800 text-xs text-zinc-200 font-mono">
+        <span className="text-[9px] text-zinc-400 font-bold uppercase tracking-wider block mb-0.5">
+          [ACTIONABLE CORRECTION]
         </span>
-        <p className="text-xs text-blue-200 leading-relaxed">{item.fix}</p>
+        <p className="font-sans text-xs text-zinc-300">{item.fix}</p>
       </div>
     </div>
   );
 }
 
-// ─── Rewrite Section ──────────────────────────────────────────────────────────
+// ─── Rewrite Panel (Editorial Side-by-Side) ──────────────────────────────────
 function RewritePanel({
   originalEmail,
   rewrite,
@@ -374,55 +309,64 @@ function RewritePanel({
 
   return (
     <div className="flex flex-col gap-4">
-      {/* Rewrite card */}
-      <div className="bg-[#111113] border border-[#27272A] rounded-xl p-5 shadow-sm">
-        <div className="flex items-center justify-between gap-3 mb-4 flex-wrap">
-          <div className="inline-flex bg-[#18181B] border border-[#27272A] rounded-lg p-1 gap-1">
+      {/* Email Rewrite Box */}
+      <div className="relative p-5 rounded-[2px] bg-[#0E0E12] border-2 border-zinc-800 font-mono shadow-md">
+        <MaskingTape width={90} angle={1.5} className="absolute -top-2.5 -right-3" />
+
+        <div className="flex items-center justify-between gap-3 mb-4 pb-3 border-b border-zinc-800 flex-wrap">
+          <div className="flex items-center gap-1.5">
             <button
-              onClick={() => setShowOriginal(false)}
-              className={`px-3 py-1 text-xs font-semibold rounded-md transition ${
+              onClick={() => {
+                sfx.click();
+                setShowOriginal(false);
+              }}
+              className={`px-3 py-1 text-xs font-mono font-bold uppercase tracking-wider rounded-[2px] transition border cursor-pointer ${
                 !showOriginal
-                  ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/25"
-                  : "text-zinc-400 hover:text-zinc-200 border border-transparent"
+                  ? "bg-white text-black border-white shadow-[2px_2px_0px_rgba(255,255,255,0.2)]"
+                  : "bg-transparent text-zinc-400 border-zinc-800 hover:text-white"
               }`}
             >
-              Optimized Rewrite
+              [OPTIMIZED REWRITE]
             </button>
             <button
-              onClick={() => setShowOriginal(true)}
-              className={`px-3 py-1 text-xs font-semibold rounded-md transition ${
+              onClick={() => {
+                sfx.click();
+                setShowOriginal(true);
+              }}
+              className={`px-3 py-1 text-xs font-mono font-bold uppercase tracking-wider rounded-[2px] transition border cursor-pointer ${
                 showOriginal
-                  ? "bg-red-500/15 text-red-400 border border-red-500/25"
-                  : "text-zinc-400 hover:text-zinc-200 border border-transparent"
+                  ? "bg-red-500 text-white border-red-500 shadow-[2px_2px_0px_rgba(239,68,68,0.3)]"
+                  : "bg-transparent text-zinc-400 border-zinc-800 hover:text-white"
               }`}
             >
-              Original Draft
+              [ORIGINAL DRAFT]
             </button>
           </div>
 
           <div className="flex items-center gap-2">
             {!showOriginal && onIterateV2 && (
               <button
-                onClick={onIterateV2}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-md bg-blue-600 text-white hover:bg-blue-500 transition shadow-sm active:scale-95"
-                title="Load this optimized copy into the editor to test or refine as Version 2"
+                onClick={() => {
+                  sfx.stamp();
+                  onIterateV2();
+                }}
+                className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-mono font-bold uppercase tracking-wider bg-blue-600 text-white hover:bg-blue-500 border border-blue-400 shadow-[2px_2px_0px_rgba(59,130,246,0.3)] active:translate-x-[1px] active:translate-y-[1px] rounded-[2px] transition cursor-pointer"
+                title="Transfer this rewrite to the editor for Version 2 testing"
               >
-                <RotateCcw size={12} />
-                <span>Iterate V2</span>
+                <RotateCcw size={11} />
+                <span>[ITERATE V2 →]</span>
               </button>
             )}
-            {!showOriginal && (
-              <CopyBtn text={rewrite.email} label="Copy Email" />
-            )}
+            {!showOriginal && <CopyBtn text={rewrite.email} label="COPY EMAIL" />}
           </div>
         </div>
 
-        {/* Email content */}
+        {/* Email Body */}
         <div
-          className={`p-4 rounded-lg bg-[#09090B] border border-[#27272A] text-xs sm:text-sm leading-relaxed whitespace-pre-wrap font-sans transition border-l-2 ${
+          className={`p-4 rounded-[2px] bg-[#141418] border text-xs sm:text-sm leading-relaxed whitespace-pre-wrap font-sans transition ${
             showOriginal
-              ? "border-l-red-500 text-zinc-400"
-              : "border-l-emerald-500 text-zinc-100"
+              ? "border-red-500/50 text-zinc-400"
+              : "border-emerald-500/60 text-zinc-100"
           }`}
         >
           {showOriginal ? originalEmail : rewrite.email}
@@ -431,15 +375,14 @@ function RewritePanel({
 
       {/* Subject Line Variants */}
       {rewrite.subjectLines && rewrite.subjectLines.length > 0 && (
-        <div className="bg-[#111113] border border-[#27272A] rounded-xl p-5 shadow-sm">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-xs font-semibold text-zinc-300 uppercase tracking-wide">
-              Subject Line Variations
-            </h3>
-            <span className="text-[11px] text-zinc-500">
-              4 distinct hooks for A/B testing
+        <div className="p-4 rounded-[2px] bg-[#0E0E12] border-2 border-zinc-800 font-mono shadow-sm">
+          <div className="flex items-center justify-between pb-2 mb-3 border-b border-zinc-800">
+            <span className="text-[11px] font-bold text-zinc-200 uppercase tracking-wider">
+              SUBJECT LINE VARIATIONS // 4 A/B HOOKS
             </span>
+            <span className="text-[10px] text-zinc-500">[TEST SUITE]</span>
           </div>
+
           <div className="flex flex-col gap-2">
             {rewrite.subjectLines.map((line, i) => {
               const letter = ["A", "B", "C", "D"][i] ?? String(i + 1);
@@ -447,28 +390,28 @@ function RewritePanel({
               return (
                 <div
                   key={i}
-                  className={`flex items-center justify-between gap-3 p-3 rounded-lg border transition ${
+                  className={`flex items-center justify-between gap-3 p-2.5 rounded-[2px] border transition ${
                     isFirst
-                      ? "bg-blue-500/5 border-blue-500/25"
-                      : "bg-[#18181B] border-[#27272A]"
+                      ? "bg-[#14141A] border-blue-500/50"
+                      : "bg-[#141418] border-zinc-800"
                   }`}
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
                     <span
-                      className={`font-mono text-xs font-bold w-5 h-5 rounded flex items-center justify-center shrink-0 ${
+                      className={`w-5 h-5 rounded-[2px] flex items-center justify-center text-[10px] font-black shrink-0 ${
                         isFirst
-                          ? "bg-blue-500/20 text-blue-300 border border-blue-500/30"
-                          : "bg-zinc-800 text-zinc-400 border border-zinc-700/50"
+                          ? "bg-blue-600 text-white"
+                          : "bg-zinc-800 text-zinc-400 border border-zinc-700"
                       }`}
                     >
                       {letter}
                     </span>
-                    <span className="text-xs sm:text-sm text-zinc-200 truncate">
+                    <span className="text-xs sm:text-sm text-zinc-200 truncate font-sans font-medium">
                       {line}
                     </span>
                     {isFirst && (
-                      <span className="hidden sm:inline-block font-mono text-[10px] text-blue-400 bg-blue-500/10 px-1.5 py-0.5 rounded border border-blue-500/20 shrink-0">
-                        Top Pick
+                      <span className="hidden sm:inline-block text-[9px] text-blue-400 bg-blue-500/10 px-1.5 py-0.5 border border-blue-500/30 uppercase font-bold shrink-0">
+                        TOP PICK
                       </span>
                     )}
                   </div>
@@ -480,13 +423,13 @@ function RewritePanel({
         </div>
       )}
 
-      {/* Signal Rationale */}
+      {/* Rationale Dossier */}
       {rewrite.whyThisWorks && (
-        <div className="bg-[#111113] border border-[#27272A] rounded-xl p-5 shadow-sm border-l-2 border-l-blue-500">
-          <span className="text-xs font-semibold text-blue-400 uppercase tracking-wider block mb-1">
-            Why This Rewrite Converts
+        <div className="p-4 rounded-[2px] bg-[#0E0E12] border-2 border-zinc-800 font-mono shadow-sm">
+          <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block mb-1">
+            [PSYCHOLOGICAL RATIONALE]
           </span>
-          <p className="text-xs text-zinc-300 leading-relaxed">
+          <p className="text-xs text-zinc-300 font-sans leading-relaxed">
             {rewrite.whyThisWorks}
           </p>
         </div>
@@ -495,7 +438,7 @@ function RewritePanel({
   );
 }
 
-// ─── Follow-Up Timeline ───────────────────────────────────────────────────────
+// ─── Cadence Timeline ─────────────────────────────────────────────────────────
 function FollowUpSequence({
   day3,
   day7,
@@ -505,39 +448,40 @@ function FollowUpSequence({
 }) {
   const steps = [
     {
-      day: "Day 3",
-      tag: "Soft Context Bump",
+      day: "TOUCH // 02",
+      timing: "DAY 3",
+      tag: "SOFT CONTEXT BUMP",
       content: day3,
-      badge: "Touch 2",
     },
     {
-      day: "Day 7",
-      tag: "Angle Pivot & Frictionless Breakup",
+      day: "TOUCH // 03",
+      timing: "DAY 7",
+      tag: "PIVOT / VALUE TAKEAWAY",
       content: day7,
-      badge: "Touch 3",
     },
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 font-mono">
       {steps.map((step) => (
         <div
-          key={step.day}
-          className="bg-[#111113] border border-[#27272A] rounded-xl p-4 shadow-sm flex flex-col justify-between"
+          key={step.timing}
+          className="p-4 rounded-[2px] bg-[#0E0E12] border-2 border-zinc-800 flex flex-col justify-between shadow-sm"
         >
           <div>
-            <div className="flex items-center justify-between mb-2.5">
+            <div className="flex items-center justify-between pb-2 mb-2.5 border-b border-zinc-800">
               <div className="flex items-center gap-2">
-                <span className="font-mono text-xs font-bold text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded border border-blue-500/20">
-                  {step.day}
+                <span className="text-[10px] font-black bg-zinc-800 text-white px-2 py-0.5">
+                  {step.timing}
                 </span>
-                <span className="text-xs font-semibold text-zinc-300">
+                <span className="text-[10px] font-bold text-zinc-400">
                   {step.tag}
                 </span>
               </div>
-              <CopyBtn text={step.content} label="Copy" />
+              <CopyBtn text={step.content} label="COPY" />
             </div>
-            <p className="text-xs text-zinc-300 leading-relaxed whitespace-pre-wrap p-3 rounded-lg bg-[#09090B] border border-[#27272A]">
+
+            <p className="text-xs text-zinc-300 font-sans leading-relaxed whitespace-pre-wrap p-3 bg-[#141418] border border-zinc-800 rounded-[2px]">
               {step.content}
             </p>
           </div>
@@ -547,37 +491,7 @@ function FollowUpSequence({
   );
 }
 
-// ─── Breakdown Section ────────────────────────────────────────────────────────
-function BreakdownSection({
-  breakdown,
-}: {
-  breakdown: AnalysisResult["emailBreakdown"];
-}) {
-  const items = [
-    { label: "Hook & Opening Context", val: breakdown.hook },
-    { label: "Value Proposition Mapping", val: breakdown.valueProp },
-    { label: "Personalization Depth", val: breakdown.personalization },
-    { label: "Call-To-Action Friction", val: breakdown.cta },
-  ];
-
-  return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-      {items.map(({ label, val }) => (
-        <div
-          key={label}
-          className="bg-[#111113] border border-[#27272A] p-3.5 rounded-xl"
-        >
-          <span className="text-xs font-semibold text-zinc-400 block mb-1">
-            {label}
-          </span>
-          <p className="text-xs text-zinc-200 leading-relaxed">{val}</p>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-// ─── Primary Result Panel ────────────────────────────────────────────────────
+// ─── Primary Result Panel Component ──────────────────────────────────────────
 interface ResultPanelProps {
   analysis: AnalysisResult | null;
   selected: SavedAnalysis | null;
@@ -593,17 +507,14 @@ export function ResultPanel({
 }: ResultPanelProps) {
   if (!analysis) {
     return (
-      <div className="py-20 px-4 flex flex-col items-center text-center">
-        <div className="w-14 h-14 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 mb-5 shadow-inner">
-          <TrendingUp size={24} />
-        </div>
-        <h2 className="text-lg font-bold text-white tracking-tight mb-2">
-          Ready for Email Diagnosis
+      <div className="py-20 px-4 flex flex-col items-center text-center font-mono">
+        <RubberStamp text="SPECIMEN QUEUE EMPTY" variant="neutral" angle={-1} className="mb-4 text-xs" />
+        <h2 className="text-base font-bold text-white uppercase tracking-wider mb-2">
+          [AWAITING INPUT DOSSIER]
         </h2>
-        <p className="text-sm text-zinc-400 max-w-sm leading-relaxed mb-6">
-          Paste your cold outreach copy and prospect profile on the left.
-          InboxSignal runs full diagnostic scoring, detects rejection drivers,
-          and generates conversion-ready rewrites.
+        <p className="text-xs text-zinc-500 font-sans max-w-sm leading-relaxed mb-6">
+          Paste cold outreach copy on the left panel. InboxSignal performs a
+          forensic autopsy across 4 signal vectors and compiles conversion rewrites.
         </p>
       </div>
     );
@@ -613,17 +524,17 @@ export function ResultPanel({
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
+      transition={{ duration: 0.25 }}
       className="flex flex-col gap-6"
     >
-      {/* 1. Score Summary */}
+      {/* 1. Score Readout */}
       <ScoreSection signals={analysis.signals} />
 
       {/* 2. Failure Diagnosis */}
       <div>
         <SectionHeading
-          n="02"
-          title="Failure Diagnosis"
+          n="SECTION // 02"
+          title="FORENSIC FAILURE DIAGNOSIS"
           count={analysis.diagnosis.length}
         />
         <div className="flex flex-col gap-3">
@@ -634,9 +545,12 @@ export function ResultPanel({
         </div>
       </div>
 
-      {/* 3. Optimized Rewrite */}
+      {/* 3. Conversion Rewrite */}
       <div>
-        <SectionHeading n="03" title="Conversion Rewrite & Subject Lines" />
+        <SectionHeading
+          n="SECTION // 03"
+          title="CONVERSION REWRITE & A/B HOOKS"
+        />
         <RewritePanel
           originalEmail={originalEmail}
           rewrite={analysis.rewrite}
@@ -646,17 +560,14 @@ export function ResultPanel({
 
       {/* 4. Follow-Up Sequence */}
       <div>
-        <SectionHeading n="04" title="Multi-Touch Follow-Up Cadence" />
+        <SectionHeading
+          n="SECTION // 04"
+          title="MULTI-TOUCH CADENCE SPEC"
+        />
         <FollowUpSequence
           day3={analysis.followUps.day3}
           day7={analysis.followUps.day7}
         />
-      </div>
-
-      {/* 5. Structural Breakdown */}
-      <div>
-        <SectionHeading n="05" title="Copy Component Breakdown" />
-        <BreakdownSection breakdown={analysis.emailBreakdown} />
       </div>
     </motion.div>
   );

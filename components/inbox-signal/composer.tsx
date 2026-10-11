@@ -9,9 +9,13 @@ import {
   Mail,
   User,
   Sparkles,
-  Zap,
 } from "lucide-react";
-import { motion } from "framer-motion";
+import { sfx } from "./tactile-audio";
+import {
+  MaskingTape,
+  CropMarkCorner,
+  RubberStamp,
+} from "./tactile-elements";
 
 interface ComposerProps {
   displayMode: "landing" | "sidebar";
@@ -64,6 +68,7 @@ export function Composer({
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
       if (canSubmit) {
+        sfx.stamp();
         if (signedIn) onAnalyze();
         else onSignInAndAnalyze();
       }
@@ -74,66 +79,90 @@ export function Composer({
     <div
       className={
         isSidebar
-          ? "flex flex-col gap-3 w-full"
-          : "w-full max-w-xl mx-auto flex flex-col gap-3"
+          ? "flex flex-col gap-3.5 w-full relative"
+          : "w-full max-w-xl mx-auto flex flex-col gap-3.5 relative"
       }
     >
-      {/* Metrics Bar (Landing Page Only) */}
+      {/* Editorial Tape on top corner (Breaks the grid) */}
       {!isSidebar && (
-        <div className="grid grid-cols-3 gap-2 p-1.5 rounded-xl bg-[#111113] border border-[#27272A] mb-2 shadow-sm">
-          <div className="flex flex-col items-center justify-center p-3 rounded-lg bg-[#18181B] border border-[#27272A]/50">
-            <span className="font-mono text-base sm:text-lg font-bold text-white tracking-tight">
-              &lt; 30s
-            </span>
-            <span className="text-[10px] font-medium text-zinc-400 uppercase tracking-wider mt-0.5">
-              Diagnosis Speed
-            </span>
-          </div>
-          <div className="flex flex-col items-center justify-center p-3 rounded-lg bg-[#18181B] border border-[#27272A]/50">
-            <span className="font-mono text-base sm:text-lg font-bold text-blue-400 tracking-tight">
-              0–100
-            </span>
-            <span className="text-[10px] font-medium text-zinc-400 uppercase tracking-wider mt-0.5">
-              Signal Score
-            </span>
-          </div>
-          <div className="flex flex-col items-center justify-center p-3 rounded-lg bg-[#18181B] border border-[#27272A]/50">
-            <span className="font-mono text-base sm:text-lg font-bold text-emerald-400 tracking-tight">
-              4 Dims
-            </span>
-            <span className="text-[10px] font-medium text-zinc-400 uppercase tracking-wider mt-0.5">
-              Deep Analysis
-            </span>
+        <MaskingTape
+          width={110}
+          angle={-2}
+          className="absolute -top-3.5 -right-3 hidden sm:block"
+        />
+      )}
+
+      {/* Metrics Bar (Landing Page Only - Print & Meter Style) */}
+      {!isSidebar && (
+        <div className="relative p-2 rounded-[2px] bg-[#0E0E11] border border-zinc-800 mb-1 shadow-sm font-mono">
+          <CropMarkCorner position="top-left" />
+          <CropMarkCorner position="top-right" />
+          <CropMarkCorner position="bottom-left" />
+          <CropMarkCorner position="bottom-right" />
+
+          <div className="grid grid-cols-3 gap-2">
+            <div className="flex flex-col items-center justify-center p-3 bg-[#141418] border border-zinc-800/80">
+              <span className="text-[9px] uppercase tracking-wider text-zinc-500 font-bold">
+                [LATENCY]
+              </span>
+              <span className="text-base sm:text-lg font-black text-white mt-0.5 tracking-tight">
+                &lt; 30s
+              </span>
+              <span className="text-[9px] text-zinc-500">SPEED</span>
+            </div>
+
+            <div className="flex flex-col items-center justify-center p-3 bg-[#141418] border border-zinc-800/80">
+              <span className="text-[9px] uppercase tracking-wider text-blue-400 font-bold">
+                [RANGE]
+              </span>
+              <span className="text-base sm:text-lg font-black text-blue-400 mt-0.5 tracking-tight">
+                0–100
+              </span>
+              <span className="text-[9px] text-zinc-500">SCORE</span>
+            </div>
+
+            <div className="flex flex-col items-center justify-center p-3 bg-[#141418] border border-zinc-800/80">
+              <span className="text-[9px] uppercase tracking-wider text-emerald-400 font-bold">
+                [VECTORS]
+              </span>
+              <span className="text-base sm:text-lg font-black text-emerald-400 mt-0.5 tracking-tight">
+                4 DIMS
+              </span>
+              <span className="text-[9px] text-zinc-500">DIAGNOSIS</span>
+            </div>
           </div>
         </div>
       )}
 
-      {/* Cold Email Input */}
-      <div className="flex flex-col rounded-xl bg-[#111113] border border-[#27272A] focus-within:border-blue-500/80 focus-within:ring-1 focus-within:ring-blue-500/30 transition shadow-sm overflow-hidden">
-        <div className="flex items-center justify-between px-3.5 pt-3 pb-1 border-b border-[#27272A]/60">
+      {/* Cold Email Input Card (Tactile Paper Dossier) */}
+      <div className="relative rounded-[2px] bg-[#0F0F13] border-2 border-zinc-800 focus-within:border-zinc-500 transition shadow-md">
+        <CropMarkCorner position="top-left" />
+        <CropMarkCorner position="bottom-right" />
+
+        <div className="flex items-center justify-between px-3.5 py-2.5 bg-[#141418] border-b border-zinc-800 font-mono">
           <div className="flex items-center gap-2">
-            <Mail size={13} className="text-zinc-400" />
-            <label
-              htmlFor="cold-email-input"
-              className="text-xs font-semibold text-zinc-200 tracking-wide"
-            >
-              Cold Email Copy
-            </label>
+            <Mail size={12} className="text-zinc-400" />
+            <span className="text-[11px] font-bold text-zinc-200 tracking-wider uppercase">
+              SPEC // 01 · COLD OUTREACH DRAFT
+            </span>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5">
             {email.length > 0 ? (
-              <span className="font-mono text-[10px] text-zinc-500">
-                {wordCount} words · {charCount} chars
+              <span className="text-[10px] text-zinc-500 font-mono tracking-tight">
+                [{wordCount} WORDS · {charCount} CHARS]
               </span>
             ) : !isSidebar ? (
               <button
                 type="button"
-                onClick={onUseDemo}
-                className="inline-flex items-center gap-1.5 text-[11px] font-medium text-zinc-400 hover:text-white bg-[#18181B] hover:bg-zinc-800 px-2 py-0.5 rounded border border-[#27272A] transition"
+                onClick={() => {
+                  sfx.click();
+                  onUseDemo();
+                }}
+                className="inline-flex items-center gap-1.5 text-[10px] font-mono font-bold text-zinc-300 hover:text-white bg-zinc-800/90 hover:bg-zinc-700 px-2 py-0.5 border border-zinc-700 transition"
               >
                 <RotateCcw size={10} />
-                <span>Fill sample</span>
+                <span>[LOAD CASE SAMPLE]</span>
               </button>
             ) : null}
           </div>
@@ -145,25 +174,25 @@ export function Composer({
           onChange={(e) => onEmailChange(e.target.value)}
           onKeyDown={handleKeyDown}
           rows={isSidebar ? 7 : 4}
-          placeholder="Paste your cold email here (subject line and email body)..."
-          className="w-full px-3.5 py-2.5 bg-transparent text-sm text-zinc-100 placeholder:text-zinc-600 resize-none focus:outline-none font-sans leading-relaxed"
+          placeholder="Paste cold email draft here (subject line and message body)..."
+          className="w-full px-3.5 py-3 bg-transparent text-sm text-zinc-100 placeholder:text-zinc-600 resize-none focus:outline-none font-sans leading-relaxed"
         />
       </div>
 
-      {/* Prospect Context Input */}
-      <div className="flex flex-col rounded-xl bg-[#111113] border border-[#27272A] focus-within:border-blue-500/80 focus-within:ring-1 focus-within:ring-blue-500/30 transition shadow-sm overflow-hidden">
-        <div className="flex items-center justify-between px-3.5 pt-3 pb-1 border-b border-[#27272A]/60">
+      {/* Target Context Input Card */}
+      <div className="relative rounded-[2px] bg-[#0F0F13] border-2 border-zinc-800 focus-within:border-zinc-500 transition shadow-md">
+        <CropMarkCorner position="top-right" />
+        <CropMarkCorner position="bottom-left" />
+
+        <div className="flex items-center justify-between px-3.5 py-2.5 bg-[#141418] border-b border-zinc-800 font-mono">
           <div className="flex items-center gap-2">
-            <User size={13} className="text-zinc-400" />
-            <label
-              htmlFor="prospect-context-input"
-              className="text-xs font-semibold text-zinc-200 tracking-wide"
-            >
-              Target Prospect & Context
-            </label>
+            <User size={12} className="text-zinc-400" />
+            <span className="text-[11px] font-bold text-zinc-200 tracking-wider uppercase">
+              SPEC // 02 · PROSPECT CONTEXT & ROLE
+            </span>
           </div>
-          <span className="text-[10px] text-zinc-500 hidden sm:inline">
-            Role, company stage, target pain point
+          <span className="text-[9px] text-zinc-500 hidden sm:inline uppercase">
+            [TITLE · COMPANY STAGE · PAIN]
           </span>
         </div>
 
@@ -173,42 +202,45 @@ export function Composer({
           onChange={(e) => onProspectChange(e.target.value)}
           onKeyDown={handleKeyDown}
           rows={isSidebar ? 3 : 2}
-          placeholder="e.g. VP Sales at Series B B2B SaaS. Hiring 3 AEs. Pain: flat outbound response rates."
+          placeholder="e.g. VP of Sales at Series B SaaS. 12 SDRs missing quota. Low cold email response rates."
           className="w-full px-3.5 py-2.5 bg-transparent text-sm text-zinc-100 placeholder:text-zinc-600 resize-none focus:outline-none font-sans leading-relaxed"
         />
       </div>
 
-      {/* Submit / Action Row */}
-      <div className="flex items-center justify-between pt-1">
-        <div className="flex items-center gap-2 text-xs text-zinc-500">
-          <kbd className="font-mono text-[10px] bg-[#18181B] px-1.5 py-0.5 rounded border border-[#27272A] text-zinc-400">
-            {isMac ? "⌘" : "Ctrl"} + Enter
-          </kbd>
-          <span className="hidden sm:inline">to analyze</span>
+      {/* Action Row & Tactile Button */}
+      <div className="flex items-center justify-between pt-1 font-mono">
+        <div className="flex items-center gap-2 text-[11px] text-zinc-500">
+          <span className="bg-zinc-800 px-1.5 py-0.5 border border-zinc-700 text-zinc-300">
+            {isMac ? "⌘" : "CTRL"} + ENTER
+          </span>
+          <span className="hidden sm:inline">[EXECUTE AUTOPSY]</span>
         </div>
 
         {signedIn ? (
           <button
             type="button"
-            onClick={onAnalyze}
+            onClick={() => {
+              sfx.stamp();
+              onAnalyze();
+            }}
             disabled={!canSubmit || limitReached}
-            className={`inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg text-xs font-semibold transition shadow-sm ${
+            className={`inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-[2px] text-xs font-mono font-bold uppercase tracking-wider transition select-none ${
               canSubmit && !limitReached
-                ? "bg-blue-600 text-white hover:bg-blue-500 active:scale-95"
-                : "bg-zinc-800 text-zinc-500 cursor-not-allowed border border-zinc-700/50"
+                ? "bg-white text-black hover:bg-zinc-200 border-2 border-white shadow-[3px_3px_0px_rgba(255,255,255,0.2)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none cursor-pointer"
+                : "bg-zinc-900 text-zinc-600 border border-zinc-800 cursor-not-allowed"
             }`}
           >
             {loading ? (
               <>
                 <Loader2 size={13} className="animate-spin" />
-                <span>Diagnosing email...</span>
+                <span>DIAGNOSING SPECS...</span>
               </>
             ) : limitReached ? (
-              <span>Daily Limit Reached</span>
+              <span>[QUOTA EXHAUSTED]</span>
             ) : (
               <>
-                <Sparkles size={13} />
-                <span>Run Signal Diagnosis</span>
+                <Sparkles size={12} />
+                <span>STAMP &amp; RUN DIAGNOSIS</span>
               </>
             )}
           </button>
@@ -216,11 +248,14 @@ export function Composer({
           <SignInButton mode="modal" forceRedirectUrl="/">
             <button
               type="button"
-              onClick={onSignInAndAnalyze}
-              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg text-xs font-semibold bg-blue-600 text-white hover:bg-blue-500 active:scale-95 transition shadow-sm"
+              onClick={() => {
+                sfx.click();
+                onSignInAndAnalyze();
+              }}
+              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-[2px] text-xs font-mono font-bold uppercase tracking-wider bg-white text-black hover:bg-zinc-200 border-2 border-white shadow-[3px_3px_0px_rgba(255,255,255,0.25)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition cursor-pointer"
             >
-              <span>Analyze Free</span>
-              <ArrowRight size={13} />
+              <span>RUN FREE AUTOPSY</span>
+              <ArrowRight size={12} />
             </button>
           </SignInButton>
         )}
