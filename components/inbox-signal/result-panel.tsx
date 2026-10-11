@@ -70,7 +70,7 @@ function SectionHeading({
   return (
     <div className="flex items-center justify-between pb-2 mb-3 border-b border-white/[0.06]">
       <div className="flex items-center gap-2">
-        <span className="font-mono text-[10px] font-semibold text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded-full border border-blue-500/20">
+        <span className="font-mono text-[10px] font-semibold text-[#D4FF00] bg-[#D4FF00]/10 px-2 py-0.5 rounded-full border border-[#D4FF00]/25">
           {n}
         </span>
         <h2 className="text-xs font-semibold text-slate-200 uppercase tracking-wider">
@@ -285,8 +285,8 @@ function DiagnosisCard({
       </div>
 
       <div className="p-3 rounded-xl bg-white/[0.02] border border-white/[0.06] text-xs text-slate-200">
-        <span className="text-[11px] font-semibold text-blue-400 block mb-0.5">
-          Correction
+        <span className="text-[11px] font-semibold text-[#D4FF00] block mb-0.5 font-mono uppercase tracking-wider">
+          Actionable Correction
         </span>
         <p className="text-slate-300">{item.fix}</p>
       </div>
@@ -469,7 +469,7 @@ function FollowUpSequence({
           <div>
             <div className="flex items-center justify-between pb-2.5 mb-3 border-b border-white/[0.06]">
               <div className="flex items-center gap-2">
-                <span className="font-mono text-xs font-semibold text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded-full border border-blue-500/20">
+                <span className="font-mono text-xs font-semibold text-[#D4FF00] bg-[#D4FF00]/10 px-2 py-0.5 rounded-full border border-[#D4FF00]/25">
                   {step.timing}
                 </span>
                 <span className="text-xs font-semibold text-slate-300">
@@ -506,7 +506,7 @@ export function ResultPanel({
   if (!analysis) {
     return (
       <div className="py-24 px-4 flex flex-col items-center text-center">
-        <div className="w-14 h-14 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 mb-5 shadow-inner">
+        <div className="w-14 h-14 rounded-2xl bg-[#D4FF00]/10 border border-[#D4FF00]/20 flex items-center justify-center text-[#D4FF00] mb-5 shadow-[0_0_20px_rgba(212,255,0,0.12)]">
           <TrendingUp size={24} />
         </div>
         <h2 className="text-lg font-bold text-white tracking-tight mb-2">

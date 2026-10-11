@@ -148,14 +148,14 @@ export function TemplateSwipeFile({ onLoadIntoStudio }: TemplateSwipeFileProps) 
   return (
     <div className="max-w-5xl mx-auto space-y-6 pb-12 animate-fade-in">
       {/* Header */}
-      <div className="p-6 rounded-3xl bg-[#111319]/80 border border-white/[0.08] backdrop-blur-xl">
+      <div className="p-6 rounded-3xl bg-[#0D0F14]/95 border border-white/[0.08] backdrop-blur-xl">
         <div className="flex items-center gap-2 mb-1">
-          <span className="w-2 h-2 rounded-full bg-blue-400" />
+          <span className="w-1.5 h-1.5 rounded-full bg-[#D4FF00] shadow-[0_0_8px_#D4FF00] animate-pulse" />
           <span className="text-[11px] font-mono uppercase tracking-wider text-slate-400">
             High-Signal Outbound Vault
           </span>
         </div>
-        <h1 className="text-2xl font-bold text-white">Outbound Swipe File & Templates</h1>
+        <h1 className="text-2xl font-bold text-white tracking-tight">Outbound Swipe File & Templates</h1>
         <p className="text-xs text-slate-400 mt-1 max-w-xl">
           Curated battle-tested outreach frameworks benchmarked at 85+ Signal
           Scores. Load directly into the Diagnostic Studio to adapt for your
@@ -171,9 +171,9 @@ export function TemplateSwipeFile({ onLoadIntoStudio }: TemplateSwipeFileProps) 
                 sfx.click();
                 setSelectedCategory(c.id);
               }}
-              className={`px-3 py-1.5 rounded-xl text-xs font-medium transition cursor-pointer ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition cursor-pointer ${
                 selectedCategory === c.id
-                  ? "bg-blue-600 text-white shadow-md shadow-blue-600/20"
+                  ? "bg-[#D4FF00] text-black shadow-[0_0_15px_rgba(212,255,0,0.3)]"
                   : "bg-white/[0.03] text-slate-400 hover:text-white border border-white/[0.06]"
               }`}
             >
@@ -190,14 +190,14 @@ export function TemplateSwipeFile({ onLoadIntoStudio }: TemplateSwipeFileProps) 
           return (
             <div
               key={item.id}
-              className="p-6 rounded-3xl bg-[#111319]/80 border border-white/[0.08] hover:border-white/[0.15] transition-all backdrop-blur-xl flex flex-col justify-between"
+              className="p-6 rounded-3xl bg-[#0D0F14]/95 border border-white/[0.08] hover:border-white/[0.15] transition-all backdrop-blur-xl flex flex-col justify-between"
             >
               <div>
                 <div className="flex items-center justify-between mb-3">
-                  <span className="text-[10px] font-mono uppercase text-blue-400 bg-blue-500/10 border border-blue-500/20 px-2 py-0.5 rounded-full">
+                  <span className="text-[10px] font-mono uppercase text-slate-300 bg-white/[0.04] border border-white/[0.08] px-2.5 py-0.5 rounded-full">
                     {item.category}
                   </span>
-                  <span className="text-xs font-mono font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-full">
+                  <span className="text-xs font-mono font-bold text-[#D4FF00] bg-[#D4FF00]/10 border border-[#D4FF00]/25 px-2.5 py-0.5 rounded-full">
                     Score {item.benchmarkedScore}/100
                   </span>
                 </div>
@@ -238,8 +238,11 @@ export function TemplateSwipeFile({ onLoadIntoStudio }: TemplateSwipeFileProps) 
               {/* Actions */}
               <div className="flex items-center gap-2 pt-3 border-t border-white/[0.06]">
                 <button
-                  onClick={() => onLoadIntoStudio(item)}
-                  className="flex-1 py-2 px-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold flex items-center justify-center gap-1.5 shadow-md shadow-blue-600/20 transition cursor-pointer"
+                  onClick={() => {
+                    sfx.click();
+                    onLoadIntoStudio(item);
+                  }}
+                  className="flex-1 py-2 px-3 rounded-xl bg-[#D4FF00] hover:bg-[#e2ff33] text-black text-xs font-bold flex items-center justify-center gap-1.5 shadow-[0_0_18px_rgba(212,255,0,0.25)] transition active:scale-98 cursor-pointer"
                 >
                   <Sparkles size={13} />
                   <span>Load into Studio</span>

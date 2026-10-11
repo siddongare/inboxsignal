@@ -29,6 +29,9 @@ import { Composer } from "@/components/inbox-signal/composer";
 import { HistoryPanel } from "@/components/inbox-signal/history-panel";
 import { ProgressPanel } from "@/components/inbox-signal/progress-panel";
 import { ResultPanel } from "@/components/inbox-signal/result-panel";
+import { AnalyticsView } from "@/components/inbox-signal/analytics-view";
+import { TemplateSwipeFile, type SwipeTemplate } from "@/components/inbox-signal/template-swipe-file";
+import { BenchmarkRubricView } from "@/components/inbox-signal/benchmark-rubric-view";
 import { demoEmail, demoProspect } from "@/components/inbox-signal/utils";
 import { sfx } from "@/components/inbox-signal/tactile-audio";
 
@@ -347,15 +350,33 @@ function Header({
           </>
         )}
       </div>
+
+      {/* ── Mobile Floating Bottom Dock (High-Precision Thumb Navigation) ── */}
+      <div className="sm:hidden fixed bottom-4 left-4 right-4 z-50 p-1.5 rounded-2xl bg-[#0D0F14]/90 border border-white/[0.1] backdrop-blur-2xl flex items-center justify-around shadow-2xl">
+        {navItems.map(({ id, label, icon: Icon }) => (
+          <button
+            key={id}
+            onClick={() => {
+              sfx.click();
+              onNavChange(id);
+            }}
+            className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition cursor-pointer ${
+              activeNav === id
+                ? "bg-white/[0.1] text-white shadow-sm border border-white/[0.1]"
+                : "text-slate-400 hover:text-white"
+            }`}
+          >
+            <Icon
+              size={15}
+              className={activeNav === id ? "text-[#D4FF00]" : "text-slate-400"}
+            />
+            <span className="text-[10px] font-medium tracking-tight">{label}</span>
+          </button>
+        ))}
+      </div>
     </header>
   );
 }
-
-
-
-import { AnalyticsView } from "@/components/inbox-signal/analytics-view";
-import { TemplateSwipeFile, type SwipeTemplate } from "@/components/inbox-signal/template-swipe-file";
-import { BenchmarkRubricView } from "@/components/inbox-signal/benchmark-rubric-view";
 
 // ─── Main Shell Component ────────────────────────────────────────────────────
 interface InboxSignalShellProps {
@@ -586,7 +607,7 @@ export default function InboxSignalShell({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1, transition: { duration: 0.25 } }}
               exit={{ opacity: 0, transition: { duration: 0.15 } }}
-              className="flex flex-col items-center justify-center min-h-[calc(100vh-56px)] px-4 py-12 relative"
+              className="flex flex-col items-center justify-center min-h-[calc(100vh-5rem)] px-4 py-12 relative"
             >
               <HeroSection />
 
@@ -620,9 +641,9 @@ export default function InboxSignalShell({
 
         {/* ── STUDIO: RESULTS DASHBOARD PHASE ── */}
         {activeNav === "studio" && !isLanding && (
-          <div className="layout-row flex flex-1 min-h-[calc(100vh-56px)]">
+          <div className="layout-row flex flex-1 min-h-[calc(100vh-5rem)]">
             {/* Sidebar */}
-            <aside className="sidebar-panel w-full md:w-[350px] shrink-0 sticky top-14 h-[calc(100vh-56px)] overflow-y-auto flex flex-col border-r border-white/[0.08] bg-[#0A0B10]">
+            <aside className="sidebar-panel w-full md:w-[350px] shrink-0 sticky top-20 h-[calc(100vh-5rem)] overflow-y-auto flex flex-col border-r border-white/[0.08] bg-[#0A0B10]">
               {/* Sidebar Tabs */}
               <div className="flex p-2.5 gap-2 border-b border-white/[0.06] sticky top-0 z-10 bg-[#0A0B10]/95 backdrop-blur-md">
                 <button
@@ -702,7 +723,7 @@ export default function InboxSignalShell({
                       <SignUpButton mode="modal">
                         <button
                           onClick={() => sfx.click()}
-                          className="w-full py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold rounded-xl transition cursor-pointer"
+                          className="w-full py-2 bg-[#D4FF00] hover:bg-[#e2ff33] text-black text-xs font-bold rounded-xl shadow-[0_0_20px_rgba(212,255,0,0.3)] transition active:scale-98 cursor-pointer"
                         >
                           Create Account
                         </button>
@@ -727,7 +748,7 @@ export default function InboxSignalShell({
             {/* Results pane */}
             <main
               ref={resultsRef}
-              className="results-scroll flex-1 overflow-y-auto sticky top-14 h-[calc(100vh-56px)] p-4 sm:p-8"
+              className="results-scroll flex-1 overflow-y-auto sticky top-20 h-[calc(100vh-5rem)] p-4 sm:p-8"
             >
               <AnimatePresence mode="wait">
                 {status === "loading" && (
@@ -738,9 +759,9 @@ export default function InboxSignalShell({
                     exit={{ opacity: 0 }}
                     className="max-w-3xl mx-auto py-12"
                   >
-                    <div className="flex items-center gap-3 mb-6 p-4 border border-blue-500/20 bg-blue-500/[0.04] rounded-2xl">
-                      <div className="animate-spin w-4 h-4 border-2 border-blue-400 border-t-transparent rounded-full" />
-                      <span className="text-xs font-semibold text-blue-300">
+                    <div className="flex items-center gap-3 mb-6 p-4 border border-[#D4FF00]/20 bg-[#D4FF00]/[0.04] rounded-2xl">
+                      <div className="animate-spin w-4 h-4 border-2 border-[#D4FF00] border-t-transparent rounded-full" />
+                      <span className="text-xs font-semibold text-[#D4FF00]">
                         Diagnosing cold outreach vectors...
                       </span>
                     </div>

@@ -89,7 +89,7 @@ export function AnalyticsView({
   if (!stats) {
     return (
       <div className="max-w-4xl mx-auto py-16 px-4 text-center">
-        <div className="w-14 h-14 rounded-2xl bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center mx-auto mb-4">
+        <div className="w-14 h-14 rounded-2xl bg-[#D4FF00]/10 border border-[#D4FF00]/20 text-[#D4FF00] flex items-center justify-center mx-auto mb-4 shadow-[0_0_20px_rgba(212,255,0,0.12)]">
           <TrendingUp size={26} />
         </div>
         <h2 className="text-xl font-bold text-white mb-2">No Audits Run Yet</h2>
@@ -100,7 +100,7 @@ export function AnalyticsView({
         </p>
         <button
           onClick={onGoToStudio}
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-medium text-xs shadow-lg shadow-blue-600/20 transition cursor-pointer"
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#D4FF00] hover:bg-[#e2ff33] text-black font-bold text-xs shadow-[0_0_20px_rgba(212,255,0,0.3)] transition active:scale-98 cursor-pointer"
         >
           <span>Open Diagnostic Studio</span>
           <ArrowUpRight size={14} />
@@ -216,7 +216,7 @@ export function AnalyticsView({
               {
                 label: "Clarity & Readability",
                 score: stats.avgClarity,
-                color: "bg-blue-500",
+                color: "bg-[#D4FF00]",
                 desc: "Focus, length, and executive scannability",
               },
               {
@@ -299,8 +299,8 @@ export function AnalyticsView({
             )}
           </div>
 
-          <div className="mt-4 p-3.5 rounded-2xl bg-blue-500/[0.06] border border-blue-500/20 text-xs text-blue-200 flex items-center gap-3">
-            <ShieldAlert size={18} className="text-blue-400 shrink-0" />
+          <div className="mt-4 p-3.5 rounded-2xl bg-[#D4FF00]/[0.06] border border-[#D4FF00]/20 text-xs text-slate-200 flex items-center gap-3">
+            <ShieldAlert size={18} className="text-[#D4FF00] shrink-0" />
             <span>
               Executive buyers reject emails primarily due to vague credibility
               and high-friction initial asks.
@@ -331,7 +331,7 @@ export function AnalyticsView({
               >
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-semibold text-white group-hover:text-blue-400 transition truncate">
+                    <span className="text-xs font-semibold text-white group-hover:text-[#D4FF00] transition truncate">
                       {item.title}
                     </span>
                   </div>

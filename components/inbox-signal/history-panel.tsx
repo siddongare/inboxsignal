@@ -83,7 +83,7 @@ function HistoryItem(props: {
     <div
       className={`rounded-xl border p-3 transition-all ${
         props.active
-          ? "border-blue-500/40 bg-blue-500/[0.06] shadow-sm"
+          ? "border-[#D4FF00]/40 bg-[#D4FF00]/[0.06] shadow-sm"
           : "border-white/[0.06] bg-white/[0.02] hover:border-white/[0.12] hover:bg-white/[0.04]"
       }`}
     >
@@ -109,7 +109,7 @@ function HistoryItem(props: {
                     if (event.key === "Enter") saveTitle();
                     if (event.key === "Escape") setEditing(false);
                   }}
-                  className="w-full rounded-lg border border-blue-500/60 bg-[#090A0F] px-2.5 py-1 text-xs text-white focus:outline-none"
+                  className="w-full rounded-lg border border-[#D4FF00]/60 bg-[#090A0F] px-2.5 py-1 text-xs text-white focus:outline-none focus:ring-1 focus:ring-[#D4FF00]/30"
                   autoFocus
                 />
                 <button

@@ -46,7 +46,7 @@ export function ProgressPanel({ history }: { history: SavedAnalysis[] }) {
             Signal Velocity
           </h2>
         </div>
-        <TrendingUp className="text-blue-400" size={16} />
+        <TrendingUp className="text-[#D4FF00]" size={16} />
       </div>
 
       <div className="grid grid-cols-3 gap-2">

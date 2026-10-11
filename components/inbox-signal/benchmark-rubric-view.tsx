@@ -106,14 +106,14 @@ export function BenchmarkRubricView({ onGoToStudio }: BenchmarkRubricViewProps) 
   return (
     <div className="max-w-5xl mx-auto space-y-6 pb-12 animate-fade-in">
       {/* Header */}
-      <div className="p-6 rounded-3xl bg-[#111319]/80 border border-white/[0.08] backdrop-blur-xl">
+      <div className="p-6 rounded-3xl bg-[#0D0F14]/95 border border-white/[0.08] backdrop-blur-xl">
         <div className="flex items-center gap-2 mb-1">
-          <span className="w-2 h-2 rounded-full bg-emerald-400" />
+          <span className="w-1.5 h-1.5 rounded-full bg-[#D4FF00] shadow-[0_0_8px_#D4FF00] animate-pulse" />
           <span className="text-[11px] font-mono uppercase tracking-wider text-slate-400">
             Standardization Framework
           </span>
         </div>
-        <h1 className="text-2xl font-bold text-white">Signal Benchmark Rubric</h1>
+        <h1 className="text-2xl font-bold text-white tracking-tight">Signal Benchmark Rubric</h1>
         <p className="text-xs text-slate-400 mt-1 max-w-xl">
           The rigorous evaluation standard used by InboxSignal's diagnostic
           engine to grade cold emails. Built on insights from millions of B2B
@@ -126,7 +126,7 @@ export function BenchmarkRubricView({ onGoToStudio }: BenchmarkRubricViewProps) 
         {rubrics.map((r) => (
           <div
             key={r.dimension}
-            className="p-6 rounded-3xl bg-[#111319]/80 border border-white/[0.08] backdrop-blur-xl"
+            className="p-6 rounded-3xl bg-[#0D0F14]/95 border border-white/[0.08] backdrop-blur-xl"
           >
             <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 mb-4 border-b border-white/[0.06] gap-2">
               <div>
@@ -136,10 +136,10 @@ export function BenchmarkRubricView({ onGoToStudio }: BenchmarkRubricViewProps) 
                 <p className="text-xs text-slate-400 mt-0.5">{r.summary}</p>
               </div>
               <div className="flex items-center gap-2 shrink-0">
-                <span className="text-xs font-mono text-blue-400 bg-blue-500/10 px-2.5 py-1 rounded-lg border border-blue-500/20">
+                <span className="text-xs font-mono text-slate-300 bg-white/[0.04] px-2.5 py-1 rounded-lg border border-white/[0.08]">
                   Weight: {r.weight}
                 </span>
-                <span className="text-xs font-mono text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20">
+                <span className="text-xs font-mono text-[#D4FF00] bg-[#D4FF00]/10 px-2.5 py-1 rounded-lg border border-[#D4FF00]/25">
                   Target: {r.benchmark}
                 </span>
               </div>
@@ -173,19 +173,19 @@ export function BenchmarkRubricView({ onGoToStudio }: BenchmarkRubricViewProps) 
       </div>
 
       {/* Callout */}
-      <div className="p-6 rounded-3xl bg-gradient-to-r from-blue-600/20 via-indigo-600/15 to-transparent border border-blue-500/20 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="p-6 rounded-3xl bg-[#0D0F14]/95 border border-white/[0.08] flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xl">
         <div>
           <h4 className="text-sm font-semibold text-white">
             Ready to test your email against the standard?
           </h4>
-          <p className="text-xs text-slate-300 mt-1">
+          <p className="text-xs text-slate-400 mt-1">
             Run a diagnostic audit in the Studio to receive a mathematical
             breakdown across all 4 dimensions.
           </p>
         </div>
         <button
           onClick={onGoToStudio}
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs transition cursor-pointer shadow-lg shadow-blue-600/25 shrink-0"
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#D4FF00] hover:bg-[#e2ff33] text-black font-bold text-xs transition active:scale-98 cursor-pointer shadow-[0_0_20px_rgba(212,255,0,0.3)] shrink-0"
         >
           <span>Launch Studio</span>
           <ArrowRight size={14} />
