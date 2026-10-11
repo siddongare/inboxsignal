@@ -49,6 +49,15 @@ export const metadata: Metadata = {
       "AI cold outreach diagnostic engine. Signal score, failure analysis, rewrite, and follow-up sequence.",
     images: ["/opengraph-image"],
   },
+  icons: {
+    icon: [
+      { url: "/icon", sizes: "32x32", type: "image/png" },
+    ],
+    apple: [
+      { url: "/apple-icon", sizes: "180x180", type: "image/png" },
+    ],
+  },
+  manifest: "/manifest",
   metadataBase: new URL("https://inboxsignal.vercel.app"),
 };
 
@@ -69,43 +78,43 @@ export default function RootLayout({
       appearance={{
         baseTheme: dark,
         variables: {
-          colorPrimary: "#3B82F6",
-          colorBackground: "#09090B",
-          colorInputBackground: "#18181B",
+          colorPrimary: "#D4FF00",
+          colorBackground: "#060709",
+          colorInputBackground: "#0D0F14",
           colorInputText: "#FAFAFA",
           colorText: "#FAFAFA",
-          colorTextSecondary: "#A1A1AA",
+          colorTextSecondary: "#94A3B8",
           colorNeutral: "#FAFAFA",
-          colorDanger: "#EF4444",
+          colorDanger: "#FF2A55",
           fontFamily: "var(--font-sans), system-ui, -apple-system, sans-serif",
-          borderRadius: "8px",
+          borderRadius: "12px",
         },
         elements: {
           card: {
-            background: "#111113",
-            border: "1px solid #27272A",
-            boxShadow: "0 24px 80px rgba(0,0,0,0.8)",
+            background: "#0D0F14",
+            border: "1px solid rgba(255, 255, 255, 0.1)",
+            boxShadow: "0 24px 80px rgba(0, 0, 0, 0.9)",
           },
           formButtonPrimary: {
-            background: "#3B82F6",
-            color: "#FFFFFF",
-            fontWeight: "600",
+            background: "#D4FF00",
+            color: "#000000",
+            fontWeight: "700",
             letterSpacing: "0.01em",
           },
           formButtonPrimary__loading: {
-            background: "rgba(59, 130, 246, 0.6)",
+            background: "rgba(212, 255, 0, 0.7)",
           },
           formFieldInput: {
-            background: "#18181B",
-            border: "1px solid #27272A",
+            background: "#080A0D",
+            border: "1px solid rgba(255, 255, 255, 0.1)",
             color: "#FAFAFA",
           },
           formFieldInput__focus: {
-            borderColor: "#3B82F6",
-            boxShadow: "0 0 0 2px rgba(59, 130, 246, 0.2)",
+            borderColor: "#D4FF00",
+            boxShadow: "0 0 0 2px rgba(212, 255, 0, 0.25)",
           },
           formFieldLabel: {
-            color: "#A1A1AA",
+            color: "#94A3B8",
           },
           socialButtonsBlockButton: {
             background: "#18181B",

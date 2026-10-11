@@ -313,27 +313,68 @@ function Header({
         </nav>
       </div>
 
-      {/* Right User Status */}
-      <div className="flex items-center gap-4">
+      {/* Right User Status & Profile */}
+      <div className="flex items-center gap-3">
         {signedIn ? (
-          <>
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.03] border border-white/[0.06] shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#D4FF00] shadow-[0_0_6px_#D4FF00] animate-pulse" />
-              <span className="font-mono text-xs text-slate-300 font-medium">
-                {remaining}/{limit} left
+          <div className="flex items-center gap-3">
+            {/* Account Tier Badge (Desktop) */}
+            <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/[0.03] border border-white/[0.06] text-[10px] font-mono text-slate-400">
+              <span className="w-1 h-1 rounded-full bg-[#D4FF00]" />
+              <span className="tracking-wider uppercase">Free Lab Tier</span>
+            </div>
+
+            {/* Quota Gauge Pill */}
+            <div
+              className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#0D0F14]/90 border border-white/[0.08] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] select-none cursor-help"
+              title="Daily free allocation. Quota resets daily at 00:00 UTC."
+            >
+              <span
+                className={`w-1.5 h-1.5 rounded-full ${
+                  remaining > 2
+                    ? "bg-[#D4FF00] shadow-[0_0_8px_#D4FF00]"
+                    : remaining > 0
+                    ? "bg-amber-400 shadow-[0_0_8px_#F59E0B]"
+                    : "bg-rose-500 shadow-[0_0_8px_#FF2A55]"
+                } animate-pulse`}
+              />
+              <span className="font-mono text-xs text-slate-200 font-bold">
+                {remaining}/{limit}
+              </span>
+              <span className="text-[10px] font-mono text-slate-400 hidden sm:inline uppercase">
+                left
               </span>
             </div>
+
+            {/* Haute Customized UserButton */}
             <UserButton
               appearance={{
                 elements: {
                   userButtonTrigger: {
-                    border: "1px solid rgba(255,255,255,0.14)",
+                    border: "1.5px solid rgba(212, 255, 0, 0.45)",
                     borderRadius: "999px",
+                    boxShadow: "0 0 14px rgba(212, 255, 0, 0.15)",
+                    transition: "all 0.2s ease",
+                  },
+                  userButtonPopoverCard: {
+                    background: "#0D0F14",
+                    border: "1px solid rgba(255, 255, 255, 0.1)",
+                    boxShadow: "0 24px 70px rgba(0, 0, 0, 0.95)",
+                    backdropFilter: "blur(24px)",
+                    borderRadius: "16px",
+                  },
+                  userButtonPopoverActionButton: {
+                    color: "#CBD5E1",
+                  },
+                  userButtonPopoverActionButtonIcon: {
+                    color: "#D4FF00",
+                  },
+                  userButtonPopoverFooter: {
+                    borderTop: "1px solid rgba(255, 255, 255, 0.06)",
                   },
                 },
               }}
             />
-          </>
+          </div>
         ) : (
           <>
             <SignInButton mode="modal">

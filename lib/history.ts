@@ -1,15 +1,19 @@
-import { kv } from "@vercel/kv";
+import { createClient } from "@vercel/kv";
 import type { AnalysisResult, SavedAnalysis } from "@/lib/analysis-types";
 import { getSignalScore } from "@/lib/analysis-types";
 
 const MAX_HISTORY_ITEMS = 50;
 const memoryHistory = new Map<string, SavedAnalysis[]>();
 
-function hasKvConfig() {
-  return Boolean(
-    (process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL) &&
-    (process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN),
-  );
+function getKvClient() {
+  const url = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
+  const token = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
+  if (!url || !token) return null;
+  try {
+    return createClient({ url, token });
+  } catch {
+    return null;
+  }
 }
 
 function getHistoryKey(userId: string) {
@@ -36,9 +40,14 @@ function createId() {
 }
 
 async function readRawHistory(userId: string): Promise<SavedAnalysis[]> {
-  if (hasKvConfig()) {
-    const value = await kv.get<SavedAnalysis[]>(getHistoryKey(userId));
-    return Array.isArray(value) ? value : [];
+  const client = getKvClient();
+  if (client) {
+    try {
+      const value = await client.get<SavedAnalysis[]>(getHistoryKey(userId));
+      if (Array.isArray(value)) return value;
+    } catch (err) {
+      console.warn("History KV read failed, using memory fallback:", err);
+    }
   }
 
   return memoryHistory.get(userId) ?? [];
@@ -53,9 +62,14 @@ async function writeRawHistory(userId: string, history: SavedAnalysis[]) {
     )
     .slice(0, MAX_HISTORY_ITEMS);
 
-  if (hasKvConfig()) {
-    await kv.set(getHistoryKey(userId), nextHistory);
-    return;
+  const client = getKvClient();
+  if (client) {
+    try {
+      await client.set(getHistoryKey(userId), nextHistory);
+      return;
+    } catch (err) {
+      console.warn("History KV write failed, using memory fallback:", err);
+    }
   }
 
   memoryHistory.set(userId, nextHistory);
@@ -99,7 +113,7 @@ export async function updateAnalysisTitle(
   const cleanTitle = title.trim().slice(0, 100);
   const nextHistory = history.map((item) =>
     item.id === analysisId
-      ? { ...item, title: cleanTitle || item.title, updatedAt: new Date().toISOString() }
+      ? { ...item, title: cleanTitle, updatedAt: new Date().toISOString() }
       : item,
   );
 
@@ -107,28 +121,12 @@ export async function updateAnalysisTitle(
   return nextHistory.find((item) => item.id === analysisId) ?? null;
 }
 
-export async function deleteAnalysis(userId: string, analysisId: string) {
+export async function removeAnalysis(userId: string, analysisId: string) {
   const history = await readRawHistory(userId);
   const nextHistory = history.filter((item) => item.id !== analysisId);
   await writeRawHistory(userId, nextHistory);
-  return nextHistory.length !== history.length;
+  return true;
 }
 
-export function getHistoryStats(history: SavedAnalysis[]) {
-  const sorted = history
-    .slice()
-    .sort(
-      (a, b) =>
-        new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
-    );
-  const first = sorted[0]?.score ?? 0;
-  const latest = sorted.at(-1)?.score ?? 0;
-  const best = sorted.reduce((max, item) => Math.max(max, item.score), 0);
+export { removeAnalysis as deleteAnalysis };
 
-  return {
-    total: history.length,
-    latest,
-    best,
-    improvement: sorted.length > 1 ? latest - first : 0,
-  };
-}

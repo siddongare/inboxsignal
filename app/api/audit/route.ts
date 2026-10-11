@@ -12,8 +12,28 @@ const groqClient = new Groq({
   apiKey: process.env.GROQ_API_KEY,
 });
 
-function jsonResponse(body: AuditApiResponse, status = 200) {
-  return Response.json(body, { status });
+const ipRateMap = new Map<string, { count: number; expiresAt: number }>();
+
+function isIpRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const entry = ipRateMap.get(ip);
+  if (!entry || now > entry.expiresAt) {
+    ipRateMap.set(ip, { count: 1, expiresAt: now + 60_000 });
+    return false;
+  }
+  entry.count += 1;
+  return entry.count > 15; // Max 15 requests per 60 seconds per IP to stop bot floods
+}
+
+function jsonResponse(body: AuditApiResponse, status = 200, cookieToken?: string) {
+  const headers = new Headers({ "Content-Type": "application/json" });
+  if (cookieToken) {
+    headers.set(
+      "Set-Cookie",
+      `inboxsignal_quota=${cookieToken}; Path=/; HttpOnly; SameSite=Lax; Max-Age=86400`,
+    );
+  }
+  return new Response(JSON.stringify(body), { status, headers });
 }
 
 function coerceText(value: unknown) {
@@ -93,6 +113,22 @@ When you write the rewrite:
 Because this rewrite adheres to all high-signal best practices, if this exact rewrite is fed back into your diagnostic engine, it will legitimately score 88-96 across all dimensions.`;
 
 export async function POST(req: Request): Promise<Response> {
+  const clientIp =
+    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    req.headers.get("x-real-ip") ||
+    "127.0.0.1";
+
+  if (isIpRateLimited(clientIp)) {
+    return jsonResponse(
+      {
+        error: "Too many requests. Please wait a moment before running another diagnostic.",
+        remaining: 0,
+        limit: DAILY_ANALYSIS_LIMIT,
+      },
+      429,
+    );
+  }
+
   const { userId } = await auth();
 
   if (!userId) {
@@ -130,16 +166,29 @@ export async function POST(req: Request): Promise<Response> {
     );
   }
 
+  // Military-grade input constraints to prevent token-depletion attacks
+  if (email.length > 5000 || prospect.length > 2000) {
+    return jsonResponse(
+      {
+        error: "Specimen exceeds maximum allowed character limit (5,000 for email, 2,000 for prospect)",
+        remaining: 0,
+        limit: DAILY_ANALYSIS_LIMIT,
+      },
+      400,
+    );
+  }
+
   const usage = await reserveDailyUsage(userId);
 
   if (!usage.allowed) {
     return jsonResponse(
       {
-        error: "Daily limit reached",
+        error: "Daily limit reached (5 analyses per day). Quota resets at 00:00 UTC.",
         remaining: 0,
         limit: usage.limit,
       },
       429,
+      usage.token,
     );
   }
 
@@ -187,13 +236,17 @@ export async function POST(req: Request): Promise<Response> {
     const data = normalizeAnalysisResponse(parsed);
     const savedAnalysis = await saveAnalysis({ userId, email, prospect, result: data });
 
-    return jsonResponse({
-      success: true,
-      data,
-      savedAnalysis,
-      remaining: usage.remaining,
-      limit: usage.limit,
-    });
+    return jsonResponse(
+      {
+        success: true,
+        data,
+        savedAnalysis,
+        remaining: usage.remaining,
+        limit: usage.limit,
+      },
+      200,
+      usage.token,
+    );
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message.toLowerCase() : "";
     const isRateLimit =
