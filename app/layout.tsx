@@ -1,29 +1,38 @@
 import { ClerkProvider } from "@clerk/nextjs";
 import { dark } from "@clerk/themes";
 import type { Metadata, Viewport } from "next";
+import { Plus_Jakarta_Sans, Geist_Mono } from "next/font/google";
 import "./globals.css";
+
+const plusJakartaSans = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-sans",
+  display: "swap",
+});
+
+const geistMono = Geist_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-mono",
+  display: "swap",
+});
 
 // ─── SEO & Metadata ───────────────────────────────────────────────────────────
 export const metadata: Metadata = {
   title: {
-    default: "InboxSignal — Turn cold emails into replies",
+    default: "InboxSignal — AI Cold Email Diagnosis & Optimization",
     template: "%s | InboxSignal",
   },
   description:
-    "AI-powered cold email diagnosis. Find out exactly why your outreach isn't getting replies — and get a rewrite that fixes it.",
+    "Diagnose why your cold outreach gets ignored. Get benchmark-calibrated failure analysis across clarity, relevance, credibility, and CTA strength — plus conversion-focused rewrites.",
   openGraph: {
-    title: "InboxSignal — Turn cold emails into replies",
+    title: "InboxSignal — AI Cold Email Diagnosis & Optimization",
     description:
-      "Diagnose your cold email in seconds. Signal score, failure analysis, rewrite, and follow-up sequence.",
+      "Diagnose cold outreach failure points in seconds. Get signal score breakdown, actionable fixes, high-converting rewrite, and multi-touch follow-up sequence.",
     type: "website",
     url: "https://inboxsignal.vercel.app",
     siteName: "InboxSignal",
-    // OG image served from app/opengraph-image.tsx (next/og)
-    // Create: app/opengraph-image.tsx with ImageResponse
-    // Design direction: pure black card, Geist Mono font, large "InboxSignal"
-    // wordmark top-left, the tagline "Turn cold emails into replies." center,
-    // and a subtle monochrome signal-strength bar graphic bottom-right.
-    // Keep the entire image #000 bg / white type to match the app aesthetic.
     images: [
       {
         url: "/opengraph-image",
@@ -37,7 +46,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "InboxSignal — Turn cold emails into replies",
     description:
-      "AI cold email diagnosis. Score, rewrite, and follow-up sequence — free.",
+      "AI cold outreach diagnostic engine. Signal score, failure analysis, rewrite, and follow-up sequence.",
     images: ["/opengraph-image"],
   },
   metadataBase: new URL("https://inboxsignal.vercel.app"),
@@ -46,7 +55,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1, // Prevent iOS zoom-on-focus
+  maximumScale: 5,
 };
 
 // ─── Root Layout ──────────────────────────────────────────────────────────────
@@ -60,86 +69,82 @@ export default function RootLayout({
       appearance={{
         baseTheme: dark,
         variables: {
-          // Core palette — everything is white-on-black
-          colorPrimary: "#ffffff",
-          colorBackground: "#080808",
-          colorInputBackground: "#111111",
-          colorInputText: "#f0f0f0",
-          colorText: "#ededed",
-          colorTextSecondary: "rgba(255,255,255,0.45)",
-          colorNeutral: "#ffffff",
-          colorDanger: "#ff6b6b",
-          // Typography
-          fontFamily: "'Geist Mono', 'DM Mono', ui-monospace, monospace",
+          colorPrimary: "#3B82F6",
+          colorBackground: "#09090B",
+          colorInputBackground: "#18181B",
+          colorInputText: "#FAFAFA",
+          colorText: "#FAFAFA",
+          colorTextSecondary: "#A1A1AA",
+          colorNeutral: "#FAFAFA",
+          colorDanger: "#EF4444",
+          fontFamily: "var(--font-sans), system-ui, -apple-system, sans-serif",
           borderRadius: "8px",
         },
         elements: {
-          // Card / modal container
           card: {
-            background: "#0a0a0a",
-            border: "1px solid rgba(255,255,255,0.09)",
+            background: "#111113",
+            border: "1px solid #27272A",
             boxShadow: "0 24px 80px rgba(0,0,0,0.8)",
           },
-          // All button text, input labels, form labels → full white
           formButtonPrimary: {
-            background: "rgba(255,255,255,0.92)",
-            color: "#000000",
-            fontWeight: "700",
-            letterSpacing: "0.04em",
+            background: "#3B82F6",
+            color: "#FFFFFF",
+            fontWeight: "600",
+            letterSpacing: "0.01em",
           },
           formButtonPrimary__loading: {
-            background: "rgba(255,255,255,0.6)",
+            background: "rgba(59, 130, 246, 0.6)",
           },
-          // Input fields
           formFieldInput: {
-            background: "#111111",
-            border: "1px solid rgba(255,255,255,0.12)",
-            color: "#f0f0f0",
+            background: "#18181B",
+            border: "1px solid #27272A",
+            color: "#FAFAFA",
           },
           formFieldInput__focus: {
-            borderColor: "rgba(255,255,255,0.4)",
-            boxShadow: "0 0 0 2px rgba(255,255,255,0.08)",
+            borderColor: "#3B82F6",
+            boxShadow: "0 0 0 2px rgba(59, 130, 246, 0.2)",
           },
           formFieldLabel: {
-            color: "rgba(255,255,255,0.6)",
+            color: "#A1A1AA",
           },
-          // Social auth buttons (Google, GitHub etc.)
           socialButtonsBlockButton: {
-            background: "#111111",
-            border: "1px solid rgba(255,255,255,0.10)",
-            color: "#ededed",
+            background: "#18181B",
+            border: "1px solid #27272A",
+            color: "#FAFAFA",
           },
           socialButtonsBlockButtonText: {
-            color: "#ededed",
+            color: "#FAFAFA",
           },
-          // Divider text "or"
           dividerText: {
-            color: "rgba(255,255,255,0.28)",
+            color: "#71717A",
           },
-          // Header / footer links
-          headerTitle: { color: "#ededed" },
-          headerSubtitle: { color: "rgba(255,255,255,0.42)" },
-          identityPreviewText: { color: "#ededed" },
-          identityPreviewEditButtonIcon: { color: "rgba(255,255,255,0.45)" },
-          // Navbar / user button popup
+          headerTitle: { color: "#FAFAFA" },
+          headerSubtitle: { color: "#A1A1AA" },
+          identityPreviewText: { color: "#FAFAFA" },
           userButtonPopoverCard: {
-            background: "#0a0a0a",
-            border: "1px solid rgba(255,255,255,0.09)",
+            background: "#111113",
+            border: "1px solid #27272A",
           },
           userButtonPopoverActionButton: {
-            color: "rgba(255,255,255,0.7)",
+            color: "#D4D4D8",
           },
           userButtonPopoverActionButton__hover: {
-            background: "rgba(255,255,255,0.04)",
+            background: "#18181B",
           },
-          // Footer
-          footerActionLink: { color: "rgba(255,255,255,0.45)" },
-          footerActionText: { color: "rgba(255,255,255,0.28)" },
+          footerActionLink: { color: "#60A5FA" },
+          footerActionText: { color: "#71717A" },
         },
       }}
     >
-      <html lang="en" suppressHydrationWarning>
-        <body suppressHydrationWarning className="bg-black antialiased">
+      <html
+        lang="en"
+        suppressHydrationWarning
+        className={`${plusJakartaSans.variable} ${geistMono.variable}`}
+      >
+        <body
+          suppressHydrationWarning
+          className="bg-[#09090B] text-[#FAFAFA] font-sans antialiased min-h-screen selection:bg-blue-500/20 selection:text-white"
+        >
           {children}
         </body>
       </html>

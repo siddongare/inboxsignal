@@ -1,35 +1,56 @@
 @import "tailwindcss";
 
+/* ─── Design Tokens (Linear / Stripe inspired) ──────────────────────────── */
 :root {
-  --bg: #07090D;
-  --surface: rgba(255, 255, 255, 0.03);
-  --border: rgba(255, 255, 255, 0.07);
-  --border-hover: rgba(255, 255, 255, 0.12);
-  --text-primary: #F1F5F9;
-  --text-secondary: #94A3B8;
-  --text-muted: #475569;
+  /* Backgrounds */
+  --bg: #09090B;
+  --surface: #111113;
+  --surface-hover: #18181B;
+  --surface-raised: #1C1C1F;
+
+  /* Borders */
+  --border: #27272A;
+  --border-hover: #3F3F46;
+
+  /* Text */
+  --text-primary: #FAFAFA;
+  --text-secondary: #A1A1AA;
+  --text-muted: #71717A;
+  --text-faint: #52525B;
+
+  /* Semantic Colors */
+  --accent: #3B82F6;
+  --accent-hover: #2563EB;
+  --accent-dim: rgba(59, 130, 246, 0.12);
+  --critical: #EF4444;
+  --critical-dim: rgba(239, 68, 68, 0.10);
+  --high: #F97316;
+  --high-dim: rgba(249, 115, 22, 0.08);
+  --medium: #EAB308;
+  --medium-dim: rgba(234, 179, 8, 0.08);
+  --low: #22C55E;
+  --low-dim: rgba(34, 197, 94, 0.08);
   --indigo: #6366F1;
-  --indigo-dim: rgba(99, 102, 241, 0.14);
-  --green: #10B981;
-  --green-dim: rgba(16, 185, 129, 0.14);
-  --red: #EF4444;
-  --red-dim: rgba(239, 68, 68, 0.12);
-  --amber: #F59E0B;
-  --amber-dim: rgba(245, 158, 11, 0.14);
+  --indigo-dim: rgba(99, 102, 241, 0.10);
 }
 
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after {
+  box-sizing: border-box;
+}
 
 html, body {
   height: 100%;
   background: var(--bg);
   color: var(--text-primary);
+  font-family: var(--font-sans), 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
 }
 
 ::selection {
-  background: rgba(99, 102, 241, 0.28);
+  background: var(--accent-dim);
+  color: var(--text-primary);
 }
 
 textarea, input, button {
@@ -38,4 +59,44 @@ textarea, input, button {
 
 textarea:focus, input:focus {
   outline: none;
+}
+
+/* ─── Scrollbar ──────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: var(--border-hover); }
+
+/* ─── Mono utility (scores, data, labels) ────────────────────────────────── */
+.font-mono {
+  font-family: var(--font-mono), 'Geist Mono', ui-monospace, monospace;
+}
+
+/* ─── Responsive layout overrides ────────────────────────────────────────── */
+@media (max-width: 767px) {
+  .sidebar-panel {
+    position: relative !important;
+    width: 100% !important;
+    height: auto !important;
+    max-height: none !important;
+    border-right: none !important;
+    border-bottom: 1px solid var(--border) !important;
+    overflow-y: visible !important;
+  }
+  .results-scroll {
+    height: auto !important;
+    min-height: 60vh !important;
+    position: relative !important;
+    overflow-y: auto !important;
+  }
+  .layout-row {
+    flex-direction: column !important;
+    min-height: unset !important;
+  }
+}
+
+@media (max-width: 440px) {
+  .feature-grid-inner {
+    grid-template-columns: 1fr !important;
+  }
 }
