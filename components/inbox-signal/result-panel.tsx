@@ -26,7 +26,7 @@ import { sfx } from "./tactile-audio";
 function getScoreColor(s: number) {
   if (s < 45) return { stroke: "#FF2A55", glow: "rgba(255, 42, 85, 0.22)", text: "text-[#FF2A55]", bg: "bg-[#FF2A55]/10", border: "border-[#FF2A55]/30" };
   if (s < 68) return { stroke: "#F59E0B", glow: "rgba(245, 158, 11, 0.22)", text: "text-amber-400", bg: "bg-amber-500/10", border: "border-amber-500/30" };
-  return { stroke: "#FF5500", glow: "rgba(255, 85, 0, 0.28)", text: "text-[#FF5500]", bg: "bg-[#FF5500]/10", border: "border-[#FF5500]/30" };
+  return { stroke: "#D4FF00", glow: "rgba(212, 255, 0, 0.28)", text: "text-[#D4FF00]", bg: "bg-[#D4FF00]/10", border: "border-[#D4FF00]/30" };
 }
 
 function getVerdictText(s: number) {
@@ -348,7 +348,7 @@ function RewritePanel({
                   sfx.click();
                   onIterateV2();
                 }}
-                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold rounded-lg bg-[#FF5500] text-black hover:bg-[#ff6a1a] shadow-[0_0_15px_rgba(255,85,0,0.3)] transition active:scale-95 cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold rounded-lg bg-[#D4FF00] text-black hover:bg-[#e2ff33] shadow-[0_0_15px_rgba(212,255,0,0.3)] transition active:scale-95 cursor-pointer"
                 title="Transfer this rewrite into the composer to iterate as Version 2"
               >
                 <RotateCcw size={12} className="text-black" />
@@ -364,7 +364,7 @@ function RewritePanel({
           className={`p-4 rounded-2xl bg-[#040507] border text-xs sm:text-sm leading-relaxed whitespace-pre-wrap font-sans transition-all ${
             showOriginal
               ? "border-[#FF2A55]/30 text-slate-400"
-              : "border-[#FF5500]/30 text-slate-100"
+              : "border-[#D4FF00]/30 text-slate-100"
           }`}
         >
           {showOriginal ? originalEmail : rewrite.email}
@@ -392,7 +392,7 @@ function RewritePanel({
                   key={i}
                   className={`flex items-center justify-between gap-3 p-3 rounded-xl border transition ${
                     isFirst
-                      ? "bg-[#FF5500]/[0.06] border-[#FF5500]/30"
+                      ? "bg-[#D4FF00]/[0.06] border-[#D4FF00]/30"
                       : "bg-white/[0.02] border-white/[0.06]"
                   }`}
                 >
@@ -400,7 +400,7 @@ function RewritePanel({
                     <span
                       className={`w-5 h-5 rounded-lg flex items-center justify-center font-mono text-xs font-bold shrink-0 ${
                         isFirst
-                          ? "bg-[#FF5500] text-black shadow-[0_0_10px_rgba(255,85,0,0.3)]"
+                          ? "bg-[#D4FF00] text-black shadow-[0_0_10px_rgba(212,255,0,0.3)]"
                           : "bg-white/[0.06] text-slate-400"
                       }`}
                     >
@@ -410,7 +410,7 @@ function RewritePanel({
                       {line}
                     </span>
                     {isFirst && (
-                      <span className="hidden sm:inline-block font-mono text-[10px] text-[#FF5500] bg-[#FF5500]/10 px-2 py-0.5 rounded-full border border-[#FF5500]/20 shrink-0 uppercase tracking-wider">
+                      <span className="hidden sm:inline-block font-mono text-[10px] text-[#D4FF00] bg-[#D4FF00]/10 px-2 py-0.5 rounded-full border border-[#D4FF00]/20 shrink-0 uppercase tracking-wider">
                         Top Pick
                       </span>
                     )}
@@ -426,7 +426,7 @@ function RewritePanel({
       {/* Rationale Note */}
       {rewrite.whyThisWorks && (
         <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/[0.08]">
-          <span className="text-xs font-semibold text-[#FF5500] uppercase tracking-wider font-mono block mb-1">
+          <span className="text-xs font-semibold text-[#D4FF00] uppercase tracking-wider font-mono block mb-1">
             Conversion Strategy Rationale
           </span>
           <p className="text-xs text-slate-300 leading-relaxed">

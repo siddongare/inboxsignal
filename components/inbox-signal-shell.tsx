@@ -32,13 +32,13 @@ import { ResultPanel } from "@/components/inbox-signal/result-panel";
 import { demoEmail, demoProspect } from "@/components/inbox-signal/utils";
 import { sfx } from "@/components/inbox-signal/tactile-audio";
 
-// ─── Haute Hero Section (Issey Miyake × Mikalai × SYNC Precision) ────────────
+// ─── Haute Hero Section (Issey Miyake × Mikalai Precision) ───────────────────
 function HeroSection() {
   return (
-    <div className="relative text-center mb-8 w-full max-w-3xl mx-auto select-none pt-2">
+    <div className="relative text-center mb-8 w-full max-w-3xl mx-auto select-none pt-4">
       {/* Sleek Minimalist Status Pill */}
       <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 mb-6 rounded-full bg-white/[0.03] border border-white/[0.08] backdrop-blur-xl">
-        <span className="w-1.5 h-1.5 rounded-full bg-[#FF5500] shadow-[0_0_8px_#FF5500] animate-pulse" />
+        <span className="w-1.5 h-1.5 rounded-full bg-[#D4FF00] shadow-[0_0_8px_#D4FF00] animate-pulse" />
         <span className="font-mono text-[11px] font-medium tracking-wider text-slate-300 uppercase">
           Signal Laboratory
         </span>
@@ -48,10 +48,10 @@ function HeroSection() {
         </span>
       </div>
 
-      {/* Main Sculpted Headline with Molten Ember Accent */}
+      {/* Main Sculpted Headline with Electric Acid Lime Accent */}
       <h1 className="text-4xl sm:text-6xl md:text-[5.2rem] font-extrabold text-white tracking-[-0.04em] leading-[0.96] font-sans">
         Eliminate cold outreach{" "}
-        <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF5500] via-[#FF9900] to-amber-200">
+        <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#D4FF00] via-emerald-300 to-teal-200">
           blind spots.
         </span>
       </h1>
@@ -69,7 +69,7 @@ function FeatureGrid() {
   const items = [
     {
       icon: Zap,
-      accent: "text-[#FF5500] border-[#FF5500]/25 bg-[#FF5500]/10",
+      accent: "text-[#D4FF00] border-[#D4FF00]/25 bg-[#D4FF00]/10",
       tag: "Engine",
       title: "Signal Score Composite",
       desc: "Mathematical calibration across clarity, buyer relevance, verifiable proof, and CTA friction.",
@@ -83,14 +83,14 @@ function FeatureGrid() {
     },
     {
       icon: FileText,
-      accent: "text-amber-400 border-amber-500/25 bg-amber-500/10",
+      accent: "text-emerald-400 border-emerald-500/25 bg-emerald-500/10",
       tag: "Synthesis",
       title: "Conversion-Calibrated Rewrite",
       desc: "Sub-120 word surgical draft with 4 distinct psychological subject angles ready for launch.",
     },
     {
       icon: Layers,
-      accent: "text-orange-400 border-orange-500/25 bg-orange-500/10",
+      accent: "text-indigo-400 border-indigo-500/25 bg-indigo-500/10",
       tag: "Cadence",
       title: "Multi-Touch Sequence",
       desc: "Day 3 context bump and Day 7 breakup sequence that adds fresh enterprise angles without filler.",
@@ -103,7 +103,7 @@ function FeatureGrid() {
         <div
           key={title}
           onClick={() => sfx.click()}
-          className="p-6 rounded-3xl bg-[#0A0C10]/90 border border-white/[0.08] hover:border-white/[0.16] hover:bg-[#0F1218] transition-all duration-300 shadow-xl backdrop-blur-2xl group cursor-default relative overflow-hidden"
+          className="p-6 rounded-3xl bg-[#0D0F14]/90 border border-white/[0.08] hover:border-white/[0.16] hover:bg-[#12151D] transition-all duration-300 shadow-xl backdrop-blur-2xl group cursor-default relative overflow-hidden"
         >
           {/* Subtle corner light reflection */}
           <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-white/[0.03] to-transparent pointer-events-none" />
@@ -137,7 +137,7 @@ function ResultPreview() {
     <div className="w-full max-w-2xl mx-auto mt-14 mb-8">
       <div className="flex items-center justify-between pb-2 mb-2 px-1 text-xs">
         <div className="flex items-center gap-2">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#FF5500]" />
+          <span className="w-1.5 h-1.5 rounded-full bg-[#D4FF00]" />
           <span className="text-slate-400 font-mono text-[11px] tracking-wider uppercase">
             Teardown Dossier · SDR to VP of Revenue
           </span>
@@ -153,7 +153,7 @@ function ResultPreview() {
         </button>
       </div>
 
-      <div className="relative rounded-3xl bg-[#0A0C10]/95 border border-white/[0.08] p-6 shadow-2xl backdrop-blur-2xl overflow-hidden">
+      <div className="relative rounded-3xl bg-[#0D0F14]/95 border border-white/[0.08] p-6 shadow-2xl backdrop-blur-2xl overflow-hidden">
         {/* Conceal overlay */}
         {!revealed && (
           <div
@@ -161,9 +161,9 @@ function ResultPreview() {
               sfx.click();
               setRevealed(true);
             }}
-            className="absolute inset-0 bg-[#040507]/85 backdrop-blur-md z-30 flex flex-col items-center justify-center p-6 text-center cursor-pointer group"
+            className="absolute inset-0 bg-[#060709]/85 backdrop-blur-md z-30 flex flex-col items-center justify-center p-6 text-center cursor-pointer group"
           >
-            <div className="w-11 h-11 rounded-2xl bg-[#FF5500]/10 border border-[#FF5500]/25 flex items-center justify-center text-[#FF5500] mb-2.5 group-hover:scale-105 transition shadow-[0_0_18px_rgba(255,85,0,0.2)]">
+            <div className="w-11 h-11 rounded-2xl bg-[#D4FF00]/10 border border-[#D4FF00]/25 flex items-center justify-center text-[#D4FF00] mb-2.5 group-hover:scale-105 transition shadow-[0_0_18px_rgba(212,255,0,0.2)]">
               <TrendingUp size={18} />
             </div>
             <span className="text-xs font-semibold text-white mb-1 tracking-tight">
@@ -209,7 +209,7 @@ function ResultPreview() {
           {/* Right Column: Rewrite preview */}
           <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/[0.05] flex flex-col justify-between">
             <div>
-              <span className="text-xs font-semibold text-[#FF5500] block mb-2 font-mono uppercase tracking-wider">
+              <span className="text-xs font-semibold text-[#D4FF00] block mb-2 font-mono uppercase tracking-wider">
                 Synthesized Vector
               </span>
               <p className="text-xs text-slate-300 leading-relaxed whitespace-pre-wrap">
@@ -223,7 +223,7 @@ function ResultPreview() {
   );
 }
 
-// ─── Header Navigation (Haute Atelier Precision) ─────────────────────────────
+// ─── Header Navigation (Mikalai × Issey Miyake Fluid Architecture) ──────────
 function Header({
   signedIn,
   remaining,
@@ -247,9 +247,9 @@ function Header({
   ];
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 h-16 px-6 sm:px-10 bg-[#040507]/90 backdrop-blur-2xl border-b border-white/[0.06] flex items-center justify-between select-none">
-      {/* Brand Monogram & Title */}
-      <div className="flex items-center gap-8">
+    <header className="fixed top-0 left-0 right-0 z-50 h-20 px-6 sm:px-12 bg-gradient-to-b from-[#060709]/95 via-[#060709]/80 to-transparent backdrop-blur-xl flex items-center justify-between select-none transition-all">
+      {/* Brand: Mikalai-Style Geometric Haute Monogram */}
+      <div className="flex items-center gap-10">
         <button
           onClick={() => {
             sfx.click();
@@ -257,22 +257,31 @@ function Header({
           }}
           className="flex items-center gap-3 bg-transparent border-none cursor-pointer p-0 group"
         >
-          {/* Architectural Ember Monogram: Issey Miyake / SYNC */}
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#FF5500] to-[#FF9900] text-black flex items-center justify-center font-extrabold text-[13px] tracking-tight shadow-[0_0_18px_rgba(255,85,0,0.35)] group-hover:scale-105 transition-all duration-300">
-            IS
+          {/* Mikalai Geometric Icon: Precision origami fold & radar pulse */}
+          <div className="relative w-9 h-9 rounded-xl bg-[#0D0F14] border border-white/[0.1] flex items-center justify-center overflow-hidden shadow-[0_0_20px_rgba(212,255,0,0.15)] group-hover:border-[#D4FF00]/60 transition-all duration-300">
+            <div className="absolute inset-0 bg-gradient-to-br from-[#D4FF00]/10 via-transparent to-transparent pointer-events-none" />
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="transform group-hover:scale-105 transition-transform duration-300">
+              {/* Outer structural diamond/hexagon */}
+              <polygon points="12,2 22,8.5 22,15.5 12,22 2,15.5 2,8.5" stroke="#D4FF00" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+              {/* Center signal core */}
+              <circle cx="12" cy="12" r="3.2" fill="#D4FF00" />
+              <line x1="12" y1="2" x2="12" y2="7" stroke="rgba(255,255,255,0.4)" strokeWidth="1.4" />
+              <line x1="12" y1="17" x2="12" y2="22" stroke="rgba(255,255,255,0.4)" strokeWidth="1.4" />
+            </svg>
           </div>
+
           <div className="flex items-baseline gap-2">
-            <span className="text-base font-bold tracking-tight text-white">
+            <span className="text-base font-extrabold tracking-[-0.03em] text-white">
               InboxSignal
             </span>
-            <span className="font-mono text-[9px] text-[#FF5500] font-semibold tracking-widest uppercase opacity-80">
+            <span className="font-mono text-[9px] text-[#D4FF00] font-bold tracking-widest uppercase opacity-90 px-1.5 py-0.5 rounded bg-[#D4FF00]/10 border border-[#D4FF00]/20">
               Lab
             </span>
           </div>
         </button>
 
-        {/* Global Floating Pill Navigation */}
-        <nav className="hidden sm:flex items-center gap-1.5 p-1 rounded-2xl bg-white/[0.03] border border-white/[0.06]">
+        {/* Seamless Floating Pill Navigation */}
+        <nav className="hidden sm:flex items-center gap-1 p-1 rounded-2xl bg-white/[0.02] border border-white/[0.06] backdrop-blur-md">
           {navItems.map(({ id, label, icon: Icon }) => (
             <button
               key={id}
@@ -288,7 +297,7 @@ function Header({
             >
               <Icon
                 size={13}
-                className={activeNav === id ? "text-[#FF5500]" : "text-slate-500"}
+                className={activeNav === id ? "text-[#D4FF00]" : "text-slate-500"}
               />
               <span>{label}</span>
             </button>
@@ -301,7 +310,7 @@ function Header({
         {signedIn ? (
           <>
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.03] border border-white/[0.06]">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#FF5500] animate-pulse" />
+              <span className="w-1.5 h-1.5 rounded-full bg-[#D4FF00] shadow-[0_0_6px_#D4FF00] animate-pulse" />
               <span className="font-mono text-xs text-slate-300 font-medium">
                 {remaining}/{limit} left
               </span>
@@ -330,7 +339,7 @@ function Header({
             <SignUpButton mode="modal">
               <button
                 onClick={() => sfx.click()}
-                className="text-xs font-bold bg-[#FF5500] text-black px-4.5 py-2 rounded-xl shadow-[0_0_20px_rgba(255,85,0,0.3)] hover:shadow-[0_0_25px_rgba(255,85,0,0.45)] hover:bg-[#ff6a1a] transition active:scale-98 cursor-pointer"
+                className="text-xs font-bold bg-[#D4FF00] text-black px-4.5 py-2 rounded-xl shadow-[0_0_20px_rgba(212,255,0,0.3)] hover:shadow-[0_0_28px_rgba(212,255,0,0.45)] hover:bg-[#e2ff33] transition active:scale-98 cursor-pointer"
               >
                 Get Started
               </button>
@@ -514,7 +523,7 @@ export default function InboxSignalShell({
   const isLanding = phase === "landing";
 
   return (
-    <div className="min-h-screen flex flex-col relative bg-[#090A0F] text-slate-100">
+    <div className="min-h-screen flex flex-col relative bg-[#060709] text-slate-100">
       {/* Header */}
       <Header
         signedIn={signedIn}
@@ -532,7 +541,7 @@ export default function InboxSignalShell({
         onReset={handleReset}
       />
 
-      <div className="pt-14 flex-1 flex flex-col relative z-10">
+      <div className="pt-20 flex-1 flex flex-col relative z-10">
         {/* ── TAB 1: ANALYTICS VIEW ── */}
         {activeNav === "analytics" && (
           <main className="flex-1 p-4 sm:p-8">

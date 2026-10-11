@@ -1,18 +1,18 @@
 @import "tailwindcss";
 
-/* ─── Haute Minimalist Design Tokens (Issey Miyake × Mikalai × SYNC) ────── */
+/* ─── Haute Minimalist Design Tokens (Issey Miyake × Mikalai × Luma) ────── */
 :root {
   /* Canvas & Glass Surfaces */
-  --bg-canvas: #040507;
-  --surface-card: #0A0C10;
-  --surface-card-hover: #0F1218;
-  --surface-glass: rgba(10, 12, 16, 0.75);
-  --surface-input: #07080B;
+  --bg-canvas: #060709;
+  --surface-card: #0D0F14;
+  --surface-card-hover: #12151D;
+  --surface-glass: rgba(13, 15, 20, 0.72);
+  --surface-input: #080A0D;
 
   /* Precision Architectural Micro-Borders */
   --border-subtle: rgba(255, 255, 255, 0.08);
   --border-hover: rgba(255, 255, 255, 0.16);
-  --border-active: rgba(255, 107, 0, 0.5);
+  --border-active: rgba(212, 255, 0, 0.45);
 
   /* Typography */
   --text-primary: #FFFFFF;
@@ -20,11 +20,10 @@
   --text-muted: #8E9BAE;
   --text-faint: #475569;
 
-  /* Haute Signature Accents (Molten Ember & Solar Electric) */
-  --accent-ember: #FF5500;
-  --accent-ember-glow: rgba(255, 85, 0, 0.22);
-  --accent-solar: #FF9900;
+  /* Haute Signature Accents (Electric Acid Lime & Solar Accents) */
   --accent-lime: #D4FF00;
+  --accent-lime-glow: rgba(212, 255, 0, 0.22);
+  --accent-amber: #F59E0B;
   --accent-crimson: #FF2A55;
   --accent-emerald: #10B981;
 }
@@ -54,16 +53,16 @@ body::before {
   z-index: 0;
 }
 
-/* Haute Solar Atmospheric Glow (SYNC / Issey Miyake Warm Ember) */
+/* Haute Ambient Radial Luminosity (Seamless Acid Lime & Deep Slate) */
 body::after {
   content: "";
   position: fixed;
-  top: -160px;
+  top: -120px;
   left: 50%;
   transform: translateX(-50%);
-  width: 1100px;
-  height: 520px;
-  background: radial-gradient(ellipse 700px 300px at 50% 15%, rgba(255, 85, 0, 0.08), rgba(255, 153, 0, 0.04), transparent 70%);
+  width: 1200px;
+  height: 600px;
+  background: radial-gradient(ellipse 750px 320px at 50% 20%, rgba(212, 255, 0, 0.08), rgba(99, 102, 241, 0.04), transparent 75%);
   pointer-events: none;
   z-index: 0;
 }

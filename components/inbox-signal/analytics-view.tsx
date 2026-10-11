@@ -115,7 +115,7 @@ export function AnalyticsView({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 rounded-3xl bg-[#0A0C10]/95 border border-white/[0.08] backdrop-blur-2xl">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#FF5500] shadow-[0_0_8px_#FF5500] animate-pulse" />
+            <span className="w-1.5 h-1.5 rounded-full bg-[#D4FF00] shadow-[0_0_8px_#D4FF00] animate-pulse" />
             <span className="text-[11px] font-mono uppercase tracking-widest text-slate-400">
               Pipeline Intelligence Lab
             </span>
@@ -128,7 +128,7 @@ export function AnalyticsView({
 
         <button
           onClick={onGoToStudio}
-          className="self-start sm:self-auto inline-flex items-center gap-2 px-4.5 py-2 rounded-xl bg-[#FF5500] text-black hover:bg-[#ff6a1a] font-bold text-xs shadow-[0_0_15px_rgba(255,85,0,0.25)] transition cursor-pointer"
+          className="self-start sm:self-auto inline-flex items-center gap-2 px-4.5 py-2 rounded-xl bg-[#D4FF00] text-black hover:bg-[#e2ff33] font-bold text-xs shadow-[0_0_15px_rgba(212,255,0,0.25)] transition cursor-pointer"
         >
           <span>+ Dissect New Vector</span>
           <ArrowUpRight size={13} />
@@ -140,7 +140,7 @@ export function AnalyticsView({
         <div className="p-5 rounded-2xl bg-[#0A0C10]/90 border border-white/[0.08] backdrop-blur-xl">
           <div className="flex items-center justify-between text-slate-400 mb-2">
             <span className="text-xs font-medium">Avg Signal Score</span>
-            <Target size={14} className="text-[#FF5500]" />
+            <Target size={14} className="text-[#D4FF00]" />
           </div>
           <div className="flex items-baseline gap-2">
             <span className="text-3xl font-mono font-bold text-white tracking-tight">
@@ -158,10 +158,10 @@ export function AnalyticsView({
         <div className="p-5 rounded-2xl bg-[#0A0C10]/90 border border-white/[0.08] backdrop-blur-xl">
           <div className="flex items-center justify-between text-slate-400 mb-2">
             <span className="text-xs font-medium">Top High-Water Mark</span>
-            <Award size={14} className="text-[#FF5500]" />
+            <Award size={14} className="text-[#D4FF00]" />
           </div>
           <div className="flex items-baseline gap-2">
-            <span className="text-3xl font-mono font-bold text-[#FF5500] tracking-tight">
+            <span className="text-3xl font-mono font-bold text-[#D4FF00] tracking-tight">
               {stats.highestScore}
             </span>
             <span className="text-xs text-slate-500 font-mono">/100</span>

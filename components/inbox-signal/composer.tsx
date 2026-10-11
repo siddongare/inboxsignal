@@ -78,9 +78,9 @@ export function Composer({
           : "w-full max-w-xl mx-auto flex flex-col gap-3.5"
       }
     >
-      {/* Haute Architecture Metrics Bar (Molten Ember & Charcoal Glass) */}
+      {/* Haute Architecture Metrics Bar (Electric Acid Lime & Carbon Glass) */}
       {!isSidebar && (
-        <div className="grid grid-cols-3 gap-2.5 p-1.5 rounded-2xl bg-[#0A0C10]/95 border border-white/[0.08] backdrop-blur-2xl mb-1 shadow-2xl">
+        <div className="grid grid-cols-3 gap-2.5 p-1.5 rounded-2xl bg-[#0D0F14]/95 border border-white/[0.08] backdrop-blur-2xl mb-1 shadow-2xl">
           <div className="flex flex-col items-center justify-center py-3 px-2 rounded-xl bg-white/[0.02] border border-white/[0.04]">
             <span className="font-mono text-base sm:text-lg font-bold text-white tracking-tight">
               &lt; 30s
@@ -90,20 +90,20 @@ export function Composer({
             </span>
           </div>
 
-          <div className="flex flex-col items-center justify-center py-3 px-2 rounded-xl bg-[#FF5500]/[0.08] border border-[#FF5500]/[0.25]">
-            <span className="font-mono text-base sm:text-lg font-bold text-[#FF5500] tracking-tight">
+          <div className="flex flex-col items-center justify-center py-3 px-2 rounded-xl bg-[#D4FF00]/[0.08] border border-[#D4FF00]/[0.25]">
+            <span className="font-mono text-base sm:text-lg font-bold text-[#D4FF00] tracking-tight">
               0–100
             </span>
-            <span className="text-[10px] font-mono font-medium text-[#FF5500]/80 tracking-wider mt-0.5 uppercase">
+            <span className="text-[10px] font-mono font-medium text-[#D4FF00]/80 tracking-wider mt-0.5 uppercase">
               Signal Index
             </span>
           </div>
 
           <div className="flex flex-col items-center justify-center py-3 px-2 rounded-xl bg-white/[0.02] border border-white/[0.04]">
-            <span className="font-mono text-base sm:text-lg font-bold text-amber-300 tracking-tight">
+            <span className="font-mono text-base sm:text-lg font-bold text-emerald-300 tracking-tight">
               4 Vectors
             </span>
-            <span className="text-[10px] font-mono font-medium text-amber-200/80 tracking-wider mt-0.5 uppercase">
+            <span className="text-[10px] font-mono font-medium text-emerald-200/80 tracking-wider mt-0.5 uppercase">
               Forensics
             </span>
           </div>
@@ -111,7 +111,7 @@ export function Composer({
       )}
 
       {/* Cold Email Input Card (Refined Glassmorphism) */}
-      <div className="relative rounded-2xl bg-[#0A0C10]/95 border border-white/[0.08] hover:border-white/[0.14] focus-within:border-[#FF5500]/60 focus-within:ring-2 focus-within:ring-[#FF5500]/15 transition-all shadow-xl overflow-hidden backdrop-blur-2xl">
+      <div className="relative rounded-2xl bg-[#0D0F14]/95 border border-white/[0.08] hover:border-white/[0.14] focus-within:border-[#D4FF00]/60 focus-within:ring-2 focus-within:ring-[#D4FF00]/15 transition-all shadow-xl overflow-hidden backdrop-blur-2xl">
         <div className="flex items-center justify-between px-4 py-3 bg-white/[0.02] border-b border-white/[0.06]">
           <div className="flex items-center gap-2">
             <Mail size={13} className="text-slate-400" />
@@ -153,7 +153,7 @@ export function Composer({
       </div>
 
       {/* Target Prospect & Context Input Card */}
-      <div className="relative rounded-2xl bg-[#0A0C10]/95 border border-white/[0.08] hover:border-white/[0.14] focus-within:border-[#FF5500]/60 focus-within:ring-2 focus-within:ring-[#FF5500]/15 transition-all shadow-xl overflow-hidden backdrop-blur-2xl">
+      <div className="relative rounded-2xl bg-[#0D0F14]/95 border border-white/[0.08] hover:border-white/[0.14] focus-within:border-[#D4FF00]/60 focus-within:ring-2 focus-within:ring-[#D4FF00]/15 transition-all shadow-xl overflow-hidden backdrop-blur-2xl">
         <div className="flex items-center justify-between px-4 py-3 bg-white/[0.02] border-b border-white/[0.06]">
           <div className="flex items-center gap-2">
             <User size={13} className="text-slate-400" />
@@ -177,7 +177,7 @@ export function Composer({
         />
       </div>
 
-      {/* Action Row & Molten Ember Primary Button */}
+      {/* Action Row & Electric Acid Lime Primary Button */}
       <div className="flex items-center justify-between pt-1">
         <div className="flex items-center gap-2 text-xs text-slate-500">
           <kbd className="font-mono text-[10px] bg-white/[0.05] px-2 py-0.5 rounded-md border border-white/[0.08] text-slate-300">
@@ -196,7 +196,7 @@ export function Composer({
             disabled={!canSubmit || limitReached}
             className={`inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl text-xs font-bold transition-all shadow-md select-none ${
               canSubmit && !limitReached
-                ? "bg-[#FF5500] text-black hover:bg-[#ff6a1a] shadow-[0_0_22px_rgba(255,85,0,0.3)] hover:shadow-[0_0_30px_rgba(255,85,0,0.45)] active:scale-98 cursor-pointer"
+                ? "bg-[#D4FF00] text-black hover:bg-[#e2ff33] shadow-[0_0_22px_rgba(212,255,0,0.3)] hover:shadow-[0_0_30px_rgba(212,255,0,0.45)] active:scale-98 cursor-pointer"
                 : "bg-[#141720] text-slate-500 border border-white/[0.06] cursor-not-allowed"
             }`}
           >
@@ -222,7 +222,7 @@ export function Composer({
                 sfx.click();
                 onSignInAndAnalyze();
               }}
-              className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl text-xs font-bold bg-[#FF5500] text-black hover:bg-[#ff6a1a] shadow-[0_0_22px_rgba(255,85,0,0.3)] hover:shadow-[0_0_30px_rgba(255,85,0,0.45)] active:scale-98 transition-all cursor-pointer"
+              className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl text-xs font-bold bg-[#D4FF00] text-black hover:bg-[#e2ff33] shadow-[0_0_22px_rgba(212,255,0,0.3)] hover:shadow-[0_0_30px_rgba(212,255,0,0.45)] active:scale-98 transition-all cursor-pointer"
             >
               <span>Dissect Specimen Free</span>
               <ArrowRight size={13} />
