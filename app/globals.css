@@ -1,34 +1,32 @@
 @import "tailwindcss";
 
-/* ─── Luma-Inspired Luxury Minimalist Design Tokens ────────────────────── */
+/* ─── Haute Minimalist Design Tokens (Issey Miyake × Mikalai × Luma) ────── */
 :root {
   /* Canvas & Glass Surfaces */
-  --bg-canvas: #090A0F;
-  --surface-card: #111319;
-  --surface-card-hover: #161822;
-  --surface-glass: rgba(18, 20, 28, 0.65);
-  --surface-input: #0D0E14;
+  --bg-canvas: #050608;
+  --surface-card: #0D0F14;
+  --surface-card-hover: #12151D;
+  --surface-glass: rgba(13, 15, 20, 0.72);
+  --surface-input: #090A0E;
 
-  /* Precision Borders */
-  --border-subtle: rgba(255, 255, 255, 0.07);
-  --border-hover: rgba(255, 255, 255, 0.14);
-  --border-active: rgba(255, 255, 255, 0.22);
+  /* Precision Architectural Micro-Borders */
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-hover: rgba(255, 255, 255, 0.16);
+  --border-active: rgba(212, 255, 0, 0.45);
 
   /* Typography */
   --text-primary: #FFFFFF;
   --text-secondary: #CBD5E1;
-  --text-muted: #94A3B8;
-  --text-faint: #64748B;
+  --text-muted: #8E9BAE;
+  --text-faint: #475569;
 
-  /* Luminous Accents */
-  --accent-blue: #3B82F6;
-  --accent-blue-glow: rgba(59, 130, 246, 0.15);
+  /* Haute Signature Accents */
+  --accent-lime: #D4FF00;
+  --accent-lime-glow: rgba(212, 255, 0, 0.18);
+  --accent-violet: #8B5CF6;
+  --accent-violet-glow: rgba(139, 92, 246, 0.20);
   --accent-emerald: #10B981;
-  --accent-emerald-glow: rgba(16, 185, 129, 0.15);
-  --accent-rose: #F43F5E;
-  --accent-rose-glow: rgba(244, 63, 94, 0.15);
-  --accent-amber: #F59E0B;
-  --accent-amber-glow: rgba(245, 158, 11, 0.15);
+  --accent-rose: #FF3366;
 }
 
 *, *::before, *::after {
@@ -45,16 +43,27 @@ html, body {
   overflow-x: hidden;
 }
 
-/* Subtle Ambient Gradient at Top of Canvas */
+/* Subtle Architectural Grid Texture */
 body::before {
   content: "";
   position: fixed;
-  top: 0;
+  inset: 0;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 28px 28px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Haute Ambient Radial Luminosity (Acid Lime & Deep Indigo) */
+body::after {
+  content: "";
+  position: fixed;
+  top: -150px;
   left: 50%;
   transform: translateX(-50%);
-  width: 900px;
-  height: 450px;
-  background: radial-gradient(circle 450px at 50% 0%, rgba(59, 130, 246, 0.08), transparent 70%);
+  width: 1000px;
+  height: 550px;
+  background: radial-gradient(ellipse 650px 320px at 50% 20%, rgba(212, 255, 0, 0.07), rgba(139, 92, 246, 0.05), transparent 75%);
   pointer-events: none;
   z-index: 0;
 }

@@ -78,33 +78,33 @@ export function Composer({
           : "w-full max-w-xl mx-auto flex flex-col gap-3.5"
       }
     >
-      {/* Sleek Luma-Style Metrics Bar (Landing Page Only) */}
+      {/* Haute Architecture Metrics Bar (Acid Lime & Carbon Glass) */}
       {!isSidebar && (
-        <div className="grid grid-cols-3 gap-2.5 p-1.5 rounded-2xl bg-[#111319]/80 border border-white/[0.08] backdrop-blur-xl mb-1 shadow-sm">
+        <div className="grid grid-cols-3 gap-2.5 p-1.5 rounded-2xl bg-[#0D0F14]/90 border border-white/[0.08] backdrop-blur-2xl mb-1 shadow-2xl">
           <div className="flex flex-col items-center justify-center py-3 px-2 rounded-xl bg-white/[0.02] border border-white/[0.04]">
             <span className="font-mono text-base sm:text-lg font-bold text-white tracking-tight">
               &lt; 30s
             </span>
-            <span className="text-[10px] font-medium text-slate-400 tracking-wide mt-0.5 uppercase">
-              Diagnosis
+            <span className="text-[10px] font-mono font-medium text-slate-400 tracking-wider mt-0.5 uppercase">
+              Latency
             </span>
           </div>
 
-          <div className="flex flex-col items-center justify-center py-3 px-2 rounded-xl bg-blue-500/[0.04] border border-blue-500/[0.12]">
-            <span className="font-mono text-base sm:text-lg font-bold text-blue-400 tracking-tight">
+          <div className="flex flex-col items-center justify-center py-3 px-2 rounded-xl bg-[#D4FF00]/[0.06] border border-[#D4FF00]/[0.2]">
+            <span className="font-mono text-base sm:text-lg font-bold text-[#D4FF00] tracking-tight">
               0–100
             </span>
-            <span className="text-[10px] font-medium text-blue-300/80 tracking-wide mt-0.5 uppercase">
-              Signal Score
+            <span className="text-[10px] font-mono font-medium text-[#D4FF00]/80 tracking-wider mt-0.5 uppercase">
+              Signal Index
             </span>
           </div>
 
-          <div className="flex flex-col items-center justify-center py-3 px-2 rounded-xl bg-emerald-500/[0.04] border border-emerald-500/[0.12]">
-            <span className="font-mono text-base sm:text-lg font-bold text-emerald-400 tracking-tight">
+          <div className="flex flex-col items-center justify-center py-3 px-2 rounded-xl bg-purple-500/[0.06] border border-purple-500/[0.2]">
+            <span className="font-mono text-base sm:text-lg font-bold text-purple-300 tracking-tight">
               4 Vectors
             </span>
-            <span className="text-[10px] font-medium text-emerald-300/80 tracking-wide mt-0.5 uppercase">
-              Analysis
+            <span className="text-[10px] font-mono font-medium text-purple-200/80 tracking-wider mt-0.5 uppercase">
+              Forensics
             </span>
           </div>
         </div>
@@ -194,23 +194,23 @@ export function Composer({
               onAnalyze();
             }}
             disabled={!canSubmit || limitReached}
-            className={`inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl text-xs font-semibold transition-all shadow-md select-none ${
+            className={`inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl text-xs font-bold transition-all shadow-md select-none ${
               canSubmit && !limitReached
-                ? "bg-blue-600 text-white hover:bg-blue-500 shadow-[0_0_20px_rgba(59,130,246,0.25)] hover:shadow-[0_0_25px_rgba(59,130,246,0.35)] active:scale-98 cursor-pointer"
-                : "bg-slate-800 text-slate-500 border border-white/[0.06] cursor-not-allowed"
+                ? "bg-[#D4FF00] text-black hover:bg-[#e2ff33] shadow-[0_0_25px_rgba(212,255,0,0.3)] hover:shadow-[0_0_35px_rgba(212,255,0,0.45)] active:scale-98 cursor-pointer"
+                : "bg-[#161822] text-slate-500 border border-white/[0.06] cursor-not-allowed"
             }`}
           >
             {loading ? (
               <>
-                <Loader2 size={13} className="animate-spin" />
-                <span>Diagnosing email...</span>
+                <Loader2 size={13} className="animate-spin text-black" />
+                <span>Dissecting vector...</span>
               </>
             ) : limitReached ? (
               <span>Daily Limit Reached</span>
             ) : (
               <>
-                <Sparkles size={13} />
-                <span>Run Signal Diagnosis</span>
+                <Sparkles size={13} className="text-black" />
+                <span>Run Diagnostic Dissection</span>
               </>
             )}
           </button>
@@ -222,9 +222,9 @@ export function Composer({
                 sfx.click();
                 onSignInAndAnalyze();
               }}
-              className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl text-xs font-semibold bg-blue-600 text-white hover:bg-blue-500 shadow-[0_0_20px_rgba(59,130,246,0.25)] hover:shadow-[0_0_25px_rgba(59,130,246,0.35)] active:scale-98 transition-all cursor-pointer"
+              className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl text-xs font-bold bg-[#D4FF00] text-black hover:bg-[#e2ff33] shadow-[0_0_25px_rgba(212,255,0,0.3)] hover:shadow-[0_0_35px_rgba(212,255,0,0.45)] active:scale-98 transition-all cursor-pointer"
             >
-              <span>Diagnose Free</span>
+              <span>Dissect Specimen Free</span>
               <ArrowRight size={13} />
             </button>
           </SignInButton>

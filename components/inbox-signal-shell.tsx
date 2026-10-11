@@ -32,79 +32,92 @@ import { ResultPanel } from "@/components/inbox-signal/result-panel";
 import { demoEmail, demoProspect } from "@/components/inbox-signal/utils";
 import { sfx } from "@/components/inbox-signal/tactile-audio";
 
-// ─── Luma-Style Hero Section ──────────────────────────────────────────────────
+// ─── Haute Hero Section (Issey Miyake × Mikalai Precision) ───────────────────
 function HeroSection() {
   return (
-    <div className="relative text-center mb-6 w-full max-w-2xl mx-auto select-none">
-      {/* Subtle Luminous Status Pill */}
-      <div className="inline-flex items-center gap-2.5 px-4 py-1.5 mb-5 rounded-full bg-white/[0.03] border border-white/[0.08] backdrop-blur-xl shadow-inner">
-        <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-        <span className="text-xs font-medium text-slate-300">
-          Free · 3 diagnostic analyses / day
+    <div className="relative text-center mb-8 w-full max-w-3xl mx-auto select-none pt-4">
+      {/* Haute Architecture Status Pill */}
+      <div className="inline-flex items-center gap-2.5 px-3.5 py-1.2 mb-6 rounded-full bg-[#0D0F14]/90 border border-white/[0.08] backdrop-blur-2xl shadow-xl">
+        <span className="w-1.5 h-1.5 rounded-full bg-[#D4FF00] shadow-[0_0_8px_#D4FF00] animate-pulse" />
+        <span className="font-mono text-[11px] tracking-wider text-slate-300 uppercase">
+          Signal Laboratory
         </span>
-        <span className="text-slate-600">·</span>
-        <span className="text-xs text-slate-400">No credit card</span>
+        <span className="text-white/20">/</span>
+        <span className="text-[11px] text-slate-400">Executive Outbound Teardown</span>
       </div>
 
-      {/* Main Elegant Headline */}
-      <h1 className="text-4xl sm:text-6xl md:text-7xl font-bold text-white tracking-tight leading-[1.05] font-sans">
-        Turn cold emails{" "}
-        <span className="bg-gradient-to-r from-blue-400 via-indigo-300 to-emerald-300 bg-clip-text text-transparent">
-          into pipeline.
+      {/* Main Sculpted Headline */}
+      <h1 className="text-4xl sm:text-6xl md:text-[5rem] font-extrabold text-white tracking-[-0.035em] leading-[0.98] font-sans">
+        Eliminate cold outreach{" "}
+        <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#D4FF00] via-emerald-300 to-indigo-300">
+          blind spots.
         </span>
       </h1>
 
-      <p className="text-sm sm:text-base text-slate-400 max-w-md mx-auto leading-relaxed mt-4 font-normal">
-        Diagnose why executive buyers ignore your outbound. Get an objective
-        signal score, failure mechanisms, and high-converting rewrites.
+      <p className="text-sm sm:text-base text-slate-400 max-w-lg mx-auto leading-relaxed mt-5 font-normal tracking-[-0.01em]">
+        Diagnose the precise cognitive failure mechanisms that trigger executive deletes.
+        Calibrated mathematical scoring, structural forensic breakdown, and high-conversion rewrites.
       </p>
     </div>
   );
 }
 
-// ─── Feature Bento Grid (Luma Minimalist Style) ──────────────────────────────
+// ─── Feature Bento Grid (Architectural Haute Minimalism) ─────────────────────
 function FeatureGrid() {
   const items = [
     {
       icon: Zap,
-      color: "text-blue-400 bg-blue-500/10 border-blue-500/20",
-      title: "Signal Score Engine",
-      desc: "Mathematical composite across clarity, relevance, credibility, and CTA friction.",
+      accent: "text-[#D4FF00] border-[#D4FF00]/25 bg-[#D4FF00]/10",
+      tag: "Engine",
+      title: "Signal Score Composite",
+      desc: "Mathematical calibration across clarity, buyer relevance, verifiable proof, and CTA friction.",
     },
     {
       icon: AlertTriangle,
-      color: "text-rose-400 bg-rose-500/10 border-rose-500/20",
-      title: "Forensic Failure Diagnosis",
-      desc: "Severity-ranked failure points with the cognitive rejection mechanism explained.",
+      accent: "text-[#FF3366] border-[#FF3366]/25 bg-[#FF3366]/10",
+      tag: "Forensics",
+      title: "Cognitive Rejection Traps",
+      desc: "Instant identification of executive triggers: fake familiarity, vague claims, and calendar drag.",
     },
     {
       icon: FileText,
-      color: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20",
-      title: "Conversion-Focused Rewrite",
-      desc: "Compelling message rewrite plus 4 distinct subject line variations ready for deployment.",
+      accent: "text-emerald-400 border-emerald-500/25 bg-emerald-500/10",
+      tag: "Synthesis",
+      title: "Conversion-Calibrated Rewrite",
+      desc: "Sub-120 word surgical draft with 4 distinct psychological subject angles ready for launch.",
     },
     {
       icon: Layers,
-      color: "text-indigo-400 bg-indigo-500/10 border-indigo-500/20",
-      title: "Multi-Touch Cadence",
-      desc: "Day 3 context bump and Day 7 breakup sequence adding fresh angles without filler.",
+      accent: "text-[#8B5CF6] border-[#8B5CF6]/25 bg-[#8B5CF6]/10",
+      tag: "Cadence",
+      title: "Multi-Touch Sequence",
+      desc: "Day 3 context bump and Day 7 breakup sequence that adds fresh enterprise angles without filler.",
     },
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-xl mx-auto mt-10">
-      {items.map(({ icon: Icon, color, title, desc }) => (
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-2xl mx-auto mt-12">
+      {items.map(({ icon: Icon, accent, tag, title, desc }) => (
         <div
           key={title}
           onClick={() => sfx.click()}
-          className="p-5 rounded-3xl bg-[#111319]/80 border border-white/[0.08] hover:border-white/[0.14] transition-all shadow-sm backdrop-blur-xl group cursor-default"
+          className="p-6 rounded-3xl bg-[#0D0F14]/85 border border-white/[0.08] hover:border-white/[0.16] hover:bg-[#12151D]/90 transition-all duration-300 shadow-xl backdrop-blur-2xl group cursor-default relative overflow-hidden"
         >
-          <div
-            className={`w-9 h-9 rounded-xl flex items-center justify-center border mb-3.5 ${color}`}
-          >
-            <Icon size={18} />
+          {/* Subtle corner light reflection */}
+          <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-white/[0.03] to-transparent pointer-events-none" />
+
+          <div className="flex items-center justify-between mb-4">
+            <div
+              className={`w-9 h-9 rounded-xl flex items-center justify-center border ${accent}`}
+            >
+              <Icon size={18} />
+            </div>
+            <span className="font-mono text-[10px] tracking-widest uppercase text-slate-500 bg-white/[0.02] px-2 py-0.5 rounded border border-white/[0.04]">
+              {tag}
+            </span>
           </div>
-          <h3 className="text-sm font-semibold text-white tracking-tight mb-1">
+
+          <h3 className="text-sm font-semibold text-white tracking-tight mb-1.5">
             {title}
           </h3>
           <p className="text-xs text-slate-400 leading-relaxed">{desc}</p>
@@ -114,28 +127,31 @@ function FeatureGrid() {
   );
 }
 
-// ─── Result Preview (Luma Mockup Sample) ──────────────────────────────────────
+// ─── Result Preview (Haute Teardown Mockup) ──────────────────────────────────
 function ResultPreview() {
   const [revealed, setRevealed] = useState(false);
 
   return (
-    <div className="w-full max-w-xl mx-auto mt-12 mb-8">
-      <div className="flex items-center justify-between pb-2 mb-2 text-xs">
-        <span className="text-slate-400 font-medium">
-          Verified Audit · AutoLead to VP of Sales
-        </span>
+    <div className="w-full max-w-2xl mx-auto mt-14 mb-8">
+      <div className="flex items-center justify-between pb-2 mb-2 px-1 text-xs">
+        <div className="flex items-center gap-2">
+          <span className="w-1.5 h-1.5 rounded-full bg-[#D4FF00]" />
+          <span className="text-slate-400 font-mono text-[11px] tracking-wider uppercase">
+            Teardown Dossier · SDR to VP of Revenue
+          </span>
+        </div>
         <button
           onClick={() => {
             sfx.click();
             setRevealed((r) => !r);
           }}
-          className="px-3 py-1 text-xs font-semibold rounded-lg bg-white/[0.04] hover:bg-white/[0.08] text-slate-300 border border-white/[0.08] transition"
+          className="px-3 py-1 text-xs font-semibold rounded-lg bg-white/[0.04] hover:bg-white/[0.08] text-slate-300 border border-white/[0.08] transition cursor-pointer"
         >
-          {revealed ? "Conceal Sample" : "Examine Sample →"}
+          {revealed ? "Conceal Teardown" : "Examine Specimen →"}
         </button>
       </div>
 
-      <div className="relative rounded-3xl bg-[#111319]/90 border border-white/[0.08] p-6 shadow-xl backdrop-blur-xl overflow-hidden">
+      <div className="relative rounded-3xl bg-[#0D0F14]/90 border border-white/[0.08] p-6 shadow-2xl backdrop-blur-2xl overflow-hidden">
         {/* Conceal overlay */}
         {!revealed && (
           <div
@@ -143,17 +159,16 @@ function ResultPreview() {
               sfx.click();
               setRevealed(true);
             }}
-            className="absolute inset-0 bg-[#090A0F]/80 backdrop-blur-md z-30 flex flex-col items-center justify-center p-6 text-center cursor-pointer"
+            className="absolute inset-0 bg-[#050608]/85 backdrop-blur-md z-30 flex flex-col items-center justify-center p-6 text-center cursor-pointer group"
           >
-            <div className="w-10 h-10 rounded-full bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 mb-2">
+            <div className="w-11 h-11 rounded-2xl bg-[#D4FF00]/10 border border-[#D4FF00]/25 flex items-center justify-center text-[#D4FF00] mb-2.5 group-hover:scale-105 transition shadow-[0_0_15px_rgba(212,255,0,0.15)]">
               <TrendingUp size={18} />
             </div>
-            <span className="text-xs font-semibold text-white mb-1">
-              Click to Reveal Diagnostic Breakdown
+            <span className="text-xs font-semibold text-white mb-1 tracking-tight">
+              Click to Reveal Specimen Breakdown
             </span>
-            <p className="text-xs text-slate-400 max-w-xs">
-              Preview how InboxSignal scores a draft (47/100) and rewrites it into
-              high-signal outbound.
+            <p className="text-xs text-slate-400 max-w-xs leading-relaxed">
+              Experience how InboxSignal dissects a 47/100 outbound failure and synthesizes high-signal copy.
             </p>
           </div>
         )}
@@ -165,7 +180,7 @@ function ResultPreview() {
               <span className="text-xs font-semibold text-slate-300">
                 Composite Signal
               </span>
-              <span className="font-mono text-sm font-bold text-rose-400">
+              <span className="font-mono text-sm font-bold text-[#FF3366]">
                 47 / 100
               </span>
             </div>
@@ -176,7 +191,7 @@ function ResultPreview() {
               </div>
               <div className="flex justify-between text-slate-400">
                 <span>Relevance</span>
-                <span className="font-mono text-rose-400 font-semibold">35%</span>
+                <span className="font-mono text-[#FF3366] font-semibold">35%</span>
               </div>
               <div className="flex justify-between text-slate-400">
                 <span>Credibility</span>
@@ -192,8 +207,8 @@ function ResultPreview() {
           {/* Right Column: Rewrite preview */}
           <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/[0.05] flex flex-col justify-between">
             <div>
-              <span className="text-xs font-semibold text-emerald-400 block mb-2">
-                Conversion Rewrite
+              <span className="text-xs font-semibold text-[#D4FF00] block mb-2 font-mono uppercase tracking-wider">
+                Synthesized Vector
               </span>
               <p className="text-xs text-slate-300 leading-relaxed whitespace-pre-wrap">
                 {`Hi Sarah,\n\nSaw you're scaling outbound to 12 AEs this quarter. Most revenue leaders find reply rates crater when reps send generic templates.\n\nWe helped Ramp boost cold pipeline by 42% without extra reps.\n\nOpen to seeing the teardown?`}
@@ -206,7 +221,7 @@ function ResultPreview() {
   );
 }
 
-// ─── Header Navigation ───────────────────────────────────────────────────────
+// ─── Header Navigation (Bespoke Haute Identity) ──────────────────────────────
 function Header({
   signedIn,
   remaining,
@@ -230,8 +245,8 @@ function Header({
   ];
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 h-14 px-4 sm:px-8 bg-[#090A0F]/80 backdrop-blur-xl border-b border-white/[0.06] flex items-center justify-between select-none">
-      <div className="flex items-center gap-6">
+    <header className="fixed top-0 left-0 right-0 z-50 h-14 px-4 sm:px-8 bg-[#050608]/85 backdrop-blur-2xl border-b border-white/[0.07] flex items-center justify-between select-none">
+      <div className="flex items-center gap-7">
         <button
           onClick={() => {
             sfx.click();
@@ -239,18 +254,19 @@ function Header({
           }}
           className="flex items-center gap-2.5 bg-transparent border-none cursor-pointer p-0 group"
         >
-          <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-500 text-white flex items-center justify-center font-bold text-xs shadow-md group-hover:scale-105 transition">
+          {/* Haute Monogram Badge: Issey Miyake / Mikalai architectural geometry */}
+          <div className="w-7 h-7 rounded-lg bg-[#D4FF00] text-black flex items-center justify-center font-extrabold text-[12px] tracking-tight shadow-[0_0_12px_rgba(212,255,0,0.35)] group-hover:scale-105 transition-transform duration-300">
             IS
           </div>
           <span className="text-sm font-bold tracking-tight text-white hidden sm:inline">
             InboxSignal
           </span>
-          <span className="font-mono text-[10px] text-slate-400 bg-white/[0.04] px-2 py-0.5 rounded-full border border-white/[0.06] uppercase">
-            SaaS
+          <span className="font-mono text-[9px] text-black font-bold bg-[#D4FF00] px-1.5 py-0.2 rounded uppercase tracking-wider">
+            Atelier
           </span>
         </button>
 
-        {/* Global Navigation Tabs */}
+        {/* Global Architectural Navigation Tabs */}
         <nav className="flex items-center gap-1 bg-white/[0.02] p-1 rounded-xl border border-white/[0.06]">
           {navItems.map(({ id, label, icon: Icon }) => (
             <button
@@ -259,13 +275,13 @@ function Header({
                 sfx.click();
                 onNavChange(id);
               }}
-              className={`px-3 py-1 text-xs font-medium rounded-lg transition flex items-center gap-1.5 cursor-pointer ${
+              className={`px-3 py-1 text-xs font-medium rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
                 activeNav === id
-                  ? "bg-white/[0.1] text-white shadow-sm"
+                  ? "bg-white/[0.1] text-white shadow-sm border border-white/[0.08]"
                   : "text-slate-400 hover:text-slate-200"
               }`}
             >
-              <Icon size={13} />
+              <Icon size={13} className={activeNav === id ? "text-[#D4FF00]" : ""} />
               <span>{label}</span>
             </button>
           ))}

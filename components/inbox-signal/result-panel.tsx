@@ -24,16 +24,16 @@ import { sfx } from "./tactile-audio";
 
 // ─── Luma-Style Score Helpers ─────────────────────────────────────────────────
 function getScoreColor(s: number) {
-  if (s < 45) return { stroke: "#F43F5E", glow: "rgba(244, 63, 94, 0.2)", text: "text-rose-400", bg: "bg-rose-500/10", border: "border-rose-500/25" };
-  if (s < 68) return { stroke: "#F59E0B", glow: "rgba(245, 158, 11, 0.2)", text: "text-amber-400", bg: "bg-amber-500/10", border: "border-amber-500/25" };
-  return { stroke: "#10B981", glow: "rgba(16, 185, 129, 0.2)", text: "text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/25" };
+  if (s < 45) return { stroke: "#FF3366", glow: "rgba(255, 51, 102, 0.22)", text: "text-[#FF3366]", bg: "bg-[#FF3366]/10", border: "border-[#FF3366]/30" };
+  if (s < 68) return { stroke: "#F59E0B", glow: "rgba(245, 158, 11, 0.22)", text: "text-amber-400", bg: "bg-amber-500/10", border: "border-amber-500/30" };
+  return { stroke: "#D4FF00", glow: "rgba(212, 255, 0, 0.25)", text: "text-[#D4FF00]", bg: "bg-[#D4FF00]/10", border: "border-[#D4FF00]/30" };
 }
 
 function getVerdictText(s: number) {
-  if (s < 45) return "High Rejection Risk";
-  if (s < 68) return "Friction Detected";
-  if (s < 80) return "Moderate Signal";
-  return "High Conversion Signal";
+  if (s < 45) return "Fatal Executive Friction";
+  if (s < 68) return "Suboptimal Signal-to-Noise";
+  if (s < 80) return "Compelling Outreach Angle";
+  return "Pristine Executive Signal";
 }
 
 function CopyBtn({ text, label = "Copy" }: { text: string; label?: string }) {
@@ -348,10 +348,10 @@ function RewritePanel({
                   sfx.click();
                   onIterateV2();
                 }}
-                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.3)] transition active:scale-95 cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold rounded-lg bg-[#D4FF00] text-black hover:bg-[#e2ff33] shadow-[0_0_15px_rgba(212,255,0,0.3)] transition active:scale-95 cursor-pointer"
                 title="Transfer this rewrite into the composer to iterate as Version 2"
               >
-                <RotateCcw size={12} />
+                <RotateCcw size={12} className="text-black" />
                 <span>Iterate V2</span>
               </button>
             )}
@@ -361,10 +361,10 @@ function RewritePanel({
 
         {/* Email content */}
         <div
-          className={`p-4 rounded-2xl bg-[#090A0F] border text-xs sm:text-sm leading-relaxed whitespace-pre-wrap font-sans transition-all ${
+          className={`p-4 rounded-2xl bg-[#050608] border text-xs sm:text-sm leading-relaxed whitespace-pre-wrap font-sans transition-all ${
             showOriginal
-              ? "border-rose-500/30 text-slate-400"
-              : "border-emerald-500/30 text-slate-100"
+              ? "border-[#FF3366]/30 text-slate-400"
+              : "border-[#D4FF00]/30 text-slate-100"
           }`}
         >
           {showOriginal ? originalEmail : rewrite.email}
@@ -373,12 +373,12 @@ function RewritePanel({
 
       {/* Subject Line Variations */}
       {rewrite.subjectLines && rewrite.subjectLines.length > 0 && (
-        <div className="p-5 rounded-3xl bg-[#111319]/90 border border-white/[0.08] shadow-sm backdrop-blur-xl">
+        <div className="p-5 rounded-3xl bg-[#0D0F14]/90 border border-white/[0.08] shadow-sm backdrop-blur-xl">
           <div className="flex items-center justify-between mb-3 pb-2 border-b border-white/[0.06]">
             <span className="text-xs font-semibold text-slate-300 uppercase tracking-wide">
               Subject Line Hooks
             </span>
-            <span className="text-[11px] text-slate-500">
+            <span className="text-[11px] text-slate-500 font-mono">
               4 distinct A/B variations
             </span>
           </div>
@@ -392,7 +392,7 @@ function RewritePanel({
                   key={i}
                   className={`flex items-center justify-between gap-3 p-3 rounded-xl border transition ${
                     isFirst
-                      ? "bg-blue-500/[0.04] border-blue-500/25"
+                      ? "bg-[#D4FF00]/[0.05] border-[#D4FF00]/30"
                       : "bg-white/[0.02] border-white/[0.06]"
                   }`}
                 >
@@ -400,7 +400,7 @@ function RewritePanel({
                     <span
                       className={`w-5 h-5 rounded-lg flex items-center justify-center font-mono text-xs font-bold shrink-0 ${
                         isFirst
-                          ? "bg-blue-600 text-white"
+                          ? "bg-[#D4FF00] text-black shadow-[0_0_8px_rgba(212,255,0,0.3)]"
                           : "bg-white/[0.06] text-slate-400"
                       }`}
                     >
@@ -410,7 +410,7 @@ function RewritePanel({
                       {line}
                     </span>
                     {isFirst && (
-                      <span className="hidden sm:inline-block font-mono text-[10px] text-blue-300 bg-blue-500/10 px-2 py-0.5 rounded-full border border-blue-500/20 shrink-0">
+                      <span className="hidden sm:inline-block font-mono text-[10px] text-[#D4FF00] bg-[#D4FF00]/10 px-2 py-0.5 rounded-full border border-[#D4FF00]/20 shrink-0 uppercase tracking-wider">
                         Top Pick
                       </span>
                     )}
@@ -425,8 +425,8 @@ function RewritePanel({
 
       {/* Rationale Note */}
       {rewrite.whyThisWorks && (
-        <div className="p-4 rounded-2xl bg-blue-500/[0.03] border border-blue-500/20">
-          <span className="text-xs font-semibold text-blue-400 uppercase tracking-wide block mb-1">
+        <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/[0.08]">
+          <span className="text-xs font-semibold text-[#D4FF00] uppercase tracking-wider font-mono block mb-1">
             Conversion Strategy Rationale
           </span>
           <p className="text-xs text-slate-300 leading-relaxed">

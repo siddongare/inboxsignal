@@ -112,15 +112,15 @@ export function AnalyticsView({
   return (
     <div className="max-w-5xl mx-auto space-y-6 pb-12 animate-fade-in">
       {/* Top Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 rounded-3xl bg-[#111319]/80 border border-white/[0.08] backdrop-blur-xl">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 rounded-3xl bg-[#0D0F14]/90 border border-white/[0.08] backdrop-blur-2xl">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="text-[11px] font-mono uppercase tracking-wider text-slate-400">
-              Pipeline Intelligence
+            <span className="w-1.5 h-1.5 rounded-full bg-[#D4FF00] shadow-[0_0_8px_#D4FF00] animate-pulse" />
+            <span className="text-[11px] font-mono uppercase tracking-widest text-slate-400">
+              Pipeline Intelligence Lab
             </span>
           </div>
-          <h1 className="text-2xl font-bold text-white">Outbound Velocity & Metrics</h1>
+          <h1 className="text-2xl font-bold text-white tracking-tight">Outbound Velocity &amp; Forensics</h1>
           <p className="text-xs text-slate-400 mt-1">
             Aggregated diagnostics across {stats.totalAudits} audited campaigns
           </p>
@@ -128,19 +128,19 @@ export function AnalyticsView({
 
         <button
           onClick={onGoToStudio}
-          className="self-start sm:self-auto inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/[0.06] hover:bg-white/[0.1] border border-white/[0.1] text-xs font-semibold text-white transition cursor-pointer"
+          className="self-start sm:self-auto inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#D4FF00] text-black hover:bg-[#e2ff33] font-bold text-xs shadow-[0_0_15px_rgba(212,255,0,0.25)] transition cursor-pointer"
         >
-          <span>+ Diagnose New Draft</span>
+          <span>+ Dissect New Vector</span>
           <ArrowUpRight size={13} />
         </button>
       </div>
 
       {/* Primary KPI Bento */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5">
-        <div className="p-5 rounded-2xl bg-[#111319]/60 border border-white/[0.08] backdrop-blur-xl">
+        <div className="p-5 rounded-2xl bg-[#0D0F14]/80 border border-white/[0.08] backdrop-blur-xl">
           <div className="flex items-center justify-between text-slate-400 mb-2">
             <span className="text-xs font-medium">Avg Signal Score</span>
-            <Target size={14} className="text-blue-400" />
+            <Target size={14} className="text-[#D4FF00]" />
           </div>
           <div className="flex items-baseline gap-2">
             <span className="text-3xl font-mono font-bold text-white tracking-tight">
@@ -155,13 +155,13 @@ export function AnalyticsView({
           </p>
         </div>
 
-        <div className="p-5 rounded-2xl bg-[#111319]/60 border border-white/[0.08] backdrop-blur-xl">
+        <div className="p-5 rounded-2xl bg-[#0D0F14]/80 border border-white/[0.08] backdrop-blur-xl">
           <div className="flex items-center justify-between text-slate-400 mb-2">
             <span className="text-xs font-medium">Top High-Water Mark</span>
-            <Award size={14} className="text-emerald-400" />
+            <Award size={14} className="text-[#D4FF00]" />
           </div>
           <div className="flex items-baseline gap-2">
-            <span className="text-3xl font-mono font-bold text-emerald-400 tracking-tight">
+            <span className="text-3xl font-mono font-bold text-[#D4FF00] tracking-tight">
               {stats.highestScore}
             </span>
             <span className="text-xs text-slate-500 font-mono">/100</span>
